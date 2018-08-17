@@ -55,6 +55,12 @@
     <Filter Include="소스 파일\State\LoginState">
       <UniqueIdentifier>{db275f8e-abfa-4959-a303-93b9cad03ede}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\State\CharacterState">
+      <UniqueIdentifier>{0d1f619b-26a2-4c91-a818-a30e4eb3e38c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\State\CharacterState">
+      <UniqueIdentifier>{c7856a52-aec7-4e33-a474-33372931754d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -116,6 +122,9 @@
     </ClCompile>
     <ClCompile Include="DBManager.cpp">
       <Filter>소스 파일\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterState.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="DBManager.h">
       <Filter>헤더 파일\DB</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterState.h">
+      <Filter>헤더 파일\State\CharacterState</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

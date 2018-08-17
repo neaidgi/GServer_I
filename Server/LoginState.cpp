@@ -90,8 +90,8 @@ bool LoginState::Write(User* _user)
 		state = INIT_RECV;
 		break;
 	case LoginState::LOGIN_RESULT_SEND:
-		state == INIT_RECV;
-		//state = LOGIN_RECV;
+		state = INIT_RECV;
+		_user->SetState(_user->getCharacterState());
 		break;
 	case LoginState::LOGINFAIL_RESULT_SEND:
 		state = INIT_RECV;

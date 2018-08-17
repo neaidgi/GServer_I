@@ -31,6 +31,11 @@ TenderState * User::getTenderState()
 	return tenderstate;
 }
 
+CharacterState * User::getCharacterState()
+{
+	return characterstate;
+}
+
 void User::SetState(UserState * _state)
 {
 	state = _state;
@@ -71,5 +76,6 @@ void User::InitState()
 {
 	loginstate = new LoginState();
 	tenderstate = new TenderState();
+	characterstate = new CharacterState();
 	state = loginstate;
 }
