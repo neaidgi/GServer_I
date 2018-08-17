@@ -82,7 +82,3 @@ Log.txt
 # 디버그 파일
 x64/*
 /Server/x64/Debug
-
-#etc 빌드시 생성
-*.vcxproj.filters
-*.vcxproj.user
