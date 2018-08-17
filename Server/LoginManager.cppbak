@@ -1,0 +1,277 @@
+#include "LoginManager.h"
+#include "LogManager.h"
+
+LoginManager* LoginManager::Instance = nullptr;
+
+LoginManager::LoginManager()
+{
+	userCount = 0;
+}
+LoginManager::~LoginManager()
+{
+
+}
+const UserInfo* LoginManager::getUser(const char* id)
+
+{
+	for (int i = 0; i < userCount; i++)
+	{
+		if (!strcmp(userList[i]->id, id))
+		{
+			return userList[i];
+		}
+	}
+	return nullptr;
+}
+
+void LoginManager::CreateInstance()
+{
+	if (Instance == nullptr)
+	{
+		Instance = new LoginManager();
+	}
+}
+LoginManager* LoginManager::GetInstance()
+{
+	return Instance;
+}
+void LoginManager::DestroyInstance()
+{
+	if (Instance != nullptr)
+	{
+		delete Instance;
+		Instance = nullptr;
+	}
+
+}
+void LoginManager::sendIntro(User* user)
+{
+	// 인트로
+	PROTOCOL protocol = SERVER_INTRO;
+	user->pack(protocol, 0, 0);
+	user->sendMsg();
+}
+
+void LoginManager::reqLogoutMenu(User* user, char* buf)
+{
+	const char *sLogoutMenu = "<메뉴>\n1. 로그인\n2. 회원가입\n3. 종료";
+	int len = strlen(sLogoutMenu) + 1;
+	
+	char* ptr = buf;
+
+	memcpy(ptr, &len, sizeof(int));
+	ptr += sizeof(int);
+
+	memcpy(ptr, sLogoutMenu, len);
+
+	user->pack(SERVER_LOGOUT_MENU, buf, len + sizeof(int));
+	user->sendMsg();
+	if (user->isSendSuccess() == false)
+	{
+		user->include_wset = true;
+	}
+}
+bool LoginManager::logoutMenuChoice(User* user, char* buf)
+{
+	int choice;
+	memcpy(&choice, buf, sizeof(int));
+
+	PROTOCOL p;
+
+	switch (choice)
+	{
+	case 1:
+		p = SERVER_LOGIN;
+		break;
+	case 2:	
+		p = SERVER_JOIN;
+		break;
+	case 3: p = EXIT;
+		break;
+	}
+
+	user->pack(p, buf, 0);
+	user->sendMsg();
+	if (user->isSendSuccess() == false)
+	{
+		user->include_wset = true;
+	}
+
+
+	return (p == EXIT);
+}
+void LoginManager::reqIdOverlapCheck(User* user, char* buf)
+{
+	int len;
+	char id[IDSIZE];
+
+	memcpy(&len, buf, sizeof(int));
+	buf += sizeof(int);
+
+	memcpy(id, buf, len);
+
+	user->setID(id);
+
+	bool check = (getUser(id) != nullptr);
+	user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
+	user->sendMsg();
+	if (user->isSendSuccess() == false)
+	{
+		user->include_wset = true;
+	}
+}
+void LoginManager::reqJoin(User* user, char* buf)
+{
+	if (userCount >= USERCOUNT)
+		return;
+
+	int len;
+	char pw[IDSIZE];
+	char tempbuf[IDSIZE + 10];
+
+	memcpy(&len, buf, sizeof(int));
+	buf += sizeof(int);
+
+	memcpy(pw, buf, len);
+
+	UserInfo* info = new UserInfo();
+	strcpy(info->id, user->getID());
+	strcpy(info->pw, pw);
+	user->setPW(pw);
+
+	userList[userCount++] = info;
+	user->pack(SERVER_JOIN_SUCCESS, buf, 0);
+	
+	sprintf(tempbuf, "%s [회원가입].", user->getID());
+	LogManager::GetInstance()->LogWrite(tempbuf);
+	user->sendMsg();
+	if (user->isSendSuccess() == false)
+	{
+		user->include_wset = true;
+	}
+
+}
+void LoginManager::reqLogin(User* user, char* buf)
+{
+	int len;
+	char id[IDSIZE];
+	char pw[IDSIZE];
+	char tempbuf[IDSIZE + 10];
+
+	memcpy(&len, buf, sizeof(int));
+	buf += sizeof(int);
+	memcpy(id, buf, len);
+	buf += len;
+
+	memcpy(&len, buf, sizeof(int));
+	buf += sizeof(int);
+	memcpy(pw, buf, len);
+
+
+	const UserInfo* info = getUser(id);
+
+	bool check;
+	if (info == nullptr)
+	{
+		check = false;
+	} 
+	else if (!strcmp(info->pw, pw))
+	{
+		user->setID(id);
+		user->setPW(pw);
+		user->setState(LOG_IN);
+		check = true;
+	}
+	else
+		check = false;
+
+	user->pack(SERVER_LOGIN_SUCCESS, &check, sizeof(bool));
+
+	sprintf(tempbuf, "%s [로그인].", user->getID());
+	LogManager::GetInstance()->LogWrite(tempbuf);
+	user->sendMsg();
+	if (user->isSendSuccess() == false)
+	{
+		user->include_wset = true;
+	}
+}
+void LoginManager::reqLoginMenu(User* user, char* buf)
+{
+	const char *sLoginMenu = "<메뉴>\n1. 회원탈퇴\n2. 로그아웃\n3. 종료";
+	int len = strlen(sLoginMenu) + 1;
+
+	char* ptr = buf;
+
+	memcpy(ptr, &len, sizeof(int));
+	ptr += sizeof(int);
+
+	memcpy(ptr, sLoginMenu, len);
+	user->pack(SERVER_LOGIN_MENU, buf, len + sizeof(int));
+	user->sendMsg();
+	if (user->isSendSuccess() == false)
+	{
+		user->include_wset = true;
+	}
+}
+bool LoginManager::loginMenuChoice(User* user, char* buf)
+{
+	int choice;
+	memcpy(&choice, buf, sizeof(int));
+
+	char tempbuf[IDSIZE + 10];	//문자열만들어줄것
+
+	PROTOCOL p;
+	switch (choice)
+	{
+	case 1:
+		{
+			int i;
+			for (i = 0; i < userCount; i++)
+			{
+				if (!strcmp(userList[i]->id, user->getID()))
+				{
+					break;
+				}
+			}
+			if (i != userCount)
+			{
+				sprintf(tempbuf, "%s [회원탈퇴].", user->getID());
+				LogManager::GetInstance()->LogWrite(tempbuf);
+				delete userList[i];
+				for (; i < userCount - 1; i++)
+				{
+					userList[i] = userList[i + 1];
+				}
+				userList[i] = nullptr;
+				userCount--;
+			}
+		}
+		user->setState(LOG_OUT);
+		p = SERVER_LEAVE;
+		break;
+	case 2:
+		
+		sprintf(tempbuf, "%s [로그아웃].", user->getID());
+		LogManager::GetInstance()->LogWrite(tempbuf);
+
+		user->setState(LOG_OUT); 
+		p = SERVER_LOGOUT;
+		break;
+	case 3: 
+		
+		sprintf(tempbuf, "%s [종료].", user->getID());
+		LogManager::GetInstance()->LogWrite((char*)user->getID());
+		p = EXIT;
+		break;
+	}
+
+	user->pack(p, buf, 0);
+	user->sendMsg();
+	if (user->isSendSuccess() == false)
+	{
+		user->include_wset = true;
+	}
+
+	if (p == EXIT)	return true;
+	return false;
+}
