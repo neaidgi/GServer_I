@@ -79,8 +79,14 @@ DerivedDataCache/*
 # DB기본 포함폴더
 include/*
 
+# 로그 파일
+Log.txt
+
 # 디버그 파일
 x64/*
+/Server/x64/Debug
 
 #etc 빌드시 생성
-*.vcxproj
+Server.vcxproj
+Server.vcxproj.filters
+*.vcxproj.user
