@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CharacterManager.cpp" />
     <ClCompile Include="CharacterState.cpp" />
     <ClCompile Include="CloseState.cpp" />
     <ClCompile Include="DBManager.cpp">
@@ -153,6 +154,7 @@
     <ClCompile Include="UserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CharacterManager.h" />
     <ClInclude Include="CharacterState.h" />
     <ClInclude Include="CloseState.h" />
     <ClInclude Include="DBManager.h">
