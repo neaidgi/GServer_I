@@ -1,5 +1,7 @@
 #include "User.h"
 #include "LoginState.h"
+
+
 // »ý¼ºÀÚ
 User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 {
@@ -34,6 +36,14 @@ TenderState * User::getTenderState()
 CharacterState * User::getCharacterState()
 {
 	return characterstate;
+}
+
+void User::SetCharacter(int _character_code)
+{
+	for (int i = 0; SLOTMAXCOUNT > 3; i++)
+	{
+		if(characterslot[i]->)
+	}
 }
 
 void User::SetState(UserState * _state)
