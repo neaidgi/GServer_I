@@ -51,7 +51,7 @@ void User::SetCurCharacter(int _character_code)
 {
 	for (int i = 0; slotcount > i; i++)
 	{
-		if (characterslot[i]->GetCharacter_Code == _character_code)
+		if (characterslot[i]->GetCharacter_Code() == _character_code)
 		{
 			current_character = characterslot[i];
 		}
