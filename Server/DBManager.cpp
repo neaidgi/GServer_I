@@ -248,12 +248,12 @@ bool DBManger::Login_reqLeave(char * _id)
 }
 
 // 실제 생성한 유저 캐릭터 저장
-bool DBManger::Character_reqCreate(int _code, char * _jobname, char * _nick, int _level)
+bool DBManger::Character_CharacterSlotAdd(char* _id, int _index, int _code, char * _jobname, char * _nick, int _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "INSERT INTO UserCharacterInfo values";
+	char* base_query = "INSERT INTO UserCharacterInfo";
 	int state = 0;
 
 	char query[255];
@@ -264,8 +264,17 @@ bool DBManger::Character_reqCreate(int _code, char * _jobname, char * _nick, int
 	*/
 
 	// 쿼리 입력 // code, jobname, nick, level
+	switch(_index)
 	{
-		sprintf(query, "%s ('%d','%s','%s','%d')", base_query, _code, _jobname, _nick, _level);
+	case 1:
+		sprintf(query, "%s (%d,'%s','%s',%d) SELECT character_code_first, character_jobname_first, character_nickname_first, character_level_first WHERE id = %s", base_query, _code, _jobname, _nick, _level, _id);
+		break;
+	case 2:
+		sprintf(query, "%s (%d,'%s','%s',%d) SELECT character_code_second, character_jobname_second, character_nickname_second, character_level_second WHERE id = %s", base_query, _code, _jobname, _nick, _level, _id);
+		break;
+	case 3:
+		sprintf(query, "%s (%d,'%s','%s',%d) SELECT character_code_third, character_jobname_third, character_nickname_third, character_level_third WHERE id = %s", base_query, _code, _jobname, _nick, _level, _id);
+		break;
 	}
 
 	/*
@@ -351,7 +360,7 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out, int _code)
 	}
 }
 
-bool DBManger::Character_reqCharacterSlot(int _index, int* _code, char * _jobname, char * _nick, int* _level)
+bool DBManger::Character_reqCharacterSlot(char* _id, int _index, int* _code, char * _jobname, char * _nick, int* _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -371,15 +380,15 @@ bool DBManger::Character_reqCharacterSlot(int _index, int* _code, char * _jobnam
 	{
 	case 1: 
 		sprintf(query, 
-			"%s character_code_first, character_jobname_first, character_nickname_first, character_level_first FROM UserCharacterInfo", base_query);
+			"%s character_code_first, character_jobname_first, character_nickname_first, character_level_first FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	case 2:
 		sprintf(query, 
-			"%s character_code_second, character_jobname_second, character_nickname_second, character_level_second FROM UserCharacterInfo", base_query);
+			"%s character_code_second, character_jobname_second, character_nickname_second, character_level_second FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	case 3:
 		sprintf(query, 
-			"%s character_code_third, character_jobname_third, character_nickname_third, character_level_third FROM UserCharacterInfo", base_query);
+			"%s character_code_third, character_jobname_third, character_nickname_third, character_level_third FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	}
 
@@ -396,6 +405,11 @@ bool DBManger::Character_reqCharacterSlot(int _index, int* _code, char * _jobnam
 		sql_result = mysql_store_result(mysql);
 
 		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row == NULL)
+		{
+			return false;
+		}
 
 		// DB 데이터 아웃풋 저장
 		*_code = *(int*)sql_row[0];
