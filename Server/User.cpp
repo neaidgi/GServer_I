@@ -10,12 +10,19 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 	money = 100000;
 
 	state = nullptr;
+	memset(characterslot, 0, sizeof(characterslot));
+	slotcount = 0;
 }
 
 User::~User()
 {
 	delete loginstate;
 	delete tenderstate;
+
+	for (int i = 0; i < slotcount; i++)
+	{
+		delete characterslot[i];
+	}
 }
 
 UserState* User::getState()
@@ -38,11 +45,50 @@ CharacterState * User::getCharacterState()
 	return characterstate;
 }
 
-void User::SetCharacter(int _character_code)
+// 캐릭터 선택 후 접속할 캐릭터 저장
+void User::SetCurCharacter(int _character_code)
 {
-	for (int i = 0; SLOTMAXCOUNT > 3; i++)
+	for (int i = 0; slotcount > i; i++)
 	{
-		if(characterslot[i]->)
+		if (characterslot[i]->GetCharacter_Code == _character_code)
+		{
+			current_character = characterslot[i];
+		}
+	}
+}
+
+bool User::SetSlot(Character * _character)
+{
+	if (slotcount == SLOTMAXCOUNT)
+	{
+		return false;
+	}
+
+	characterslot[slotcount++] = _character;
+	return true;
+}
+
+// 슬롯 캐릭터 1개 삭제 // 몇 번째인지 _index 받아서 삭제 후 땡기기
+bool User::DeleteCharacter(int _index)
+{
+	if (slotcount == 0)
+	{
+		return false;
+	}
+	else if (characterslot[_index] == nullptr)
+	{
+		return false;
+	}
+	else
+	{
+		delete characterslot[_index];
+		for (int i = _index; slotcount-1 > i; i++)
+		{
+			characterslot[i] = characterslot[i + 1];
+		}
+
+		characterslot[slotcount--] = nullptr;
+		return true;
 	}
 }
 

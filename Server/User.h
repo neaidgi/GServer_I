@@ -9,6 +9,7 @@
 
 #define SLOTMAXCOUNT 3 
 
+// DB에서 가져온 정보 저장할 캐릭터 객체
 class Character
 {
 private:
@@ -80,6 +81,8 @@ private:
 	CharacterState* characterstate;
 
 	Character* characterslot[SLOTMAXCOUNT];
+	int slotcount;
+	Character* current_character;
 public:
 	User(SOCKET _sock, SOCKADDR_IN _addr);
 	~User();
@@ -87,7 +90,9 @@ public:
 	LoginState* getLoginState();
 	TenderState* getTenderState();
 	CharacterState* getCharacterState();
-	void SetCharacter(int _character_code);
+	void SetCurCharacter(int _character_code);
+	bool SetSlot(Character* _character);
+	bool DeleteCharacter(int _index);
 	void SetState(UserState* _state);
 	void setID(char *id);
 	const char* getID();
