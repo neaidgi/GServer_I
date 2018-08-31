@@ -12,6 +12,7 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 	state = nullptr;
 	memset(characterslot, 0, sizeof(characterslot));
 	slotcount = 0;
+	is_slotload = false;
 }
 
 User::~User()

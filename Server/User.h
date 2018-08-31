@@ -13,12 +13,13 @@
 class Character
 {
 private:
-	char* character_name;			// 캐릭터 이름
+	char* character_name;			// 캐릭터 닉네임
 	int character_code;				// 코드
 	int	character_str;				// 힘
 	int	character_dex;				// 민
 	int	character_int;				// 지
 	int	character_health;			// 체력
+	int	character_mana;				// 마나
 	int	character_attackpoint;		// 공격력
 	int	character_defensepoint;		// 방어력
 	int	character_speed;			// 이속
@@ -34,6 +35,7 @@ public:
 	int GetCharacter_DEX() { return character_dex; }
 	int GetCharacter_INT() { return character_int; }
 	int GetCharacter_Health() { return character_health; }
+	int GetCharacter_Mana() { return character_mana; }
 	int GetCharacter_AttackPoint() { return character_attackpoint; }
 	int GetCharacter_DefensePoint() { return character_defensepoint; }
 	int GetCharacter_Speed() { return character_speed; }
@@ -50,11 +52,12 @@ public:
 		strcpy_s(name, len,_character_name);
 		character_name = name; 
 	}
-	void SetCharacter_Code(int _character_code) { character_code = _character_code; }
+	//void SetCharacter_Code(int _character_code) { character_code = _character_code; }
 	void SetCharacter_STR(int _character_str) { character_str = _character_str; }
 	void SetCharacter_DEX(int _character_dex) { character_dex = _character_dex; }
 	void SetCharacter_INT(int _character_int) { character_int = _character_int; }
 	void SetCharacter_Health(int _character_health) { character_health = _character_health; }
+	void SetCharacter_Mana(int _character_mana) { character_mana = _character_mana; }
 	void SetCharacter_AttackPoint(int _character_attackpoint) { character_attackpoint = _character_attackpoint; }
 	void SetCharacter_DefensePoint(int _character_defensepoint) { character_defensepoint = _character_defensepoint; }
 	void SetCharacter_Speed(int _character_speed) { character_speed = _character_speed; }
@@ -81,8 +84,9 @@ private:
 	CharacterState* characterstate;
 
 	Character* characterslot[SLOTMAXCOUNT];
-	int slotcount;
 	Character* current_character;
+	int slotcount;
+	bool is_slotload;
 public:
 	User(SOCKET _sock, SOCKADDR_IN _addr);
 	~User();
@@ -93,6 +97,8 @@ public:
 	void SetCurCharacter(int _character_code);
 	bool SetSlot(Character* _character);
 	bool DeleteCharacter(int _index);
+	bool isSlotLoaded() { return is_slotload; }
+	void SlotLoadComplete() { is_slotload = true; }
 	void SetState(UserState* _state);
 	void setID(char *id);
 	const char* getID();

@@ -246,3 +246,174 @@ bool DBManger::Login_reqLeave(char * _id)
 		return false;
 	}
 }
+
+// 실제 생성한 유저 캐릭터 저장
+bool DBManger::Character_reqCreate(int _code, char * _jobname, char * _nick, int _level)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "INSERT INTO UserCharacterInfo values";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	{
+		sprintf(query, "%s ('%d','%s','%s','%d')", base_query, _code, _jobname, _nick, _level);
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Create error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+// 캐릭터 설계도 요청
+bool DBManger::Character_reqCharacterInfo(Character * _character_out, int _code)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT * WHERE character_code = ";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	{
+		sprintf(query, "%s %d FROM CharacterInfo", base_query, _code);
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+		
+		sql_row = mysql_fetch_row(sql_result);
+
+		_character_out->SetCharacter_Name(sql_row[0]);
+		_character_out->SetCharacter_STR(*(int*)sql_row[1]);
+		_character_out->SetCharacter_DEX(*(int*)sql_row[2]);
+		_character_out->SetCharacter_INT(*(int*)sql_row[3]);
+		_character_out->SetCharacter_Health(*(int*)sql_row[4]);
+		_character_out->SetCharacter_Mana(*(int*)sql_row[5]);
+		_character_out->SetCharacter_AttackPoint(*(int*)sql_row[6]);
+		_character_out->SetCharacter_DefensePoint(*(int*)sql_row[7]);
+		_character_out->SetCharacter_Speed(*(int*)sql_row[8]);
+
+		_character_out->SetCharacter_GrowHealth(*(int*)sql_row[9]);
+		_character_out->SetCharacter_GrowSTR(*(int*)sql_row[10]);
+		_character_out->SetCharacter_GrowDEX(*(int*)sql_row[11]);
+		_character_out->SetCharacter_GrowINT(*(int*)sql_row[12]);
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Create error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+bool DBManger::Character_reqCharacterSlot(int _index, int* _code, char * _jobname, char * _nick, int* _level)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	switch (_index)
+	{
+	case 1: 
+		sprintf(query, 
+			"%s character_code_first, character_jobname_first, character_nickname_first, character_level_first FROM UserCharacterInfo", base_query);
+		break;
+	case 2:
+		sprintf(query, 
+			"%s character_code_second, character_jobname_second, character_nickname_second, character_level_second FROM UserCharacterInfo", base_query);
+		break;
+	case 3:
+		sprintf(query, 
+			"%s character_code_third, character_jobname_third, character_nickname_third, character_level_third FROM UserCharacterInfo", base_query);
+		break;
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		// DB 데이터 아웃풋 저장
+		*_code = *(int*)sql_row[0];
+		memcpy(_jobname, sql_row[1], strlen(sql_row[1]));
+		memcpy(_nick, sql_row[2], strlen(sql_row[2]));
+		*_level = *(int*)sql_row[3];
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Create error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
