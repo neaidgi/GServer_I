@@ -248,7 +248,7 @@ bool DBManger::Login_reqLeave(char * _id)
 }
 
 // 실제 생성한 유저 캐릭터 저장
-bool DBManger::Character_CharacterSlotAdd(char* _id, int _index, int _code, char * _jobname, char * _nick, int _level)
+bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code, char * _jobname, char * _nick, int _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -360,7 +360,7 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out, int _code)
 	}
 }
 
-bool DBManger::Character_reqCharacterSlot(char* _id, int _index, int* _code, char * _jobname, char * _nick, int* _level)
+bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _code, char * _jobname, char * _nick, int* _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -431,7 +431,7 @@ bool DBManger::Character_reqCharacterSlot(char* _id, int _index, int* _code, cha
 	}
 }
 
-bool DBManger::Character_reqCharacterDelete(char * _id, int _index)
+bool DBManger::Character_reqCharacterDelete(const char * _id, int _index)
 {
 		MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -496,7 +496,7 @@ bool DBManger::Character_reqCharacterDelete(char * _id, int _index)
 	}
 }
 
-bool DBManger::Character_reqCharacterCheckName(char * _nick)
+bool DBManger::Character_reqCharacterCheckName(const char * _nick)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
