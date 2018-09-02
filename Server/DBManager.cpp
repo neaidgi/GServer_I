@@ -431,3 +431,120 @@ bool DBManger::Character_reqCharacterSlot(char* _id, int _index, int* _code, cha
 	}
 }
 
+bool DBManger::Character_reqCharacterDelete(char * _id, int _index)
+{
+		MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "UPDATE";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	switch (_index)
+	{
+	case 1: 
+		sprintf(query, 
+			"%s UserCharacterInfo SET character_code_first = NULL,character_jobname_first = NULL,character_nickname_first = NULL, character_level_first = NULL WHERE user_id = '%s'", base_query, _id);
+		break;
+	case 2:
+		sprintf(query, 
+			"%s UserCharacterInfo SET character_code_second = NULL,character_jobname_second = NULL,character_nickname_second = NULL, character_level_second = NULL WHERE user_id = %s", base_query, _id);
+		break;
+	case 3:
+		sprintf(query, 
+			"%s UserCharacterInfo SET character_code_third = NULL,character_jobname_third = NULL,character_nickname_third = NULL, character_level_third = NULL WHERE user_id = %s", base_query, _id);
+		break;
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row == NULL)
+		{
+			return false;
+		}
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Delete error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+bool DBManger::Character_reqCharacterCheckName(char * _nick)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT character_nickname_first,character_nickname_second,character_nickname_third FROM usercharacterinfo WHERE character_nickname_first =";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+	sprintf(query, "%s '%s' OR character_nickname_second = '%s' OR character_nickname_third = '%s'", base_query, _nick, _nick, _nick);
+	/*
+	*	끝
+	*/
+
+	state = mysql_query(mysql, query);
+
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);    //
+
+		/*
+		* 결과 값의 다음 로우를 검색한다.
+		*/
+
+		bool exist = false;
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row != NULL)     // Result Set 에서 1개씩 배열을 가져옴.
+		{
+			exist = true;
+		}
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return exist;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql ChracterNickCheck error : %s \n", mysql_error(mysql));
+		return true;
+	}
+}
+

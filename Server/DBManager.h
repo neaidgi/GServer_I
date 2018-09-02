@@ -32,6 +32,9 @@ public:
 	bool Character_CharacterSlotAdd(char* _id, int _index, int _code, char* _jobname, char* _nick, int _level);
 	bool Character_reqCharacterInfo(Character* _character_out, int _code);
 	bool Character_reqCharacterSlot(char* _id, int _index,  int* _code, char* _jobname, char* _nick, int* _level);
+	
+	bool Character_reqCharacterDelete(char* _id, int _index);
+	bool Character_reqCharacterCheckName(char* _nick);
 };
 
 #endif
