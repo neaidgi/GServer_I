@@ -9,11 +9,11 @@ class CharacterManager
 {
 private:
 	static CharacterManager* Instance;
-	// 직업 3개 list로 관리
 
 	CharacterManager();
 	~CharacterManager();
 
+	// 캐릭터 기본 설계도
 	Character* CharacterOrigin[MAXCHARACTERORIGIN];
 
 	bool GetCharacter_Slot(User* _user, int _index, SlotData* _slot);
@@ -27,11 +27,11 @@ public:
 	bool InitializeManager();
 	void EndManager();
 
-	void Character_Slot_Send(User* _user);
+	void Character_Slot_Send(User* _user);					// 현재 사용X
 
-	RESULT Character_Init_Choice(User* _user);
-	RESULT Character_Management_Process(User* _user);
-	RESULT Character_EnterGame_Process(User* _user);
+	RESULT Character_Init_Choice(User* _user);				// 캐릭터 초기화면
+	RESULT Character_Management_Process(User* _user);		// 캐릭터 생성창
+	//RESULT Character_EnterGame_Process(User* _user);
 
 };
 
