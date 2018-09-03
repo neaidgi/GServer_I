@@ -65,8 +65,8 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 
 	check = DBManger::GetInstance()->Character_reqCharacterCheckName(nick);
 
-	_user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
-	_user->include_wset = true;
+	//_user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
+	//_user->include_wset = true;
 	
 	if (check)
 	{
@@ -75,6 +75,43 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 	else
 	{
 		return false;
+	}
+}
+
+void CharacterManager::CreateCharacter(User * _user, char* _buf)
+{
+	int jobcode;
+	int len;
+	char nick[NICKNAMESIZE];
+	bool check = false;
+
+	memcpy(&len, _buf, sizeof(int));
+	_buf += sizeof(int);
+
+	memcpy(nick, _buf, len);
+	_buf += len;
+
+	memcpy(&jobcode, _buf, sizeof(int));
+	_buf += sizeof(int);
+
+	switch(jobcode)
+	{
+	case TANKER:
+		DBManger::GetInstance()->Character_CharacterSlotAdd
+		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[0]->GetCharacter_Code(),
+			CharacterOrigin[0]->GetCharacter_Name(), nick, 1);
+		
+		break;
+	case WARRIOR:
+		DBManger::GetInstance()->Character_CharacterSlotAdd
+		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[1]->GetCharacter_Code(),
+			CharacterOrigin[1]->GetCharacter_Name(), nick, 1);
+		break;
+	case MAGICIAN:
+		DBManger::GetInstance()->Character_CharacterSlotAdd
+		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[2]->GetCharacter_Code(),
+			CharacterOrigin[2]->GetCharacter_Name(), nick, 1);
+		break;
 	}
 }
 
@@ -245,21 +282,27 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 	// 수정했음
 	switch (protocol)
 	{
-	case CLIENT_REQ_NICK_OVERLAP_CHECK:
+	case CLIENT_REQ_CHARACTER:
 		if (NickOverlapCheck(_user, buf))
 		{
+			// 중복 있음
+			check = false;
 			result = RT_CHARACTER_NICKOVERLAP_TRUE;
+			_user->pack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
+			_user->include_wset = true;
 		}
 		else
 		{
-			result = RT_CHARACTER_NICKOVERLAP_FALSE;
+			// 중복 없음
+			check = true;
+			result = RT_CHARACTER_CREATE;
+			CreateCharacter(_user, buf);
+			_user->pack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
+			_user->include_wset = true;
 		}
 		break;
-	case CLIENT_REQ_CHARACTER:
-		
-		break;
 	case CLIENT_CHARACTER_EXIT:				// 캐릭터 생성 취소
-		
+		result = RT_CHARACTER_EXIT;
 		break;
 	default:
 		break;

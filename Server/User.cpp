@@ -52,10 +52,10 @@ void User::SetCurCharacter(int _index)
 	for (int i = 0; slotcount > i; i++)
 	{
 		// 수정 예정
-		if (characterslot[i]->code == _character_code)
-		{
-			// 수정 예정
-		}
+		//if (characterslot[i]->code == _character_code)
+		//{
+		//	// 수정 예정
+		//}
 	}
 }
 

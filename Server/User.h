@@ -118,6 +118,7 @@ public:
 	void SetCurCharacter(int _index);
 	bool SetSlot(SlotData* _slotdata);
 	//bool GetSlot(const SlotData* )		// 슬롯데이터 접근지정자
+	const int GetSlotCount() { return slotcount; }
 	bool DeleteCharacter(int _index);
 	bool isSlotLoaded() { return is_slotload; }
 	void SlotLoadComplete() { is_slotload = true; }

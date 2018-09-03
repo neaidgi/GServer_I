@@ -38,7 +38,7 @@ enum PROTOCOL {
 	SERVER_CHARACTER_ENTER_RESULT,			// 서버 케릭터 접속결과			[프로토콜][bool]
 	SERVER_CHARACTER_DELETE_RESULT,			// 서버 케릭터 삭제 결과		[프로토콜][bool]
 	SERVER_CHARACTER_MENU,					// 서버 케릭터 메뉴 결과		[프로토콜]
-	SERVER_NICK_OVERLAP_CHECK,				// 서버 닉네임 중복 결과		[프로토콜][bool]
+	//SERVER_NICK_OVERLAP_CHECK,				// 서버 닉네임 중복 결과		[프로토콜][bool]
 	SERVER_CHARACTER_RESULT,				// 서버 케릭터 생성 확인 결과	[프로토콜][bool]
 	SERVER_CHARACTER_EXIT_RESULT,			// 서버 케릭터 생성 취소 결과	[프로토콜[
 	SERVER_LEAVE,							// 서버 회원탈퇴 결과			[프로토콜][bool]
@@ -109,7 +109,15 @@ enum RESULT {
 	RT_CHARACTER_ENTERCREATE, 			// 캐릭터 생성 화면으로 이동
 	RT_CHARACTER_CREATE,				// 캐릭터 생성 
 	RT_CHARACTER_NICKOVERLAP_TRUE,		// 닉네임 중복
-	RT_CHARACTER_NICKOVERLAP_FALSE,		// 닉네임 중복
+	RT_CHARACTER_EXIT					// 생성 취소
+};
+
+// 직업코드
+enum CHARACTER_JOB
+{
+	TANKER = 1000, 
+	WARRIOR = 2000, 
+	MAGICIAN = 3000
 };
 
 enum IOTYPE {
