@@ -41,6 +41,7 @@ public:
 	int GetCharacter_DefensePoint() { return character_defensepoint; }
 	int GetCharacter_Speed() { return character_speed; }
 	int GetCharacter_GrowHealth() { return character_growhealth; }
+	int SetCharacter_GrowMana() { return character_growmana; }
 	int GetCharacter_GrowSTR() { return character_growstr; }
 	int GetCharacter_GrowDEX() { return character_growdex; }
 	int GetCharacter_GrowINT() { return character_growint; }
