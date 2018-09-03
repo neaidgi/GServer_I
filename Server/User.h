@@ -24,7 +24,7 @@ private:
 	int	character_defensepoint;		// 방어력
 	int	character_speed;			// 이속
 	int	character_growhealth;		// 성장 체력
-	int	character_growmana;		// 성장 체력
+	int	character_growmana;			// 성장 마나
 	int	character_growstr;			// 성장 힘
 	int	character_growdex;			// 성장 민
 	int	character_growint;			// 성장 지
