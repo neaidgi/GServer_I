@@ -248,7 +248,7 @@ bool DBManger::Login_reqLeave(char * _id)
 }
 
 // 실제 생성한 유저 캐릭터 저장
-bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code, char * _jobname, char * _nick, int _level)
+bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code,const char * _jobname, char * _nick, int _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
