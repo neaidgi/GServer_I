@@ -112,7 +112,7 @@ public:
 	LoginState* getLoginState();
 	TenderState* getTenderState();
 	CharacterState* getCharacterState();
-	void SetCurCharacter(int _character_code);
+	void SetCurCharacter(int _index);
 	bool SetSlot(SlotData* _slotdata);
 	bool DeleteCharacter(int _index);
 	bool isSlotLoaded() { return is_slotload; }

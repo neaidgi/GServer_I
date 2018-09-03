@@ -47,7 +47,7 @@ CharacterState * User::getCharacterState()
 }
 
 // 캐릭터 선택 후 접속할 캐릭터 저장
-void User::SetCurCharacter(int _character_code)
+void User::SetCurCharacter(int _index)
 {
 	for (int i = 0; slotcount > i; i++)
 	{

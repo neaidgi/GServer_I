@@ -14,6 +14,8 @@ private:
 	CharacterManager();
 	~CharacterManager();
 
+	Character* CharacterOrigin[MAXCHARACTERORIGIN];
+
 	bool GetCharacter_Slot(User* _user, int _index, SlotData* _slot);
 public:
 	static void CreateInstance();

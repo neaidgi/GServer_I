@@ -297,6 +297,8 @@ bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code
 }
 
 // 캐릭터 설계도 요청
+// 현재 code받아서 하나씩 외부로 제공하는 함수
+// 수정 >> 배열 받아서 모든 캐릭터 정보 output으로 전달 
 bool DBManger::Character_reqCharacterInfo(Character * _character_out, int _code)
 {
 	MYSQL_RES *sql_result;  // the results

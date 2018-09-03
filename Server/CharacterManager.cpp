@@ -4,10 +4,18 @@ CharacterManager* CharacterManager::Instance = nullptr;
 
 CharacterManager::CharacterManager()
 {
+	memset(CharacterOrigin, 0, sizeof(CharacterOrigin));
 }
 
 CharacterManager::~CharacterManager()
 {
+	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
+	{
+		if (CharacterOrigin[i] != NULL)
+		{
+			delete CharacterOrigin[i];
+		}
+	}
 }
 
 // 슬롯 데이터 가져오기 index 1 ~ 3 // 슬롯 데이터가 없다면 false 반환
