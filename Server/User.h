@@ -24,6 +24,7 @@ private:
 	int	character_defensepoint;		// 방어력
 	int	character_speed;			// 이속
 	int	character_growhealth;		// 성장 체력
+	int	character_growmana;		// 성장 체력
 	int	character_growstr;			// 성장 힘
 	int	character_growdex;			// 성장 민
 	int	character_growint;			// 성장 지
@@ -52,7 +53,7 @@ public:
 		strcpy_s(name, len,_character_name);
 		character_name = name; 
 	}
-	//void SetCharacter_Code(int _character_code) { character_code = _character_code; }
+	void SetCharacter_Code(int _character_code) { character_code = _character_code; }
 	void SetCharacter_STR(int _character_str) { character_str = _character_str; }
 	void SetCharacter_DEX(int _character_dex) { character_dex = _character_dex; }
 	void SetCharacter_INT(int _character_int) { character_int = _character_int; }
@@ -62,6 +63,7 @@ public:
 	void SetCharacter_DefensePoint(int _character_defensepoint) { character_defensepoint = _character_defensepoint; }
 	void SetCharacter_Speed(int _character_speed) { character_speed = _character_speed; }
 	void SetCharacter_GrowHealth(int _character_growhealth) { character_growhealth = _character_growhealth; }
+	void SetCharacter_GrowMana(int _character_growmana) { character_growmana = _character_growmana; }
 	void SetCharacter_GrowSTR(int _character_growstr) { character_growstr = _character_growstr; }
 	void SetCharacter_GrowDEX(int _character_growdex) { character_growdex = _character_growdex; }
 	void SetCharacter_GrowINT(int _character_growint) { character_growint = _character_growint; }
