@@ -52,6 +52,32 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	return result;
 }
 
+bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
+{
+	int len;
+	char nick[NICKNAMESIZE];
+	bool check = false;
+
+	memcpy(&len, _buf, sizeof(int));
+	_buf += sizeof(int);
+
+	memcpy(nick, _buf, len);
+
+	check = DBManger::GetInstance()->Character_reqCharacterCheckName(nick);
+
+	_user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
+	_user->include_wset = true;
+	
+	if (check)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void CharacterManager::CreateInstance()
 {
 	if (Instance == nullptr)
@@ -79,6 +105,7 @@ bool CharacterManager::InitializeManager()
 	// 캐릭터 정보 가져오기
 	if (DBManger::GetInstance()->Character_reqCharacterInfo(CharacterOrigin) == false)
 	{
+		// 로그
 		return false;
 	}
 	return true;
@@ -98,6 +125,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 {
 	PROTOCOL protocol;
 	char buf[BUFSIZE];
+	char* ptr = buf;
 	bool check;
 	int choice;
 
@@ -125,42 +153,113 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 			}
 		}
 
+		bool is_slot;
+
 		if (count == 0)
 		{
-			bool is_slot = false;
+			is_slot = false;
+
+			// 프로토콜 데이터 패킹
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
 			memcpy(buf, &is_slot, sizeof(bool));
 			_user->pack(sendprotocol, buf, 0);
 			_user->include_wset = true;
 			result = RT_CHARACTER_SLOTRESULT;
-			break;
-		}
-
-		for (int i = 0; i < count; i++)
-		{
-			_user->SetSlot(slotdata[i]);
-		}
-		_user->SlotLoadComplete();
-
-		//
-		//	프로토콜 DATA 패킹 하는 작업
-		//
-		break;
-	case CLIENT_LOGOUT_MENU_CHOICE:
-
-		memcpy(&choice, buf, sizeof(int));
-
-		if (choice == 2)
-		{
-			sendprotocol = SERVER_JOIN;
-			_user->pack(sendprotocol, buf, 0);
-			_user->include_wset = true;
-			result = RT_JOINMENU;
 		}
 		else
 		{
-			result = RT_LOGINMENU;
+			is_slot = true;
+			for (int i = 0; i < count; i++)
+			{
+				_user->SetSlot(slotdata[i]);
+			}
+			// 슬롯 로드완료
+			_user->SlotLoadComplete();
+
+			// 프로토콜 데이터 패킹
+			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
+			memcpy(ptr, &is_slot, sizeof(bool));
+			ptr += sizeof(bool);
+
+			memcpy(ptr, &count, sizeof(int));
+			ptr += sizeof(bool);
+
+			for (int i = 0; i < count; i++)
+			{
+				int joblen = strlen(slotdata[i]->jobname);
+				int nicklen = strlen(slotdata[i]->nick);
+				memcpy(ptr, &joblen, sizeof(int));
+				ptr += sizeof(int);
+
+				memcpy(ptr, slotdata[i]->jobname, joblen);
+				ptr += joblen;
+
+				memcpy(ptr, &slotdata[i]->level, sizeof(int));
+				ptr += sizeof(int);
+
+				memcpy(ptr, &nicklen, sizeof(int));
+				ptr += sizeof(int);
+
+				memcpy(ptr, slotdata[i]->nick, nicklen);
+				ptr += nicklen;
+			}
+
+			_user->pack(sendprotocol, buf, 0);
+			_user->include_wset = true;
+			result = RT_CHARACTER_SLOTRESULT;
 		}
+		break;
+	case CLIENT_NEW_CHARACTER_MENU:
+		sendprotocol = SERVER_CHARACTER_MENU;
+		_user->pack(sendprotocol, buf, 0);
+		_user->include_wset = true;
+		result = RT_CHARACTER_ENTERCREATE;
+		break;
+	case CLIENT_CHARACTER_ENTER:
+		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
+		//_user->pack(sendprotocol, buf, 0);
+		//_user->include_wset = true;
+		//result = RT_CHARACTER_ENTERGAME;
+		break;
+	default:
+		break;
+	}
+
+	return result;
+}
+
+RESULT CharacterManager::Character_Management_Process(User * _user)
+{
+	PROTOCOL protocol;
+	char buf[BUFSIZE];
+	char* ptr = buf;
+	bool check;
+	int choice;
+
+	_user->unPack(&protocol, &buf);
+
+	PROTOCOL sendprotocol;
+
+	RESULT result;
+
+	// 수정했음
+	switch (protocol)
+	{
+	case CLIENT_REQ_NICK_OVERLAP_CHECK:
+		if (NickOverlapCheck(_user, buf))
+		{
+			result = RT_CHARACTER_NICKOVERLAP_TRUE;
+		}
+		else
+		{
+			result = RT_CHARACTER_NICKOVERLAP_FALSE;
+		}
+		break;
+	case CLIENT_REQ_CHARACTER:
+		
+		break;
+	case CLIENT_CHARACTER_EXIT:				// 캐릭터 생성 취소
+		
 		break;
 	default:
 		break;

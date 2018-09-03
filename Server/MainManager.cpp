@@ -153,7 +153,11 @@ bool MainManager::MangerInitialize()
 	ThreadManager::GetInstance()->InitializeManager();
 	TenderManager::GetInstance()->InitializeManager();
 	LoginManager::GetInstance()->InitializeManager();
-	CharacterManager::GetInstance()->InitializeManager();
+	if (CharacterManager::GetInstance()->InitializeManager() == false)
+	{
+		//·Î±×
+		ErrorManager::GetInstance()->err_quit("CharacterManager Init fail");
+	}
 	EncryptManager::GetInstance()->InitializeManager();
 
 	if (GameManager::GetInstance()->InitializeManager() == false)

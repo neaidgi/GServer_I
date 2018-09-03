@@ -107,9 +107,9 @@ enum RESULT {
 	RT_CHARACTER_ENTERGAME,				// 게임 접속
 	RT_CHARACTER_DELETE,				// 캐릭터 삭제
 	RT_CHARACTER_ENTERCREATE, 			// 캐릭터 생성 화면으로 이동
-	RT_CHARACTER_CREATE					// 캐릭터 생성 // 닉네임 중복확인도 함
-	
-										//RT_CHARACTER_NICKOVERLAP
+	RT_CHARACTER_CREATE,				// 캐릭터 생성 
+	RT_CHARACTER_NICKOVERLAP_TRUE,		// 닉네임 중복
+	RT_CHARACTER_NICKOVERLAP_FALSE,		// 닉네임 중복
 };
 
 enum IOTYPE {

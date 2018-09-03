@@ -17,6 +17,7 @@ private:
 	Character* CharacterOrigin[MAXCHARACTERORIGIN];
 
 	bool GetCharacter_Slot(User* _user, int _index, SlotData* _slot);
+	bool NickOverlapCheck(User* _user, char* _nick);
 public:
 	static void CreateInstance();
 	static CharacterManager* GetInstance();
