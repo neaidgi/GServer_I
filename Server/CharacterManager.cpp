@@ -76,7 +76,11 @@ void CharacterManager::DestroyInstance()
 
 bool CharacterManager::InitializeManager()
 {
-	
+	// 캐릭터 정보 가져오기
+	if (DBManger::GetInstance()->Character_reqCharacterInfo(CharacterOrigin) == false)
+	{
+		return false;
+	}
 	return true;
 }
 

@@ -9,6 +9,7 @@
 #include "TenderSystem.h"
 #include "LogManager.h"
 #include "DBManager.h"
+#include "CharacterManager.h"
 
 class MainManager
 {

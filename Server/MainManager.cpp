@@ -27,6 +27,7 @@ void MainManager::CreateInstance()
 		ThreadManager::CreateInstance();
 		TenderManager::CreateInstance();
 		LoginManager::CreateInstance();
+		CharacterManager::CreateInstance();
 		GameManager::CreateInstance();
 		EncryptManager::CreateInstance(ENCRYPT_KEY);
 	}
@@ -46,6 +47,7 @@ void MainManager::DestroyInstance()
 		TenderManager::DestroyInstance();
 		ThreadManager::DestroyInstance();
 		LoginManager::DestroyInstance();
+		CharacterManager::DestroyInstance();
 		EncryptManager::DestroyInstance();
 		GameManager::DestroyInstance();
 		DBManger::DestroyInstance();
@@ -137,18 +139,21 @@ bool MainManager::Initialize()
 
 bool MainManager::MangerInitialize()
 {
+	LogManager::GetInstance()->InitializeManager();
+	ErrorManager::GetInstance()->InitializeManager();
+
 	// DB 연동
 	if (DBManger::GetInstance()->InitializeDB() == false)
 	{
 		ErrorManager::GetInstance()->err_display("데이터베이스");
 		return false;
 	}
-	LogManager::GetInstance()->InitializeManager();
+
 	UserManager::GetInstance()->InitializeManager();
 	ThreadManager::GetInstance()->InitializeManager();
 	TenderManager::GetInstance()->InitializeManager();
 	LoginManager::GetInstance()->InitializeManager();
-	ErrorManager::GetInstance()->InitializeManager();
+	CharacterManager::GetInstance()->InitializeManager();
 	EncryptManager::GetInstance()->InitializeManager();
 
 	if (GameManager::GetInstance()->InitializeManager() == false)
@@ -172,6 +177,7 @@ void MainManager::EndManager()
 	ThreadManager::GetInstance()->EndManager();
 	TenderManager::GetInstance()->EndManager();
 	LoginManager::GetInstance()->EndManager();
+	CharacterManager::GetInstance()->EndManager();
 	ErrorManager::GetInstance()->EndManager();
 	EncryptManager::GetInstance()->EndManager();
 	GameManager::GetInstance()->EndManager();
