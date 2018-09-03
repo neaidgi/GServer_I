@@ -11,24 +11,6 @@ private:
 	static CharacterManager* Instance;
 	// 직업 3개 list로 관리
 
-	struct SlotData{
-		int code;
-		char* jobname;
-		char* nick;
-		int level;
-
-		SlotData() {
-			jobname = nullptr;
-			nick = nullptr;
-		}
-		~SlotData() {
-			if(jobname != nullptr)
-				delete jobname;
-			if (nick != nullptr)
-				delete nick;
-		}
-	};
-
 	CharacterManager();
 	~CharacterManager();
 

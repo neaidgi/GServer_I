@@ -33,7 +33,7 @@ enum PROTOCOL {
 	CLIENT_LOGOUT,							// 클라 로그아웃				[프로토콜]
 	CLIENT_LEAVE,							// 클라 회원탈퇴				[프로토콜]
 
-	SERVER_RESULT_CHARACTER_SLOT,			// 서버 케릭터 슬롯 전송		[프로토콜]...
+	SERVER_CHARACTER_SLOT_RESULT,			// 서버 케릭터 슬롯 전송		[프로토콜]...
 	SERVER_CHARACTER_ENTER_RESULT,			// 서버 케릭터 접속결과			[프로토콜][bool]
 	SERVER_CHARACTER_DELETE_RESULT,			// 서버 케릭터 삭제 결과		[프로토콜][bool]
 	SERVER_CHARACTER_MENU,					// 서버 케릭터 메뉴 결과		[프로토콜]
@@ -101,11 +101,13 @@ enum RESULT {
 	RT_MENUCREATE, RT_MENUPARTICIPATE, RT_MENUBACK,
 	RT_TENDERCREATE, RT_TENDERPARTICIPATE, RT_TENDERLIST,
 
-	RT_CHARACTER_ENTERGAME = 200,		// 게임 접속
+	RT_CHARACTER_SLOTRESULT = 200,
+	RT_CHARACTER_ENTERGAME,				// 게임 접속
 	RT_CHARACTER_DELETE,				// 캐릭터 삭제
 	RT_CHARACTER_ENTERCREATE, 			// 캐릭터 생성 화면으로 이동
 	RT_CHARACTER_CREATE					// 캐릭터 생성 // 닉네임 중복확인도 함
-	//RT_CHARACTER_NICKOVERLAP
+	
+										//RT_CHARACTER_NICKOVERLAP
 };
 
 enum IOTYPE {

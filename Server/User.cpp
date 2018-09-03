@@ -51,21 +51,22 @@ void User::SetCurCharacter(int _character_code)
 {
 	for (int i = 0; slotcount > i; i++)
 	{
-		if (characterslot[i]->GetCharacter_Code() == _character_code)
+		// 수정 예정
+		if (characterslot[i]->code == _character_code)
 		{
-			current_character = characterslot[i];
+			// 수정 예정
 		}
 	}
 }
 
-bool User::SetSlot(Character * _character)
+bool User::SetSlot(SlotData* _slotdata)
 {
 	if (slotcount == SLOTMAXCOUNT)
 	{
 		return false;
 	}
 
-	characterslot[slotcount++] = _character;
+	characterslot[slotcount++] = _slotdata;
 	return true;
 }
 

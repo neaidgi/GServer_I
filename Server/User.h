@@ -69,6 +69,24 @@ public:
 	~Character() { delete[]character_name; }
 };
 
+struct SlotData {
+	int code;
+	char* jobname;
+	char* nick;
+	int level;
+
+	SlotData() {
+		jobname = nullptr;
+		nick = nullptr;
+	}
+	~SlotData() {
+		if (jobname != nullptr)
+			delete jobname;
+		if (nick != nullptr)
+			delete nick;
+	}
+};
+
 
 class User : public Packet
 {
@@ -83,7 +101,7 @@ private:
 	TenderState* tenderstate;
 	CharacterState* characterstate;
 
-	Character* characterslot[SLOTMAXCOUNT];
+	SlotData* characterslot[SLOTMAXCOUNT];
 	Character* current_character;
 	int slotcount;
 	bool is_slotload;
@@ -95,7 +113,7 @@ public:
 	TenderState* getTenderState();
 	CharacterState* getCharacterState();
 	void SetCurCharacter(int _character_code);
-	bool SetSlot(Character* _character);
+	bool SetSlot(SlotData* _slotdata);
 	bool DeleteCharacter(int _index);
 	bool isSlotLoaded() { return is_slotload; }
 	void SlotLoadComplete() { is_slotload = true; }

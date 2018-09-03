@@ -94,18 +94,45 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 	PROTOCOL sendprotocol;
 
 	RESULT result;
+	SlotData* slotdata[3];
+	memset(slotdata, 0, sizeof(slotdata));
+	int count = 0;
 
 	// 수정했음
 	switch (protocol)
 	{
-	case CLIENT_REQ_LOGIN:
-		check = reqLogin(_user, buf);
-		if (check == false)
+	case CLIENT_REQ_CHARACTER_SLOT:
+		for (int i = 0; i < SLOTMAXCOUNT; i++)
 		{
-			result = RT_LOGINFAIL;
+			slotdata[i] = new SlotData();
+			if (GetCharacter_Slot(_user, i + 1, slotdata[i]) == false)
+			{
+				delete slotdata[i];
+				count = i;
+				break;
+			}
+		}
+
+		if (count == 0)
+		{
+			bool is_slot = false;
+			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
+			memcpy(buf, &is_slot, sizeof(bool));
+			_user->pack(sendprotocol, buf, 0);
+			_user->include_wset = true;
+			result = RT_CHARACTER_SLOTRESULT;
 			break;
 		}
-		result = RT_LOGIN;
+
+		for (int i = 0; i < count; i++)
+		{
+			_user->SetSlot(slotdata[i]);
+		}
+		_user->SlotLoadComplete();
+
+		//
+		//	프로토콜 DATA 패킹 하는 작업
+		//
 		break;
 	case CLIENT_LOGOUT_MENU_CHOICE:
 
