@@ -299,12 +299,12 @@ bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code
 // 캐릭터 설계도 요청
 // 현재 code받아서 하나씩 외부로 제공하는 함수
 // 수정 >> 배열 받아서 모든 캐릭터 정보 output으로 전달 
-bool DBManger::Character_reqCharacterInfo(Character * _character_out, int _code)
+bool DBManger::Character_reqCharacterInfo(Character * _character_out[])
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT * WHERE character_code = ";
+	char* base_query = "SELECT *";
 	int state = 0;
 
 	char query[255];
@@ -316,7 +316,7 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out, int _code)
 
 	// 쿼리 입력 // code, jobname, nick, level
 	{
-		sprintf(query, "%s %d FROM CharacterInfo", base_query, _code);
+		sprintf(query, "%s FROM CharacterInfo", base_query);
 	}
 
 	/*
@@ -332,21 +332,64 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out, int _code)
 		sql_result = mysql_store_result(mysql);
 		
 		sql_row = mysql_fetch_row(sql_result);
+		sql_row = mysql_fetch_row(sql_result);
+		sql_row = mysql_fetch_row(sql_result);
 
-		_character_out->SetCharacter_Name(sql_row[0]);
-		_character_out->SetCharacter_STR(*(int*)sql_row[1]);
-		_character_out->SetCharacter_DEX(*(int*)sql_row[2]);
-		_character_out->SetCharacter_INT(*(int*)sql_row[3]);
-		_character_out->SetCharacter_Health(*(int*)sql_row[4]);
-		_character_out->SetCharacter_Mana(*(int*)sql_row[5]);
-		_character_out->SetCharacter_AttackPoint(*(int*)sql_row[6]);
-		_character_out->SetCharacter_DefensePoint(*(int*)sql_row[7]);
-		_character_out->SetCharacter_Speed(*(int*)sql_row[8]);
+		// 1번
+		_character_out[0]->SetCharacter_Code(*(int*)sql_row[0]);
+		_character_out[0]->SetCharacter_Name(sql_row[1]);
+		_character_out[0]->SetCharacter_STR(*(int*)sql_row[2]);
+		_character_out[0]->SetCharacter_DEX(*(int*)sql_row[3]);
+		_character_out[0]->SetCharacter_INT(*(int*)sql_row[4]);
+		_character_out[0]->SetCharacter_Health(*(int*)sql_row[5]);
+		_character_out[0]->SetCharacter_Mana(*(int*)sql_row[6]);
+		_character_out[0]->SetCharacter_AttackPoint(*(int*)sql_row[7]);
+		_character_out[0]->SetCharacter_DefensePoint(*(int*)sql_row[8]);
+		_character_out[0]->SetCharacter_Speed(*(int*)sql_row[9]);
 
-		_character_out->SetCharacter_GrowHealth(*(int*)sql_row[9]);
-		_character_out->SetCharacter_GrowSTR(*(int*)sql_row[10]);
-		_character_out->SetCharacter_GrowDEX(*(int*)sql_row[11]);
-		_character_out->SetCharacter_GrowINT(*(int*)sql_row[12]);
+		_character_out[0]->SetCharacter_GrowHealth(*(int*)sql_row[10]);
+		_character_out[0]->SetCharacter_GrowMana(*(int*)sql_row[11]);
+		_character_out[0]->SetCharacter_GrowSTR(*(int*)sql_row[12]);
+		_character_out[0]->SetCharacter_GrowDEX(*(int*)sql_row[13]);
+		_character_out[0]->SetCharacter_GrowINT(*(int*)sql_row[14]);
+
+
+		// 2번
+		_character_out[1]->SetCharacter_Code(*(int*)sql_row[15]);
+		_character_out[1]->SetCharacter_Name(sql_row[16]);
+		_character_out[1]->SetCharacter_STR(*(int*)sql_row[17]);
+		_character_out[1]->SetCharacter_DEX(*(int*)sql_row[18]);
+		_character_out[1]->SetCharacter_INT(*(int*)sql_row[19]);
+		_character_out[1]->SetCharacter_Health(*(int*)sql_row[20]);
+		_character_out[1]->SetCharacter_Mana(*(int*)sql_row[21]);
+		_character_out[1]->SetCharacter_AttackPoint(*(int*)sql_row[22]);
+		_character_out[1]->SetCharacter_DefensePoint(*(int*)sql_row[23]);
+		_character_out[1]->SetCharacter_Speed(*(int*)sql_row[24]);
+					   
+		_character_out[1]->SetCharacter_GrowHealth(*(int*)sql_row[25]);
+		_character_out[1]->SetCharacter_GrowMana(*(int*)sql_row[26]);
+		_character_out[1]->SetCharacter_GrowSTR(*(int*)sql_row[27]);
+		_character_out[1]->SetCharacter_GrowDEX(*(int*)sql_row[28]);
+		_character_out[1]->SetCharacter_GrowINT(*(int*)sql_row[29]);
+
+
+		// 3번
+		_character_out[2]->SetCharacter_Code(*(int*)sql_row[30]);
+		_character_out[2]->SetCharacter_Name(sql_row[31]);
+		_character_out[2]->SetCharacter_STR(*(int*)sql_row[32]);
+		_character_out[2]->SetCharacter_DEX(*(int*)sql_row[33]);
+		_character_out[2]->SetCharacter_INT(*(int*)sql_row[34]);
+		_character_out[2]->SetCharacter_Health(*(int*)sql_row[35]);
+		_character_out[2]->SetCharacter_Mana(*(int*)sql_row[36]);
+		_character_out[2]->SetCharacter_AttackPoint(*(int*)sql_row[37]);
+		_character_out[2]->SetCharacter_DefensePoint(*(int*)sql_row[38]);
+		_character_out[2]->SetCharacter_Speed(*(int*)sql_row[39]);
+					   
+		_character_out[2]->SetCharacter_GrowHealth(*(int*)sql_row[40]);
+		_character_out[2]->SetCharacter_GrowMana(*(int*)sql_row[41]);
+		_character_out[2]->SetCharacter_GrowSTR(*(int*)sql_row[42]);
+		_character_out[2]->SetCharacter_GrowDEX(*(int*)sql_row[43]);
+		_character_out[2]->SetCharacter_GrowINT(*(int*)sql_row[44]);
 
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
