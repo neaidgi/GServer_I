@@ -88,7 +88,7 @@ bool DBManger::Login_CheckID(char * _id)
 	/*
 	*	쿼리문 만들기
 	*/
-	sprintf(query,"%s '%s'", base_query, _id);
+	sprintf(query, "%s '%s'", base_query, _id);
 	/*
 	*	끝
 	*/
@@ -107,7 +107,7 @@ bool DBManger::Login_CheckID(char * _id)
 
 		sql_row = mysql_fetch_row(sql_result);
 
-		if(sql_row != NULL)     // Result Set 에서 1개씩 배열을 가져옴.
+		if (sql_row != NULL)     // Result Set 에서 1개씩 배열을 가져옴.
 		{
 			exist = true;
 		}
@@ -150,7 +150,7 @@ bool DBManger::Login_reqJoin(char * _id, char * _pw, char * _nick)
 	{
 		sprintf(query, "%s ('%s','%s','%s')", base_query, _id, _pw, _nick);
 	}
-	
+
 	/*
 	*	끝
 	*/
@@ -165,7 +165,7 @@ bool DBManger::Login_reqJoin(char * _id, char * _pw, char * _nick)
 	}
 	else
 	{
-		fprintf(stderr, "Mysql join error : %s \n" , mysql_error(mysql));
+		fprintf(stderr, "Mysql join error : %s \n", mysql_error(mysql));
 		return false;
 	}
 }
@@ -182,11 +182,11 @@ bool DBManger::Login_reqLogin(char * _id, char * _pw)
 	memset(query, 0, sizeof(query));
 
 	//	쿼리문 만들기
-	sprintf(query, "%s = '%s' AND pw = '%s'", base_query, _id , _pw);
+	sprintf(query, "%s = '%s' AND pw = '%s'", base_query, _id, _pw);
 
 	// 쿼리 날리기
 	state = mysql_query(mysql, query);
-	
+
 	// 성공
 	if (state == 0)
 	{
@@ -248,7 +248,7 @@ bool DBManger::Login_reqLeave(char * _id)
 }
 
 // 실제 생성한 유저 캐릭터 저장
-bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code,const char * _jobname, char * _nick, int _level)
+bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code, const char * _jobname, char * _nick, int _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -264,7 +264,7 @@ bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code
 	*/
 
 	// 쿼리 입력 // code, jobname, nick, level
-	switch(_index)
+	switch (_index)
 	{
 	case 1:
 		sprintf(query, "%s (%d,'%s','%s',%d) SELECT character_code_first, character_jobname_first, character_nickname_first, character_level_first WHERE id = %s", base_query, _code, _jobname, _nick, _level, _id);
@@ -330,66 +330,66 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out[])
 	if (state == 0)
 	{
 		sql_result = mysql_store_result(mysql);
-		
+
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 1번
-		_character_out[0]->SetCharacter_Code(*(int*)sql_row[0]);
+		_character_out[0]->SetCharacter_Code(atoi(sql_row[0]));
 		_character_out[0]->SetCharacter_Name(sql_row[1]);
-		_character_out[0]->SetCharacter_STR(*(int*)sql_row[2]);
-		_character_out[0]->SetCharacter_DEX(*(int*)sql_row[3]);
-		_character_out[0]->SetCharacter_INT(*(int*)sql_row[4]);
-		_character_out[0]->SetCharacter_Health(*(int*)sql_row[5]);
-		_character_out[0]->SetCharacter_Mana(*(int*)sql_row[6]);
-		_character_out[0]->SetCharacter_AttackPoint(*(int*)sql_row[7]);
-		_character_out[0]->SetCharacter_DefensePoint(*(int*)sql_row[8]);
-		_character_out[0]->SetCharacter_Speed(*(int*)sql_row[9]);
+		_character_out[0]->SetCharacter_STR(atoi(sql_row[2]));
+		_character_out[0]->SetCharacter_DEX(atoi(sql_row[3]));
+		_character_out[0]->SetCharacter_INT(atoi(sql_row[4]));
+		_character_out[0]->SetCharacter_Health(atoi(sql_row[5]));
+		_character_out[0]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[0]->SetCharacter_AttackPoint(atoi(sql_row[7]));
+		_character_out[0]->SetCharacter_DefensePoint(atoi(sql_row[8]));
+		_character_out[0]->SetCharacter_Speed(atoi(sql_row[9]));
 
-		_character_out[0]->SetCharacter_GrowHealth(*(int*)sql_row[10]);
-		_character_out[0]->SetCharacter_GrowMana(*(int*)sql_row[11]);
-		_character_out[0]->SetCharacter_GrowSTR(*(int*)sql_row[12]);
-		_character_out[0]->SetCharacter_GrowDEX(*(int*)sql_row[13]);
-		_character_out[0]->SetCharacter_GrowINT(*(int*)sql_row[14]);
+		_character_out[0]->SetCharacter_GrowSTR(atoi(sql_row[10]));
+		_character_out[0]->SetCharacter_GrowDEX(atoi(sql_row[11]));
+		_character_out[0]->SetCharacter_GrowINT(atoi(sql_row[12]));
+		_character_out[0]->SetCharacter_GrowHealth(atoi(sql_row[13]));
+		_character_out[0]->SetCharacter_GrowMana(atoi(sql_row[14]));
 
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 2번
-		_character_out[1]->SetCharacter_Code(*(int*)sql_row[0]);
+		_character_out[1]->SetCharacter_Code(atoi(sql_row[0]));
 		_character_out[1]->SetCharacter_Name(sql_row[1]);
-		_character_out[1]->SetCharacter_STR(*(int*)sql_row[2]);
-		_character_out[1]->SetCharacter_DEX(*(int*)sql_row[3]);
-		_character_out[1]->SetCharacter_INT(*(int*)sql_row[4]);
-		_character_out[1]->SetCharacter_Health(*(int*)sql_row[5]);
-		_character_out[1]->SetCharacter_Mana(*(int*)sql_row[6]);
-		_character_out[1]->SetCharacter_AttackPoint(*(int*)sql_row[7]);
-		_character_out[1]->SetCharacter_DefensePoint(*(int*)sql_row[8]);
-		_character_out[1]->SetCharacter_Speed(*(int*)sql_row[9]);
+		_character_out[1]->SetCharacter_STR(atoi(sql_row[2]));
+		_character_out[1]->SetCharacter_DEX(atoi(sql_row[3]));
+		_character_out[1]->SetCharacter_INT(atoi(sql_row[4]));
+		_character_out[1]->SetCharacter_Health(atoi(sql_row[5]));
+		_character_out[1]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[1]->SetCharacter_AttackPoint(atoi(sql_row[7]));
+		_character_out[1]->SetCharacter_DefensePoint(atoi(sql_row[8]));
+		_character_out[1]->SetCharacter_Speed(atoi(sql_row[9]));
 
-		_character_out[1]->SetCharacter_GrowHealth(*(int*)sql_row[10]);
-		_character_out[1]->SetCharacter_GrowMana(*(int*)sql_row[11]);
-		_character_out[1]->SetCharacter_GrowSTR(*(int*)sql_row[12]);
-		_character_out[1]->SetCharacter_GrowDEX(*(int*)sql_row[13]);
-		_character_out[1]->SetCharacter_GrowINT(*(int*)sql_row[14]);
+		_character_out[1]->SetCharacter_GrowSTR(atoi(sql_row[10]));
+		_character_out[1]->SetCharacter_GrowDEX(atoi(sql_row[11]));
+		_character_out[1]->SetCharacter_GrowINT(atoi(sql_row[12]));
+		_character_out[1]->SetCharacter_GrowHealth(atoi(sql_row[13]));
+		_character_out[1]->SetCharacter_GrowMana(atoi(sql_row[14]));
 
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 3번
-		_character_out[2]->SetCharacter_Code(*(int*)sql_row[0]);
+		_character_out[2]->SetCharacter_Code(atoi(sql_row[0]));
 		_character_out[2]->SetCharacter_Name(sql_row[1]);
-		_character_out[2]->SetCharacter_STR(*(int*)sql_row[2]);
-		_character_out[2]->SetCharacter_DEX(*(int*)sql_row[3]);
-		_character_out[2]->SetCharacter_INT(*(int*)sql_row[4]);
-		_character_out[2]->SetCharacter_Health(*(int*)sql_row[5]);
-		_character_out[2]->SetCharacter_Mana(*(int*)sql_row[6]);
-		_character_out[2]->SetCharacter_AttackPoint(*(int*)sql_row[7]);
-		_character_out[2]->SetCharacter_DefensePoint(*(int*)sql_row[8]);
-		_character_out[2]->SetCharacter_Speed(*(int*)sql_row[9]);
+		_character_out[2]->SetCharacter_STR(atoi(sql_row[2]));
+		_character_out[2]->SetCharacter_DEX(atoi(sql_row[3]));
+		_character_out[2]->SetCharacter_INT(atoi(sql_row[4]));
+		_character_out[2]->SetCharacter_Health(atoi(sql_row[5]));
+		_character_out[2]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[2]->SetCharacter_AttackPoint(atoi(sql_row[7]));
+		_character_out[2]->SetCharacter_DefensePoint(atoi(sql_row[8]));
+		_character_out[2]->SetCharacter_Speed(atoi(sql_row[9]));
 
-		_character_out[2]->SetCharacter_GrowHealth(*(int*)sql_row[10]);
-		_character_out[2]->SetCharacter_GrowMana(*(int*)sql_row[11]);
-		_character_out[2]->SetCharacter_GrowSTR(*(int*)sql_row[12]);
-		_character_out[2]->SetCharacter_GrowDEX(*(int*)sql_row[13]);
-		_character_out[2]->SetCharacter_GrowINT(*(int*)sql_row[14]);
+		_character_out[2]->SetCharacter_GrowSTR(atoi(sql_row[10]));
+		_character_out[2]->SetCharacter_GrowDEX(atoi(sql_row[11]));
+		_character_out[2]->SetCharacter_GrowINT(atoi(sql_row[12]));
+		_character_out[2]->SetCharacter_GrowHealth(atoi(sql_row[13]));
+		_character_out[2]->SetCharacter_GrowMana(atoi(sql_row[14]));
 
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
@@ -423,16 +423,16 @@ bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _cod
 	// 쿼리 입력 // code, jobname, nick, level
 	switch (_index)
 	{
-	case 1: 
-		sprintf(query, 
+	case 1:
+		sprintf(query,
 			"%s character_code_first, character_jobname_first, character_nickname_first, character_level_first FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	case 2:
-		sprintf(query, 
+		sprintf(query,
 			"%s character_code_second, character_jobname_second, character_nickname_second, character_level_second FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	case 3:
-		sprintf(query, 
+		sprintf(query,
 			"%s character_code_third, character_jobname_third, character_nickname_third, character_level_third FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	}
@@ -478,7 +478,7 @@ bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _cod
 
 bool DBManger::Character_reqCharacterDelete(const char * _id, int _index)
 {
-		MYSQL_RES *sql_result;  // the results
+	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
 	char* base_query = "UPDATE";
@@ -494,16 +494,16 @@ bool DBManger::Character_reqCharacterDelete(const char * _id, int _index)
 	// 쿼리 입력 // code, jobname, nick, level
 	switch (_index)
 	{
-	case 1: 
-		sprintf(query, 
+	case 1:
+		sprintf(query,
 			"%s UserCharacterInfo SET character_code_first = NULL,character_jobname_first = NULL,character_nickname_first = NULL, character_level_first = NULL WHERE user_id = '%s'", base_query, _id);
 		break;
 	case 2:
-		sprintf(query, 
+		sprintf(query,
 			"%s UserCharacterInfo SET character_code_second = NULL,character_jobname_second = NULL,character_nickname_second = NULL, character_level_second = NULL WHERE user_id = %s", base_query, _id);
 		break;
 	case 3:
-		sprintf(query, 
+		sprintf(query,
 			"%s UserCharacterInfo SET character_code_third = NULL,character_jobname_third = NULL,character_nickname_third = NULL, character_level_third = NULL WHERE user_id = %s", base_query, _id);
 		break;
 	}

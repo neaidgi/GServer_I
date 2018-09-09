@@ -52,7 +52,7 @@ public:
 		int len = strlen(_character_name);
 		char* name = new char[len+1];
 		memset(name, 0, len + 1);
-		strcpy_s(name, len,_character_name);
+		strcpy_s(name, len+1,_character_name);
 		character_name = name; 
 	}
 	void SetCharacter_Code(int _character_code) { character_code = _character_code; }

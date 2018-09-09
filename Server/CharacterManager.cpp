@@ -35,7 +35,7 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 		_slot = nullptr;
 		return result;
 	}
-	
+
 	int len;
 	len = strlen(tjobname);
 	_slot->code = tcode;
@@ -67,7 +67,7 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 
 	//_user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
 	//_user->include_wset = true;
-	
+
 	if (check)
 	{
 		return true;
@@ -94,13 +94,13 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	memcpy(&jobcode, _buf, sizeof(int));
 	_buf += sizeof(int);
 
-	switch(jobcode)
+	switch (jobcode)
 	{
 	case TANKER:
 		DBManger::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[0]->GetCharacter_Code(),
 			CharacterOrigin[0]->GetCharacter_Name(), nick, 1);
-		
+
 		break;
 	case WARRIOR:
 		DBManger::GetInstance()->Character_CharacterSlotAdd
@@ -139,6 +139,11 @@ void CharacterManager::DestroyInstance()
 
 bool CharacterManager::InitializeManager()
 {
+	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
+	{
+		CharacterOrigin[i] = new Character();
+	}
+
 	// 캐릭터 정보 가져오기
 	if (DBManger::GetInstance()->Character_reqCharacterInfo(CharacterOrigin) == false)
 	{
