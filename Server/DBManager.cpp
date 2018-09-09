@@ -405,7 +405,7 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out[])
 	}
 }
 
-bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _origincode, char * _jobname, char * _nick, int* _level, int* _code)
+bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -457,11 +457,11 @@ bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _ori
 		}
 
 		// DB 데이터 아웃풋 저장
-		*_origincode = *(int*)sql_row[0];
+		_origincode = atoi(sql_row[0]);
 		memcpy(_jobname, sql_row[1], strlen(sql_row[1]));
 		memcpy(_nick, sql_row[2], strlen(sql_row[2]));
-		*_level = *(int*)sql_row[3];
-		*_code = *(int*)sql_row[3];
+		_level = atoi(sql_row[3]);
+		_code = atoi(sql_row[4]);
 
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
