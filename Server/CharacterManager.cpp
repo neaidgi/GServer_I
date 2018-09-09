@@ -21,13 +21,15 @@ CharacterManager::~CharacterManager()
 // 슬롯 데이터 가져오기 index 1 ~ 3 // 슬롯 데이터가 없다면 false 반환
 bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _slot)
 {
+	int torigincode;
 	int tcode;
 	char tjobname[20];
 	char tnick[20];
 	int tlevel;
 
+
 	bool result = DBManger::GetInstance()->Character_reqCharacterSlot
-	(_user->getID(), _index, &tcode, tjobname, tnick, &tlevel);
+	(_user->getID(), _index, &torigincode, tjobname, tnick, &tlevel, &tcode);
 
 	// 슬롯에 캐릭터 없으면 false 반환
 	if (result == false)
@@ -38,6 +40,7 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 
 	int len;
 	len = strlen(tjobname);
+	_slot->origincode = torigincode;
 	_slot->code = tcode;
 	_slot->level = tlevel;
 	_slot->jobname = new char[len + 1]();

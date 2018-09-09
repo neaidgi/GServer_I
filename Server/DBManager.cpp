@@ -405,7 +405,7 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out[])
 	}
 }
 
-bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _code, char * _jobname, char * _nick, int* _level)
+bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _origincode, char * _jobname, char * _nick, int* _level, int* _code)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -425,15 +425,15 @@ bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _cod
 	{
 	case 1:
 		sprintf(query,
-			"%s character_code_first, character_jobname_first, character_nickname_first, character_level_first FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
+			"%s character_origin_code_first, character_jobname_first, character_nickname_first, character_level_first, character_code_first FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	case 2:
 		sprintf(query,
-			"%s character_code_second, character_jobname_second, character_nickname_second, character_level_second FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
+			"%s character_origin_code_second, character_jobname_second, character_nickname_second, character_level_second, character_code_second FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	case 3:
 		sprintf(query,
-			"%s character_code_third, character_jobname_third, character_nickname_third, character_level_third FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
+			"%s character_origin_code_third, character_jobname_third, character_nickname_third, character_level_third, character_code_third FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
 		break;
 	}
 
@@ -457,10 +457,11 @@ bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int* _cod
 		}
 
 		// DB 데이터 아웃풋 저장
-		*_code = *(int*)sql_row[0];
+		*_origincode = *(int*)sql_row[0];
 		memcpy(_jobname, sql_row[1], strlen(sql_row[1]));
 		memcpy(_nick, sql_row[2], strlen(sql_row[2]));
 		*_level = *(int*)sql_row[3];
+		*_code = *(int*)sql_row[3];
 
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.

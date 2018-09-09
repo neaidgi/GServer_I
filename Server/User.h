@@ -76,10 +76,11 @@ public:
 };
 
 struct SlotData {
-	int code;
+	int origincode;
 	char* jobname;
 	char* nick;
 	int level;
+	int code;
 
 	SlotData() {
 		jobname = nullptr;
