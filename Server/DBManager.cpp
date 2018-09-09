@@ -594,3 +594,59 @@ bool DBManger::Character_reqCharacterCheckName(const char * _nick)
 	}
 }
 
+bool DBManger::Character_reqCharacterPos(int _code, Vector3& _pos)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT * WHERE character_code = ";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 
+	sprintf(query,"%s %d", base_query, _code);
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row == NULL)
+		{
+			return false;
+		}
+
+		// DB 데이터 아웃풋 저장
+		_pos.x = atof(sql_row[1]);
+		_pos.y = atof(sql_row[2]);
+		_pos.z = atof(sql_row[3]);
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Pos error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
