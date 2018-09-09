@@ -5,6 +5,7 @@
 #pragma comment(lib, "ws2_32")
 #include <WinSock2.h>
 #include <stdio.h>
+#include <math.h>
 
 // 패킷 : [전체크기 4Byte][프로토콜 4Byte][데이터]
 // 문자열 데이터 [strlen(문자열)+1 4Byte][문자열]
