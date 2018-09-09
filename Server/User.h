@@ -49,6 +49,10 @@ public:
 	int GetCharacter_GrowDEX() { return character_growdex; }
 	int GetCharacter_GrowINT() { return character_growint; }
 
+	const Vector3 GetPosition() { return Position; }
+	const Vector3 GetRotation() { return Rotation; }
+	const Vector3 GetScale() { return Scale; }
+
 	void SetCharacter_Name(char* _character_name) 
 	{ 
 		int len = strlen(_character_name);
@@ -71,6 +75,10 @@ public:
 	void SetCharacter_GrowSTR(int _character_growstr) { character_growstr = _character_growstr; }
 	void SetCharacter_GrowDEX(int _character_growdex) { character_growdex = _character_growdex; }
 	void SetCharacter_GrowINT(int _character_growint) { character_growint = _character_growint; }
+
+	void SetPosition(const Vector3& _position) { Position = _position; }
+	void SetRotation(const Vector3& _rotation) { Rotation = _rotation; }
+	void SetScale(const Vector3& _scale) { Scale = _scale; }
 
 	~Character() { delete[]character_name; }
 };
@@ -119,9 +127,10 @@ public:
 	LoginState* getLoginState();
 	TenderState* getTenderState();
 	CharacterState* getCharacterState();
-	void SetCurCharacter(int _index);
+	void SetCurCharacter(Character* _player);
+	Character* GetCurCharacter() { return current_character; }
 	bool SetSlot(SlotData* _slotdata);
-	//bool GetSlot(const SlotData* )		// 슬롯데이터 접근지정자
+	const SlotData* GetSlot(int _index) { return characterslot[_index - 1]; }		// 슬롯데이터 접근지정자
 	const int GetSlotCount() { return slotcount; }
 	bool DeleteCharacter(int _index);
 	bool isSlotLoaded() { return is_slotload; }
