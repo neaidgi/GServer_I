@@ -29,7 +29,7 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 
 
 	bool result = DBManger::GetInstance()->Character_reqCharacterSlot
-	(_user->getID(), _index, &torigincode, tjobname, tnick, &tlevel, &tcode);
+	(_user->getID(), _index, torigincode, tjobname, tnick, tlevel, tcode);
 
 	// 슬롯에 캐릭터 없으면 false 반환
 	if (result == false)
