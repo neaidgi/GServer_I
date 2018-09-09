@@ -13,7 +13,9 @@
 class Character
 {
 private:
-	
+	Vector3 Position;				// 위치
+	Vector3 Rotation;				// 방향
+	Vector3 Scale;					// 크기
 	char* character_name;			// 캐릭터 닉네임
 	int character_code;				// 코드
 	int	character_str;				// 힘
