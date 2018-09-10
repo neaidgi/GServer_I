@@ -6,6 +6,7 @@
 #include "LoginState.h"
 #include "TenderState.h"
 #include "CharacterState.h"
+#include "InGameState.h"
 
 #define SLOTMAXCOUNT 3 
 
@@ -115,6 +116,7 @@ private:
 	LoginState* loginstate;
 	TenderState* tenderstate;
 	CharacterState* characterstate;
+	InGameState* ingamestate;
 
 	SlotData* characterslot[SLOTMAXCOUNT];
 	Character* current_character;
@@ -127,6 +129,7 @@ public:
 	LoginState* getLoginState();
 	TenderState* getTenderState();
 	CharacterState* getCharacterState();
+	InGameState* getInGameState();
 	void SetCurCharacter(Character* _player);
 	Character* GetCurCharacter() { return current_character; }
 	bool SetSlot(SlotData* _slotdata);

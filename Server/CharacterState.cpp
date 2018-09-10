@@ -56,7 +56,7 @@ bool CharacterState::Write(User * _user)
 		break;
 	case CharacterState::CHARACTER_ENTER_SEND:
 		state = CHARACTER_MENU_RECV;
-		//_user->SetState();
+		_user->SetState(_user->getInGameState());
 		break;
 	case CharacterState::CHARACTER_REQ_OVLAP_NICK_SEND:
 		state = CHARACTER_REQ_RECV;

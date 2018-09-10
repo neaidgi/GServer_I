@@ -19,6 +19,7 @@ User::~User()
 {
 	delete loginstate;
 	delete tenderstate;
+	delete ingamestate;
 
 	for (int i = 0; i < slotcount; i++)
 	{
@@ -44,6 +45,11 @@ TenderState * User::getTenderState()
 CharacterState * User::getCharacterState()
 {
 	return characterstate;
+}
+
+InGameState * User::getInGameState()
+{
+	return ingamestate;
 }
 
 // 캐릭터 선택 후 접속할 캐릭터 저장
@@ -128,5 +134,6 @@ void User::InitState()
 	loginstate = new LoginState();
 	tenderstate = new TenderState();
 	characterstate = new CharacterState();
+	ingamestate = new InGameState();
 	state = loginstate;
 }
