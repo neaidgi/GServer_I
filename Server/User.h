@@ -102,6 +102,7 @@ private:
 	char pw[IDSIZE];
 	int money;
 	bool login;
+	bool ingame;
 	UserState* state;
 
 	LoginState* loginstate;

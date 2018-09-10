@@ -13,6 +13,8 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 	memset(characterslot, 0, sizeof(characterslot));
 	slotcount = 0;
 	is_slotload = false;
+	ingame = false;
+	login = false;
 }
 
 User::~User()
