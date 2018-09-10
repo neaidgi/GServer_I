@@ -64,6 +64,12 @@
     <Filter Include="헤더 파일\Math">
       <UniqueIdentifier>{66aecef6-a7b8-4964-8db0-6367ace9502f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\State\InGameState">
+      <UniqueIdentifier>{d3e030d9-1938-4860-a2db-82254dfb5153}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\State\InGameState">
+      <UniqueIdentifier>{e42e1421-90dd-4587-ac50-506215454448}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -131,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="CharacterManager.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="InGameState.cpp">
+      <Filter>소스 파일\State\InGameState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>헤더 파일\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="InGameState.h">
+      <Filter>헤더 파일\State\InGameState</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

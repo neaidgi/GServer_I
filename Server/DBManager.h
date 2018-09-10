@@ -31,10 +31,11 @@ public:
 
 	bool Character_CharacterSlotAdd(const char* _id, int _index, int _code,const char* _jobname, char* _nick, int _level);
 	bool Character_reqCharacterInfo(Character* _character_out[]);
-	bool Character_reqCharacterSlot(const char* _id, int _index, int* _origincode, char * _jobname, char * _nick, int* _level, int* _code);
+	bool Character_reqCharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code);
 	
 	bool Character_reqCharacterDelete(const char* _id, int _index);
 	bool Character_reqCharacterCheckName(const char* _nick);
+	bool Character_reqCharacterPos(int _code, Vector3& _pos);
 };
 
 #endif

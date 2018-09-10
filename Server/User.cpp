@@ -21,6 +21,7 @@ User::~User()
 {
 	delete loginstate;
 	delete tenderstate;
+	delete ingamestate;
 
 	for (int i = 0; i < slotcount; i++)
 	{
@@ -48,17 +49,15 @@ CharacterState * User::getCharacterState()
 	return characterstate;
 }
 
-// 캐릭터 선택 후 접속할 캐릭터 저장
-void User::SetCurCharacter(int _index)
+InGameState * User::getInGameState()
 {
-	for (int i = 0; slotcount > i; i++)
-	{
-		// 수정 예정
-		//if (characterslot[i]->code == _character_code)
-		//{
-		//	// 수정 예정
-		//}
-	}
+	return ingamestate;
+}
+
+// 캐릭터 선택 후 접속할 캐릭터 저장
+void User::SetCurCharacter(Character* _player)
+{
+	current_character = _player;
 }
 
 bool User::SetSlot(SlotData* _slotdata)
@@ -137,5 +136,6 @@ void User::InitState()
 	loginstate = new LoginState();
 	tenderstate = new TenderState();
 	characterstate = new CharacterState();
+	ingamestate = new InGameState();
 	state = loginstate;
 }

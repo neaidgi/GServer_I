@@ -19,6 +19,7 @@ private:
 	bool GetCharacter_Slot(User* _user, int _index, SlotData* _slot);
 	bool NickOverlapCheck(User* _user, char* _nick);
 	void CreateCharacter(User* _user, char* _buf);
+	void InitEnterGame(User* _user, char* _buf);
 public:
 	static void CreateInstance();
 	static CharacterManager* GetInstance();
@@ -29,10 +30,11 @@ public:
 
 	void Character_Slot_Send(User* _user);					// 현재 사용X
 
+	Character* CharacterSelect(User* _user, int _origincode);
+
 	RESULT Character_Init_Choice(User* _user);				// 캐릭터 초기화면
 	RESULT Character_Management_Process(User* _user);		// 캐릭터 생성창
 	//RESULT Character_EnterGame_Process(User* _user);
-
 };
 
 #endif

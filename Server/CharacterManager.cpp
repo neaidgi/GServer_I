@@ -29,7 +29,7 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 
 
 	bool result = DBManger::GetInstance()->Character_reqCharacterSlot
-	(_user->getID(), _index, &torigincode, tjobname, tnick, &tlevel, &tcode);
+	(_user->getID(), _index, torigincode, tjobname, tnick, tlevel, tcode);
 
 	// 슬롯에 캐릭터 없으면 false 반환
 	if (result == false)
@@ -118,6 +118,40 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	}
 }
 
+void CharacterManager::InitEnterGame(User * _user, char * _buf)
+{
+	PROTOCOL sendprotocol;
+	char data[BUFSIZE];
+	char* ptr = data;
+	int index = 0;
+	Vector3 pos;
+
+	memcpy(&index, _buf, sizeof(int));
+
+	DBManger::GetInstance()->Character_reqCharacterPos(_user->GetSlot(index)->code, pos);
+
+	memcpy(ptr, &pos.x, sizeof(float));
+	ptr += sizeof(float);
+
+	memcpy(ptr, &pos.y, sizeof(float));
+	ptr += sizeof(float);
+
+	memcpy(ptr, &pos.z, sizeof(float));
+	ptr += sizeof(float);
+
+	Character* player = CharacterSelect(_user, _user->GetSlot(index)->origincode);
+	_user->SetCurCharacter(player);
+	_user->GetCurCharacter()->SetPosition(pos);
+
+	// 
+	// 캐릭터 스테이터스 패킹 // 추가예정
+	// 
+
+	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
+	_user->pack(sendprotocol, data, 0);
+	_user->include_wset = true;
+}
+
 void CharacterManager::CreateInstance()
 {
 	if (Instance == nullptr)
@@ -164,6 +198,26 @@ void CharacterManager::EndManager()
 void CharacterManager::Character_Slot_Send(User * _user)
 {
 
+}
+
+Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
+{
+	Character* temp;
+	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
+	{
+		if (CharacterOrigin[i]->GetCharacter_Code() == _origincode)
+		{
+			temp = CharacterOrigin[i];
+		}
+	}
+
+	Character* player = new Character();
+
+	//
+	//	실제 스테이터스 셋팅 
+	//  player
+
+	return player;
 }
 
 RESULT CharacterManager::Character_Init_Choice(User * _user)
@@ -261,10 +315,8 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		result = RT_CHARACTER_ENTERCREATE;
 		break;
 	case CLIENT_CHARACTER_ENTER:
-		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
-		//_user->pack(sendprotocol, buf, 0);
-		//_user->include_wset = true;
-		//result = RT_CHARACTER_ENTERGAME;
+		InitEnterGame(_user, buf);
+		result = RT_CHARACTER_ENTERGAME;
 		break;
 	default:
 		break;
