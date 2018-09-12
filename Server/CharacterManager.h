@@ -20,7 +20,7 @@ private:
 	bool NickOverlapCheck(User* _user, char* _nick);
 	void CreateCharacter(User* _user, char* _buf);
 	void InitEnterGame(User* _user, char* _buf);
-	void CharacterMove(User* _user, char* _buf);
+	void CharacterMove(User* _user, char* _buf, int& _datasize);
 public:
 	static void CreateInstance();
 	static CharacterManager* GetInstance();

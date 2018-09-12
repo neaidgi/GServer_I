@@ -149,7 +149,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 	_user->pack(sendprotocol, data, 0);
-	_user->include_wset = true;
+
 }
 
 void CharacterManager::CreateInstance()
@@ -262,7 +262,6 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
 			memcpy(buf, &is_slot, sizeof(bool));
 			_user->pack(sendprotocol, buf, 0);
-			_user->include_wset = true;
 			result = RT_CHARACTER_SLOTRESULT;
 		}
 		else
@@ -304,14 +303,12 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 			}
 
 			_user->pack(sendprotocol, buf, 0);
-			_user->include_wset = true;
 			result = RT_CHARACTER_SLOTRESULT;
 		}
 		break;
 	case CLIENT_NEW_CHARACTER_MENU:
 		sendprotocol = SERVER_CHARACTER_MENU;
 		_user->pack(sendprotocol, buf, 0);
-		_user->include_wset = true;
 		result = RT_CHARACTER_ENTERCREATE;
 		break;
 	case CLIENT_CHARACTER_ENTER:
@@ -371,9 +368,10 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 	return result;
 }
 
-void CharacterManager::CharacterMove(User * _user, char * _buf)
+void CharacterManager::CharacterMove(User * _user, char * _buf, int & _datasize)
 {
 	Vector3 dirvector;
+	int datasize;
 	float time = MOVETIME;
 	char* ptr = _buf;
 
@@ -402,15 +400,21 @@ void CharacterManager::CharacterMove(User * _user, char * _buf)
 
 	memcpy(ptr, &character_pos.x, sizeof(float));
 	ptr += sizeof(float);
+	datasize += sizeof(float);
 
 	memcpy(ptr, &character_pos.y, sizeof(float));
 	ptr += sizeof(float);
+	datasize += sizeof(float);
 
 	memcpy(ptr, &character_pos.z, sizeof(float));
 	ptr += sizeof(float);
+	datasize += sizeof(float);
 
 	memcpy(ptr, &time, sizeof(float));
 	ptr += sizeof(float);
+	datasize += sizeof(float);
+
+	_datasize = datasize;
 }
 
 RESULT CharacterManager::Character_EnterGame_Process(User * _user)
@@ -419,7 +423,7 @@ RESULT CharacterManager::Character_EnterGame_Process(User * _user)
 	char buf[BUFSIZE];
 	char* ptr = buf;
 	bool check;
-	int choice;
+	int datasize = 0;
 
 	_user->unPack(&protocol, &buf);
 
@@ -430,9 +434,9 @@ RESULT CharacterManager::Character_EnterGame_Process(User * _user)
 	switch (protocol)
 	{
 	case CLIENT_INGAME_MOVE:
-		CharacterMove(_user, buf);
+		CharacterMove(_user, buf, datasize);
 		sendprotocol = SEVER_INGAME_MOVE_RESULT;
-		//_user->pack(sendprotocol, buf, )
+		_user->pack(sendprotocol, buf, datasize);
 	default:
 		break;
 	}

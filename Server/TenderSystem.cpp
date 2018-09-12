@@ -301,7 +301,6 @@ void TenderManager::reqCreate(User* user, char* buf)
 	bool check = true;
 
 	user->pack(SERVER_TENDER_CREATE_RESULT, &check, sizeof(bool));
-	user->include_wset = true;
 }
 
 void TenderManager::reqParticipate(User* user, char* buf)
@@ -350,7 +349,7 @@ void TenderManager::reqParticipate(User* user, char* buf)
 	memcpy(ptr, PARTICIPATERESULTMSG[result], msgsize);
 
 	user->pack(SERVER_TENDER_PARTICIPATE_RESULT, buf, sizeof(int) + msgsize);//결과에 맞는 문자열 전송
-	user->include_wset = true;
+
 	if ((*itor)->IsEnd())//입찰이 종료 됬는지 확인
 	{
 		end_tender_list->push(*itor);
@@ -381,7 +380,6 @@ void TenderManager::reqTenderList(User* user, char* buf)
 	}
 
 	user->pack(SERVER_TENDER_LIST_RESULT, buf, size);
-	user->include_wset = true;
 }
 
 RESULT TenderManager::TenderRecvProcess(User * _user)
@@ -442,7 +440,6 @@ RESULT TenderManager::tenderMenuChoice(User* _user)
 	}
 
 	_user->pack(SendProtocl, buf, 0);
-	_user->include_wset = true;
 
 	return result;
 }

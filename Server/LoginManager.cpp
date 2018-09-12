@@ -79,7 +79,6 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 	}
 
 	user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
-	user->include_wset = true;
 }
 
 void LoginManager::reqJoin(User* user, char* _buf)
@@ -123,7 +122,6 @@ void LoginManager::reqJoin(User* user, char* _buf)
 
 	//userList[userCount++] = info;
 	user->pack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
-	user->include_wset = true;
 
 	sprintf(tempbuf, "%s [회원가입].", user->getID());
 	LogManager::GetInstance()->LogWrite(tempbuf);
