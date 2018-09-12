@@ -57,7 +57,11 @@ enum PROTOCOL {
 	SERVER_TENDER_LIST_RESULT,				//입찰 리스트 요청 결과
 	CLIENT_REQ_TENDER_PARTICIPATE,			//입찰 요청
 	SERVER_TENDER_PARTICIPATE_RESULT,		//입찰 요청 결과
-	SERVER_TENDER_END_RESULT				//입찰 종료 결과 [프로토콜][char* 메세지]
+	SERVER_TENDER_END_RESULT,				//입찰 종료 결과 [프로토콜][char* 메세지]
+
+	CLIENT_INGAME_MOVE,						// 클라 이동					[프로토콜][방향벡터 or WASD]
+
+	SEVER_INGAME_MOVE_RESULT				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
 };
 
 
@@ -142,5 +146,6 @@ struct WSAOVERLAPPEDEx {
 #define ENCRYPT_KEY 951324896
 
 #define MAXCHARACTERORIGIN 3
+#define MOVETIME 0.02
 
 #endif

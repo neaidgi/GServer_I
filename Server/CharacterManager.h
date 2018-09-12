@@ -20,6 +20,7 @@ private:
 	bool NickOverlapCheck(User* _user, char* _nick);
 	void CreateCharacter(User* _user, char* _buf);
 	void InitEnterGame(User* _user, char* _buf);
+	void CharacterMove(User* _user, char* _buf);
 public:
 	static void CreateInstance();
 	static CharacterManager* GetInstance();
@@ -34,7 +35,7 @@ public:
 
 	RESULT Character_Init_Choice(User* _user);				// 캐릭터 초기화면
 	RESULT Character_Management_Process(User* _user);		// 캐릭터 생성창
-	//RESULT Character_EnterGame_Process(User* _user);
+	RESULT Character_EnterGame_Process(User* _user);		// 인게임 
 };
 
 #endif

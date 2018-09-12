@@ -370,3 +370,72 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 
 	return result;
 }
+
+void CharacterManager::CharacterMove(User * _user, char * _buf)
+{
+	Vector3 dirvector;
+	float time = MOVETIME;
+	char* ptr = _buf;
+
+	memcpy(&dirvector.x, ptr, sizeof(float));
+	ptr += sizeof(float);
+
+	memcpy(&dirvector.y, ptr, sizeof(float));
+	ptr += sizeof(float);
+
+	memcpy(&dirvector.z, ptr, sizeof(float));
+	ptr += sizeof(float);
+
+	memset(_buf, 0, sizeof(_buf));
+
+	ptr = _buf;
+
+	Vector3 character_pos;
+	character_pos = _user->GetCurCharacter()->GetPosition();
+	character_pos = character_pos + (dirvector * _user->GetCurCharacter()->GetCharacter_Speed());
+
+	// 
+	//	이동한 위치가 지형에 막히는지?
+	//
+
+	_user->GetCurCharacter()->SetPosition(character_pos);
+
+	memcpy(ptr, &character_pos.x, sizeof(float));
+	ptr += sizeof(float);
+
+	memcpy(ptr, &character_pos.y, sizeof(float));
+	ptr += sizeof(float);
+
+	memcpy(ptr, &character_pos.z, sizeof(float));
+	ptr += sizeof(float);
+
+	memcpy(ptr, &time, sizeof(float));
+	ptr += sizeof(float);
+}
+
+RESULT CharacterManager::Character_EnterGame_Process(User * _user)
+{
+	PROTOCOL protocol;
+	char buf[BUFSIZE];
+	char* ptr = buf;
+	bool check;
+	int choice;
+
+	_user->unPack(&protocol, &buf);
+
+	RESULT result;
+	PROTOCOL sendprotocol;
+
+	// 수정했음
+	switch (protocol)
+	{
+	case CLIENT_INGAME_MOVE:
+		CharacterMove(_user, buf);
+		sendprotocol = SEVER_INGAME_MOVE_RESULT;
+		//_user->pack(sendprotocol, buf, )
+	default:
+		break;
+	}
+
+	return result;
+}
