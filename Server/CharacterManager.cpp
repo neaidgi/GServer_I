@@ -253,6 +253,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		}
 
 		bool is_slot;
+		int size;
 
 		if (count == 0)
 		{
@@ -261,12 +262,13 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 			// 프로토콜 데이터 패킹
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
 			memcpy(buf, &is_slot, sizeof(bool));
-			_user->pack(sendprotocol, buf, 0);
+			_user->pack(sendprotocol, buf, sizeof(bool));
 			result = RT_CHARACTER_SLOTRESULT;
 		}
 		else
 		{
 			is_slot = true;
+			size = 0;
 			for (int i = 0; i < count; i++)
 			{
 				_user->SetSlot(slotdata[i]);
@@ -276,33 +278,42 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 
 			// 프로토콜 데이터 패킹
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
+
 			memcpy(ptr, &is_slot, sizeof(bool));
 			ptr += sizeof(bool);
+			size += sizeof(bool);
 
 			memcpy(ptr, &count, sizeof(int));
-			ptr += sizeof(bool);
+			ptr += sizeof(int);
+			size += sizeof(int);
 
 			for (int i = 0; i < count; i++)
 			{
 				int joblen = strlen(slotdata[i]->jobname);
 				int nicklen = strlen(slotdata[i]->nick);
+
 				memcpy(ptr, &joblen, sizeof(int));
 				ptr += sizeof(int);
+				size += sizeof(int);
 
 				memcpy(ptr, slotdata[i]->jobname, joblen);
 				ptr += joblen;
+				size += joblen;
 
 				memcpy(ptr, &slotdata[i]->level, sizeof(int));
 				ptr += sizeof(int);
+				size += sizeof(int);
 
 				memcpy(ptr, &nicklen, sizeof(int));
 				ptr += sizeof(int);
+				size += sizeof(int);
 
 				memcpy(ptr, slotdata[i]->nick, nicklen);
 				ptr += nicklen;
+				size += nicklen;
 			}
 
-			_user->pack(sendprotocol, buf, 0);
+			_user->pack(sendprotocol, buf, size);
 			result = RT_CHARACTER_SLOTRESULT;
 		}
 		break;
