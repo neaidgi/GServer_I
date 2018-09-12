@@ -22,6 +22,8 @@ private:
 	void InitEnterGame(User* _user, char* _buf);
 	void CharacterMove(User* _user, char* _buf, int& _datasize);
 	void CharacterInfo_toOther(User* _user, char* _data, int _datasize);
+	int CharacterCode();	// 캐릭터 고유 코드 만들기(임시사용)
+
 public:
 	static void CreateInstance();
 	static CharacterManager* GetInstance();

@@ -27,7 +27,6 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	char tnick[20];
 	int tlevel;
 
-
 	bool result = DBManager::GetInstance()->Character_reqCharacterSlot
 	(_user->getID(), _index, torigincode, tjobname, tnick, tlevel, tcode);
 
@@ -83,6 +82,7 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 
 void CharacterManager::CreateCharacter(User * _user, char* _buf)
 {
+	int origincode;
 	int jobcode;
 	int len;
 	char nick[NICKNAMESIZE];
@@ -97,23 +97,26 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	memcpy(&jobcode, _buf, sizeof(int));
 	_buf += sizeof(int);
 
+	// 고유코드 만들기 (minute + second + millisecond)
+	origincode = CharacterCode();
+	
 	switch (jobcode)
 	{
 	case TANKER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[0]->GetCharacter_Code(),
-			CharacterOrigin[0]->GetCharacter_Name(), nick, 1);
+			CharacterOrigin[0]->GetCharacter_Name(), nick, 1, origincode);
 
 		break;
 	case WARRIOR:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[1]->GetCharacter_Code(),
-			CharacterOrigin[1]->GetCharacter_Name(), nick, 1);
+			CharacterOrigin[1]->GetCharacter_Name(), nick, 1, origincode);
 		break;
 	case MAGICIAN:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[2]->GetCharacter_Code(),
-			CharacterOrigin[2]->GetCharacter_Name(), nick, 1);
+			CharacterOrigin[2]->GetCharacter_Name(), nick, 1, origincode);
 		break;
 	}
 }
@@ -124,6 +127,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	char data[BUFSIZE];
 	char* ptr = data;
 	int index = 0;
+	int size = 0;
 	Vector3 pos;
 
 	memcpy(&index, _buf, sizeof(int));
@@ -132,12 +136,15 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	memcpy(ptr, &pos.x, sizeof(float));
 	ptr += sizeof(float);
-
+	size = sizeof(float);
+		
 	memcpy(ptr, &pos.y, sizeof(float));
 	ptr += sizeof(float);
+	size = sizeof(float);
 
 	memcpy(ptr, &pos.z, sizeof(float));
 	ptr += sizeof(float);
+	size = sizeof(float);
 
 	Character* player = CharacterSelect(_user, _user->GetSlot(index)->origincode);
 	_user->SetCurCharacter(player);
@@ -148,7 +155,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	// 
 
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
-	_user->pack(sendprotocol, data, 0);
+	_user->pack(sendprotocol, data, size);
 
 }
 
@@ -431,6 +438,29 @@ void CharacterManager::CharacterMove(User * _user, char * _buf, int & _datasize)
 void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
 {
 	//UserManager::GetInstance()->
+}
+
+int CharacterManager::CharacterCode()
+{
+	// 임시사용 수정할 예정
+
+	SYSTEMTIME lptime;
+
+	GetLocalTime(&lptime);
+
+	int code = 0;
+
+	int minute = 0;
+	int second = 0;
+	int millisecond = 0;
+
+	minute = (lptime.wMinute * 1000000);
+	second = (lptime.wSecond * 10000);
+	millisecond = (lptime.wMilliseconds * 1);
+
+	code = minute + second + millisecond;
+
+	return code;
 }
 
 RESULT CharacterManager::Character_EnterGame_Process(User * _user)
