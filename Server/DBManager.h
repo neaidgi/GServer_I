@@ -4,20 +4,20 @@
 #pragma comment(lib, "libmysql.lib")
 
 #include "Global.h"
-#include "User.h"
+#include "Character.h"
 #include <mysql.h>
 
-class DBManger
+class DBManager
 {
 private:
-	static DBManger* Instance;
+	static DBManager* Instance;
 	MYSQL*	mysql;
 
-	DBManger();
-	~DBManger();
+	DBManager();
+	~DBManager();
 public:
 	static void CreateInstance();
-	static DBManger* GetInstance();
+	static DBManager* GetInstance();
 	static void DestroyInstance();
 
 	bool InitializeDB();

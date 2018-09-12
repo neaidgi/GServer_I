@@ -22,10 +22,13 @@ Packet::Packet(SOCKET _socket, SOCKADDR_IN _addr): TCPClient(_socket, _addr)
 
 	ZeroMemory(&sendEx.overlapped, sizeof(sendEx.overlapped));
 	ZeroMemory(&recvEx.overlapped, sizeof(recvEx.overlapped));
+	ZeroMemory(&os_sendEx.overlapped, sizeof(os_sendEx.overlapped));
 	sendEx.p = this;
 	recvEx.p = this;
+	os_sendEx.p = this;
 	sendEx.type = IOTYPE_SEND;
 	recvEx.type = IOTYPE_RECV;
+	os_sendEx.type = IOTYPE_ONESIDED_SEND;
 }
 
 // 데이터 전송
@@ -160,6 +163,30 @@ bool Packet::IOCP_RecvMsg()
 		}
 	}
 
+	return true;
+}
+
+bool Packet::IOCP_OneSided_SendMsg()
+{
+	int retval;
+	DWORD sendbytes;
+	DWORD flags;
+
+	ZeroMemory(&os_sendEx.overlapped, sizeof(os_sendEx.overlapped));
+
+	sendwsabuf.buf = sendBuf + sentSize;
+	sendwsabuf.len = sendSize - sentSize;
+	retval = WSASend(sock, &sendwsabuf, 1, &sendbytes, 0, &os_sendEx.overlapped, NULL);
+	if (retval == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			LogManager::GetInstance()->SetTime();
+			LogManager::GetInstance()->LogWrite("Packet::IOCP_SendMsg : ERROR : WSASend() result = SOCKET_ERROR");
+			ErrorManager::GetInstance()->err_display("Packet second_WSAsend()");
+			return false;
+		}
+	}
 	return true;
 }
 

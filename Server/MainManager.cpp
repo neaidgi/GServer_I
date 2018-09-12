@@ -23,7 +23,7 @@ void MainManager::CreateInstance()
 		LogManager::CreateInstance();
 		ErrorManager::CreateInstance();
 		UserManager::CreateInstance();
-		DBManger::CreateInstance();
+		DBManager::CreateInstance();
 		ThreadManager::CreateInstance();
 		TenderManager::CreateInstance();
 		LoginManager::CreateInstance();
@@ -50,7 +50,7 @@ void MainManager::DestroyInstance()
 		CharacterManager::DestroyInstance();
 		EncryptManager::DestroyInstance();
 		GameManager::DestroyInstance();
-		DBManger::DestroyInstance();
+		DBManager::DestroyInstance();
 		LogManager::DestroyInstance();
 		ErrorManager::DestroyInstance();
 	}
@@ -143,7 +143,7 @@ bool MainManager::MangerInitialize()
 	ErrorManager::GetInstance()->InitializeManager();
 
 	// DB 연동
-	if (DBManger::GetInstance()->InitializeDB() == false)
+	if (DBManager::GetInstance()->InitializeDB() == false)
 	{
 		ErrorManager::GetInstance()->err_display("데이터베이스");
 		return false;
@@ -186,7 +186,7 @@ void MainManager::EndManager()
 	EncryptManager::GetInstance()->EndManager();
 	GameManager::GetInstance()->EndManager();
 	// DB 연결 해제
-	DBManger::GetInstance()->EndManager();
+	DBManager::GetInstance()->EndManager();
 
 	// 윈속 종료
 	WSACleanup();	// 소켓 DLL 메모리 해제

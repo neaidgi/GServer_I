@@ -15,6 +15,7 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 	is_slotload = false;
 	ingame = false;
 	login = false;
+	is_callback = false;
 }
 
 User::~User()

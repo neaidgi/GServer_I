@@ -61,7 +61,8 @@ enum PROTOCOL {
 
 	CLIENT_INGAME_MOVE,						// 클라 이동					[프로토콜][방향벡터 or WASD]
 
-	SEVER_INGAME_MOVE_RESULT				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
+	SEVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
+	SEVER_INGAME_OTHERPLAYER_INFO			// 다른플레이어 정보
 };
 
 
@@ -115,7 +116,10 @@ enum RESULT {
 	RT_CHARACTER_ENTERCREATE, 			// 캐릭터 생성 화면으로 이동
 	RT_CHARACTER_CREATE,				// 캐릭터 생성 
 	RT_CHARACTER_NICKOVERLAP_TRUE,		// 닉네임 중복
-	RT_CHARACTER_EXIT					// 생성 취소
+	RT_CHARACTER_EXIT,					// 생성 취소
+
+	RT_INGAME_MOVE = 300,				// 이동
+	RT_INGAME_OTHERPLAYER_INFO			// 다른 플레이어 정보
 };
 
 // 직업코드
@@ -127,7 +131,7 @@ enum CHARACTER_JOB
 };
 
 enum IOTYPE {
-	IOTYPE_ACCEPT = 200, IOTYPE_RECV, IOTYPE_SEND
+	IOTYPE_ACCEPT = 200, IOTYPE_RECV, IOTYPE_SEND, IOTYPE_ONESIDED_SEND
 };
 
 struct WSAOVERLAPPEDEx {

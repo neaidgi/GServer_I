@@ -28,7 +28,7 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	int tlevel;
 
 
-	bool result = DBManger::GetInstance()->Character_reqCharacterSlot
+	bool result = DBManager::GetInstance()->Character_reqCharacterSlot
 	(_user->getID(), _index, torigincode, tjobname, tnick, tlevel, tcode);
 
 	// 슬롯에 캐릭터 없으면 false 반환
@@ -66,7 +66,7 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 
 	memcpy(nick, _buf, len);
 
-	check = DBManger::GetInstance()->Character_reqCharacterCheckName(nick);
+	check = DBManager::GetInstance()->Character_reqCharacterCheckName(nick);
 
 	//_user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
 	//_user->include_wset = true;
@@ -100,18 +100,18 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	switch (jobcode)
 	{
 	case TANKER:
-		DBManger::GetInstance()->Character_CharacterSlotAdd
+		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[0]->GetCharacter_Code(),
 			CharacterOrigin[0]->GetCharacter_Name(), nick, 1);
 
 		break;
 	case WARRIOR:
-		DBManger::GetInstance()->Character_CharacterSlotAdd
+		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[1]->GetCharacter_Code(),
 			CharacterOrigin[1]->GetCharacter_Name(), nick, 1);
 		break;
 	case MAGICIAN:
-		DBManger::GetInstance()->Character_CharacterSlotAdd
+		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[2]->GetCharacter_Code(),
 			CharacterOrigin[2]->GetCharacter_Name(), nick, 1);
 		break;
@@ -128,7 +128,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	memcpy(&index, _buf, sizeof(int));
 
-	DBManger::GetInstance()->Character_reqCharacterPos(_user->GetSlot(index)->code, pos);
+	DBManager::GetInstance()->Character_reqCharacterPos(_user->GetSlot(index)->code, pos);
 
 	memcpy(ptr, &pos.x, sizeof(float));
 	ptr += sizeof(float);
@@ -182,7 +182,7 @@ bool CharacterManager::InitializeManager()
 	}
 
 	// 캐릭터 정보 가져오기
-	if (DBManger::GetInstance()->Character_reqCharacterInfo(CharacterOrigin) == false)
+	if (DBManager::GetInstance()->Character_reqCharacterInfo(CharacterOrigin) == false)
 	{
 		// 로그
 		return false;
@@ -428,6 +428,11 @@ void CharacterManager::CharacterMove(User * _user, char * _buf, int & _datasize)
 	_datasize = datasize;
 }
 
+void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
+{
+	//UserManager::GetInstance()->
+}
+
 RESULT CharacterManager::Character_EnterGame_Process(User * _user)
 {
 	PROTOCOL protocol;
@@ -448,6 +453,7 @@ RESULT CharacterManager::Character_EnterGame_Process(User * _user)
 		CharacterMove(_user, buf, datasize);
 		sendprotocol = SEVER_INGAME_MOVE_RESULT;
 		_user->pack(sendprotocol, buf, datasize);
+		result = RT_INGAME_MOVE;
 	default:
 		break;
 	}

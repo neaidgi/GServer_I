@@ -10,6 +10,7 @@ class Packet : public TCPClient
 {
 private:
 	WSAOVERLAPPEDEx sendEx;
+	WSAOVERLAPPEDEx os_sendEx;
 	WSAOVERLAPPEDEx recvEx;
 	char sendBuf[BUFSIZE];
 	char recvBuf[BUFSIZE];
@@ -27,6 +28,7 @@ public:
 
 	bool IOCP_SendMsg();
 	bool IOCP_RecvMsg();
+	bool IOCP_OneSided_SendMsg();
 	void pack(PROTOCOL p, void *data, int size);
 	void bitpack(PROTOCOL p, void *data, int size);
 	void unPack(PROTOCOL *p, void *data);

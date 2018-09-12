@@ -2,30 +2,30 @@
 #include "LogManager.h"
 #include "ErrorManager.h"
 
-DBManger* DBManger::Instance = nullptr;
+DBManager* DBManager::Instance = nullptr;
 
-DBManger::DBManger()
+DBManager::DBManager()
 {
 	mysql = nullptr;
 }
-DBManger::~DBManger()
+DBManager::~DBManager()
 {
 }
 
-void DBManger::CreateInstance()
+void DBManager::CreateInstance()
 {
 	if (Instance == nullptr)
 	{
-		Instance = new DBManger();
+		Instance = new DBManager();
 	}
 }
 
-DBManger * DBManger::GetInstance()
+DBManager * DBManager::GetInstance()
 {
 	return Instance;
 }
 
-void DBManger::DestroyInstance()
+void DBManager::DestroyInstance()
 {
 	if (Instance != nullptr)
 	{
@@ -33,48 +33,48 @@ void DBManger::DestroyInstance()
 	}
 }
 
-bool DBManger::InitializeDB()
+bool DBManager::InitializeDB()
 {
 	mysql = mysql_init(NULL);
 
 	if (mysql_real_connect(mysql, "127.0.0.1", "LoginServer", "1q2w3e4r", "userinfo", 3306, NULL, 0) == NULL)
 	{
 		LogManager::GetInstance()->SetTime();
-		LogManager::GetInstance()->LogWrite("DBManger::InitializeDB : ERROR : mysql_real_connect() failed ");
+		LogManager::GetInstance()->LogWrite("DBManager::InitializeDB : ERROR : mysql_real_connect() failed ");
 		fprintf(stderr, "Mysql connection error : %s \n", mysql_error(mysql));
 		return false;
 	}
 	else
 	{
 		LogManager::GetInstance()->SetTime();
-		LogManager::GetInstance()->LogWrite("DBManger::InitializeDB : INFO : mysql_real_connect() success ");
+		LogManager::GetInstance()->LogWrite("DBManager::InitializeDB : INFO : mysql_real_connect() success ");
 		return true;
 	}
 }
 
-void DBManger::EndManager()
+void DBManager::EndManager()
 {
 	mysql_close(mysql);
 }
 
-bool DBManger::SelectDB(char * _dbname)
+bool DBManager::SelectDB(char * _dbname)
 {
 	if (mysql_select_db(mysql, _dbname)) // 데이터베이스 선택
 	{
 		LogManager::GetInstance()->SetTime();
-		LogManager::GetInstance()->LogWrite("DBManger::SelectDB : ERROR : mysql_select_db() failed ");
+		LogManager::GetInstance()->LogWrite("DBManager::SelectDB : ERROR : mysql_select_db() failed ");
 		ErrorManager::GetInstance()->err_quit("데이터 베이스 오류");
 		return false;
 	}
 	else
 	{
 		LogManager::GetInstance()->SetTime();
-		LogManager::GetInstance()->LogWrite("DBManger::SelectDB : INFO : mysql_select_db() success ");
+		LogManager::GetInstance()->LogWrite("DBManager::SelectDB : INFO : mysql_select_db() success ");
 		return true;
 	}
 }
 
-bool DBManger::Login_CheckID(char * _id)
+bool DBManager::Login_CheckID(char * _id)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -126,7 +126,7 @@ bool DBManger::Login_CheckID(char * _id)
 	}
 }
 
-bool DBManger::Login_reqJoin(char * _id, char * _pw, char * _nick)
+bool DBManager::Login_reqJoin(char * _id, char * _pw, char * _nick)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -170,7 +170,7 @@ bool DBManger::Login_reqJoin(char * _id, char * _pw, char * _nick)
 	}
 }
 
-bool DBManger::Login_reqLogin(char * _id, char * _pw)
+bool DBManager::Login_reqLogin(char * _id, char * _pw)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -215,7 +215,7 @@ bool DBManger::Login_reqLogin(char * _id, char * _pw)
 	}
 }
 
-bool DBManger::Login_reqLeave(char * _id)
+bool DBManager::Login_reqLeave(char * _id)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -248,7 +248,7 @@ bool DBManger::Login_reqLeave(char * _id)
 }
 
 // 실제 생성한 유저 캐릭터 저장
-bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code, const char * _jobname, char * _nick, int _level)
+bool DBManager::Character_CharacterSlotAdd(const char* _id, int _index, int _code, const char * _jobname, char * _nick, int _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -299,7 +299,7 @@ bool DBManger::Character_CharacterSlotAdd(const char* _id, int _index, int _code
 // 캐릭터 설계도 요청
 // 현재 code받아서 하나씩 외부로 제공하는 함수
 // 수정 >> 배열 받아서 모든 캐릭터 정보 output으로 전달 
-bool DBManger::Character_reqCharacterInfo(Character * _character_out[])
+bool DBManager::Character_reqCharacterInfo(Character * _character_out[])
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -405,7 +405,7 @@ bool DBManger::Character_reqCharacterInfo(Character * _character_out[])
 	}
 }
 
-bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code)
+bool DBManager::Character_reqCharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -477,7 +477,7 @@ bool DBManger::Character_reqCharacterSlot(const char* _id, int _index, int& _ori
 	}
 }
 
-bool DBManger::Character_reqCharacterDelete(const char * _id, int _index)
+bool DBManager::Character_reqCharacterDelete(const char * _id, int _index)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -542,7 +542,7 @@ bool DBManger::Character_reqCharacterDelete(const char * _id, int _index)
 	}
 }
 
-bool DBManger::Character_reqCharacterCheckName(const char * _nick)
+bool DBManager::Character_reqCharacterCheckName(const char * _nick)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -594,7 +594,7 @@ bool DBManger::Character_reqCharacterCheckName(const char * _nick)
 	}
 }
 
-bool DBManger::Character_reqCharacterPos(int _code, Vector3& _pos)
+bool DBManager::Character_reqCharacterPos(int _code, Vector3& _pos)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
