@@ -221,5 +221,8 @@
     <ClInclude Include="InGameState.h">
       <Filter>헤더 파일\State\InGameState</Filter>
     </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include"InGameState.h"
+#include "CharacterManager.h"
 
 bool InGameState::Read(User * _user)
 {

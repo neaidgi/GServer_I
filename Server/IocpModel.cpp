@@ -64,11 +64,25 @@ void IocpModel::IocpProcess()
 
 			if (recvProcess(user))
 			{
-				if (user->IOCP_SendMsg() == false)
+				// Send가 필요한지 확인
+				if (user->GetCallback())
 				{
-					user->stop();
-					UserManager::GetInstance()->removeUser(user);
-					break;
+					if (user->IOCP_SendMsg() == false)
+					{
+						user->stop();
+						UserManager::GetInstance()->removeUser(user);
+						break;
+					}
+				}
+				else
+				{
+					user->SetCallback(true);
+					if (user->IOCP_RecvMsg() == false)
+					{
+						user->stop();
+						UserManager::GetInstance()->removeUser(user);
+						break;
+					}
 				}
 			}
 			break;
@@ -95,6 +109,20 @@ void IocpModel::IocpProcess()
 					UserManager::GetInstance()->removeUser(user);
 					break;
 				}
+			}
+			break;
+		case IOTYPE_ONESIDED_SEND:
+			// 다 보냈는지 확인
+			if (user->IOCP_isSendSuccess(cbTransferred) == false)
+			{
+				// send : false를 return하면 소켓 종료. 다보내면 
+				if (user->IOCP_SendMsg() == false)
+				{
+					user->stop();
+					UserManager::GetInstance()->removeUser(user);
+					break;
+				}
+				continue;
 			}
 			break;
 		}

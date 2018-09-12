@@ -155,6 +155,7 @@
     <ClCompile Include="UserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Character.h" />
     <ClInclude Include="CharacterManager.h" />
     <ClInclude Include="CharacterState.h" />
     <ClInclude Include="CloseState.h" />

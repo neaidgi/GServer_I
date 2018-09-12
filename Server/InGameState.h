@@ -2,7 +2,6 @@
 #define _INGAME_STATE_H_
 
 #include"UserState.h"
-#include "CharacterManager.h"
 
 class InGameState :public UserState
 {

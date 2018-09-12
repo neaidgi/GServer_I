@@ -3,7 +3,7 @@
 
 #include "Global.h"
 #include "DBManager.h"
-#include "User.h"
+#include "UserManager.h"
 
 class CharacterManager 
 {
@@ -21,6 +21,7 @@ private:
 	void CreateCharacter(User* _user, char* _buf);
 	void InitEnterGame(User* _user, char* _buf);
 	void CharacterMove(User* _user, char* _buf, int& _datasize);
+	void CharacterInfo_toOther(User* _user, char* _data, int _datasize);
 public:
 	static void CreateInstance();
 	static CharacterManager* GetInstance();
