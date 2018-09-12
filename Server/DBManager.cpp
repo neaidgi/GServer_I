@@ -170,6 +170,39 @@ bool DBManager::Login_reqJoin(char * _id, char * _pw, char * _nick)
 	}
 }
 
+bool DBManager::Login_JoinCharacterSlot(char * _id)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "INSERT INTO UserCharacterInfo(user_id) VALUES(";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+	sprintf(query, "%s '%s')", base_query, _id);
+	/*
+	*	끝
+	*/
+
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql JoinCharacterSlot error : %s \n", mysql_error(mysql));
+		return true;
+	}
+}
+
 bool DBManager::Login_reqLogin(char * _id, char * _pw)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -248,12 +281,12 @@ bool DBManager::Login_reqLeave(char * _id)
 }
 
 // 실제 생성한 유저 캐릭터 저장
-bool DBManager::Character_CharacterSlotAdd(const char* _id, int _index, int _code, const char * _jobname, char * _nick, int _level)
+bool DBManager::Character_CharacterSlotAdd(const char* _id, int _index, int _origincode, const char* _jobname, char* _nick, int _level, int _code)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "INSERT INTO UserCharacterInfo";
+	char* base_query = "update usercharacterinfo set";
 	int state = 0;
 
 	char query[255];
@@ -267,13 +300,13 @@ bool DBManager::Character_CharacterSlotAdd(const char* _id, int _index, int _cod
 	switch (_index)
 	{
 	case 1:
-		sprintf(query, "%s (%d,'%s','%s',%d) SELECT character_code_first, character_jobname_first, character_nickname_first, character_level_first WHERE id = %s", base_query, _code, _jobname, _nick, _level, _id);
+		sprintf(query, "%s	character_origin_code_first = %d, character_jobname_first = '%s', character_nickname_first = '%s', character_level_first = %d, character_code_first = %d where user_id = %s", base_query, _origincode, _jobname, _nick, _level, _code,_id);
 		break;
 	case 2:
-		sprintf(query, "%s (%d,'%s','%s',%d) SELECT character_code_second, character_jobname_second, character_nickname_second, character_level_second WHERE id = %s", base_query, _code, _jobname, _nick, _level, _id);
+		sprintf(query, "%s character_origin_code_second = %d, character_jobname_second = '%s', character_nickname_second = '%s', character_level_second = %d, character_code_second = %d where user_id = %s", base_query, _origincode, _jobname, _nick, _level, _code, _id);
 		break;
 	case 3:
-		sprintf(query, "%s (%d,'%s','%s',%d) SELECT character_code_third, character_jobname_third, character_nickname_third, character_level_third WHERE id = %s", base_query, _code, _jobname, _nick, _level, _id);
+		sprintf(query, "%s character_origin_code_third = %d, character_jobname_third = '%s', character_nickname_third = '%s', character_level_third = %d, character_code_third = %d where user_id = %s", base_query, _origincode, _jobname, _nick, _level, _code, _id);
 		break;
 	}
 
