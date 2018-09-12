@@ -21,6 +21,7 @@ User::~User()
 {
 	delete loginstate;
 	delete tenderstate;
+	delete characterstate;
 	delete ingamestate;
 
 	for (int i = 0; i < slotcount; i++)
