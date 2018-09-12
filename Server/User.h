@@ -76,9 +76,12 @@ public:
 	void setmoney(int money);
 	void setLogin() { login = true; }
 	void setLogout() { login = false; }
+	void SetEnterGame() { ingame = true; }
+	void SetLeaveGame() { ingame = false; }
 	void SetCallback(bool _callback) { is_callback = _callback; }
 	bool GetCallback() { return is_callback; }
 	bool isLogin() { return login ? true : false; }
+	bool isIngame() { return ingame ? true : false; }
 
 	void InitState();
 };

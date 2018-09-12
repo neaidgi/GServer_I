@@ -313,6 +313,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		break;
 	case CLIENT_CHARACTER_ENTER:
 		InitEnterGame(_user, buf);
+		_user->SetEnterGame();
 		result = RT_CHARACTER_ENTERGAME;
 		break;
 	default:
@@ -417,9 +418,32 @@ void CharacterManager::CharacterMove(User * _user, char * _buf, int & _datasize)
 	_datasize = datasize;
 }
 
+// 캐릭터 정보 다른 플레이어에게 전송
 void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
 {
-	//UserManager::GetInstance()->
+	char* ptr = _data;
+	int size = _datasize;
+	const char* name = _user->GetCurCharacter()->GetCharacter_Name();
+	int namesize = strlen(name);
+
+	ptr += size;
+	memcpy(ptr, &namesize, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	memcpy(ptr, name, namesize);
+	size += namesize;
+
+	User* user;
+	while (UserManager::GetInstance()->searchData(user))
+	{
+		if (user->isIngame() && user != _user)
+		{
+
+			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, _data, _datasize);
+			user->IOCP_OneSided_SendMsg();
+		}
+	}
 }
 
 RESULT CharacterManager::Character_EnterGame_Process(User * _user)
@@ -443,6 +467,7 @@ RESULT CharacterManager::Character_EnterGame_Process(User * _user)
 		sendprotocol = SEVER_INGAME_MOVE_RESULT;
 		_user->pack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
+		CharacterInfo_toOther(_user, buf, datasize);
 	default:
 		break;
 	}

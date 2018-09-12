@@ -62,7 +62,7 @@ enum PROTOCOL {
 	CLIENT_INGAME_MOVE,						// 클라 이동					[프로토콜][방향벡터 or WASD]
 
 	SEVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
-	SEVER_INGAME_OTHERPLAYER_INFO			// 다른플레이어 정보
+	SEVER_INGAME_OTHERPLAYER_INFO			// 다른플레이어 정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
 };
 
 
