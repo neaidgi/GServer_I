@@ -458,15 +458,15 @@ bool DBManager::Character_reqCharacterSlot(const char* _id, int _index, int& _or
 	{
 	case 1:
 		sprintf(query,
-			"%s character_origin_code_first, character_jobname_first, character_nickname_first, character_level_first, character_code_first FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
+			"%s character_origin_code_first, character_jobname_first, character_nickname_first, character_level_first, character_code_first FROM UserCharacterInfo WHERE user_id = '%s'", base_query, _id);
 		break;
 	case 2:
 		sprintf(query,
-			"%s character_origin_code_second, character_jobname_second, character_nickname_second, character_level_second, character_code_second FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
+			"%s character_origin_code_second, character_jobname_second, character_nickname_second, character_level_second, character_code_second FROM UserCharacterInfo WHERE user_id = '%s'", base_query, _id);
 		break;
 	case 3:
 		sprintf(query,
-			"%s character_origin_code_third, character_jobname_third, character_nickname_third, character_level_third, character_code_third FROM UserCharacterInfo WHERE user_id = %s", base_query, _id);
+			"%s character_origin_code_third, character_jobname_third, character_nickname_third, character_level_third, character_code_third FROM UserCharacterInfo WHERE user_id = '%s'", base_query, _id);
 		break;
 	}
 
@@ -484,15 +484,24 @@ bool DBManager::Character_reqCharacterSlot(const char* _id, int _index, int& _or
 
 		sql_row = mysql_fetch_row(sql_result);
 
-		if (sql_row == NULL)
+		if (sql_row[0] == NULL)
 		{
 			return false;
 		}
 
 		// DB µ•¿Ã≈Õ æ∆øÙ«≤ ¿˙¿Â
 		_origincode = atoi(sql_row[0]);
-		memcpy(_jobname, sql_row[1], strlen(sql_row[1]));
-		memcpy(_nick, sql_row[2], strlen(sql_row[2]));
+
+		int len = strlen(sql_row[1]);
+		strcpy_s(_jobname, len + 1, sql_row[1]);
+
+		//memcpy(_jobname, sql_row[1], len);
+
+		len = strlen(sql_row[2]);
+		strcpy_s(_nick, len + 1, sql_row[2]);
+
+		//memcpy(_nick, sql_row[2], len);
+
 		_level = atoi(sql_row[3]);
 		_code = atoi(sql_row[4]);
 

@@ -106,3 +106,4 @@ drop table CharacterPos;
 drop table characterinfo;
 drop table iteminfo;
 
+SELECT * INTO OUTFILE 'C:/' FIELDS TERMINATED BY '\t' FROM CharacterPos;
