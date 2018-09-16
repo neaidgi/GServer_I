@@ -12,6 +12,7 @@ private:
 	Vector3 Scale;					// 크기
 	char* character_name;			// 캐릭터 닉네임
 	int character_code;				// 코드
+	int character_uniquecode;				// 코드
 	int	character_str;				// 힘
 	int	character_dex;				// 민
 	int	character_int;				// 지
@@ -29,6 +30,7 @@ private:
 public:
 	const char* GetCharacter_Name() { return character_name; }
 	int GetCharacter_Code() { return character_code; }
+	int GetCharacter_UniqueCode() { return character_uniquecode; }
 	int GetCharacter_STR() { return character_str; }
 	int GetCharacter_DEX() { return character_dex; }
 	int GetCharacter_INT() { return character_int; }
@@ -56,6 +58,7 @@ public:
 		character_name = name;
 	}
 	void SetCharacter_Code(int _character_code) { character_code = _character_code; }
+	void SetCharacter_UniqueCode(int _character_uniquecode) { character_uniquecode = _character_uniquecode; }
 	void SetCharacter_STR(int _character_str) { character_str = _character_str; }
 	void SetCharacter_DEX(int _character_dex) { character_dex = _character_dex; }
 	void SetCharacter_INT(int _character_int) { character_int = _character_int; }

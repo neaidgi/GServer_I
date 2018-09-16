@@ -134,21 +134,35 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	memcpy(&index, _buf, sizeof(int));
 
-	DBManager::GetInstance()->Character_reqCharacterPos(_user->GetSlot(index)->code, pos);
+	if (DBManager::GetInstance()->Character_reqCharacterPos(_user->GetSlot(index)->code, pos))
+	{
+		bool ispos = true;
+		memcpy(ptr, &ispos, sizeof(bool));
+		ptr += sizeof(bool);
+		size = sizeof(bool);
 
-	memcpy(ptr, &pos.x, sizeof(float));
-	ptr += sizeof(float);
-	size = sizeof(float);
-		
-	memcpy(ptr, &pos.y, sizeof(float));
-	ptr += sizeof(float);
-	size = sizeof(float);
+		memcpy(ptr, &pos.x, sizeof(float));
+		ptr += sizeof(float);
+		size = sizeof(float);
 
-	memcpy(ptr, &pos.z, sizeof(float));
-	ptr += sizeof(float);
-	size = sizeof(float);
+		memcpy(ptr, &pos.y, sizeof(float));
+		ptr += sizeof(float);
+		size = sizeof(float);
+
+		memcpy(ptr, &pos.z, sizeof(float));
+		ptr += sizeof(float);
+		size = sizeof(float);
+	}
+	else
+	{
+		bool ispos = false;
+		memcpy(ptr, &ispos, sizeof(bool));
+		ptr += sizeof(bool);
+		size = sizeof(bool);
+	}
 
 	Character* player = CharacterSelect(_user, _user->GetSlot(index)->origincode);
+	player->SetCharacter_UniqueCode(_user->GetSlot(index)->code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
 
@@ -156,9 +170,12 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	// 캐릭터 스테이터스 패킹 // 추가예정
 	// 
 
+	//
+	// 인게임에 접속중인 유저 리스트(카운트, 캐릭터코드, 캐릭터코드, ...)
+	// 
+
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 	_user->pack(sendprotocol, data, size);
-
 }
 
 void CharacterManager::CreateInstance()
