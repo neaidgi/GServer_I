@@ -683,3 +683,40 @@ bool DBManager::Character_reqCharacterPos(int _code, Vector3& _pos)
 	}
 }
 
+bool DBManager::Charactor_CharacterPosAdd(int _code)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "INSERT INTO CharacterPos VALUES";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 
+	sprintf(query, "(%d, null, null, null)", base_query, _code);
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Pos error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+

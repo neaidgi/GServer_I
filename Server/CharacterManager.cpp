@@ -82,7 +82,7 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 
 void CharacterManager::CreateCharacter(User * _user, char* _buf)
 {
-	int origincode;
+	int code;
 	int jobcode;
 	int len;
 	char nick[NICKNAMESIZE];
@@ -98,27 +98,29 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	_buf += sizeof(int);
 
 	// 고유코드 만들기 (minute + second + millisecond)
-	origincode = CharacterCode();
+	code = CharacterCode();
 	
 	switch (jobcode)
 	{
 	case TANKER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[0]->GetCharacter_Code(),
-			CharacterOrigin[0]->GetCharacter_Name(), nick, 1, origincode);
+			CharacterOrigin[0]->GetCharacter_Name(), nick, 1, code);
 
 		break;
 	case WARRIOR:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[1]->GetCharacter_Code(),
-			CharacterOrigin[1]->GetCharacter_Name(), nick, 1, origincode);
+			CharacterOrigin[1]->GetCharacter_Name(), nick, 1, code);
 		break;
 	case MAGICIAN:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[2]->GetCharacter_Code(),
-			CharacterOrigin[2]->GetCharacter_Name(), nick, 1, origincode);
+			CharacterOrigin[2]->GetCharacter_Name(), nick, 1, code);
 		break;
 	}
+
+	DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
 }
 
 void CharacterManager::InitEnterGame(User * _user, char * _buf)
@@ -457,7 +459,6 @@ void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _da
 	{
 		if (user->isIngame() && user != _user)
 		{
-
 			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, _data, _datasize);
 			user->IOCP_OneSided_SendMsg();
 		}
