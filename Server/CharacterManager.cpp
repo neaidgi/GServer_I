@@ -262,12 +262,13 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 	SlotData* slotdata[3];
 	memset(slotdata, 0, sizeof(slotdata));
 	int count = 0;
+	int i = 0;
 
 	// 수정했음
 	switch (protocol)
 	{
 	case CLIENT_REQ_CHARACTER_SLOT:
-		for (int i = 0; i < SLOTMAXCOUNT; i++)
+		while (i < SLOTMAXCOUNT)
 		{
 			slotdata[i] = new SlotData();
 			if (GetCharacter_Slot(_user, i + 1, slotdata[i]) == false)
@@ -276,6 +277,9 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 				count = i;
 				break;
 			}
+
+			++i;
+			count = i;
 		}
 
 		bool is_slot;
@@ -295,12 +299,15 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		{
 			is_slot = true;
 			size = 0;
+
+			// **슬롯 저장 안하게 수정 예정**
 			for (int i = 0; i < count; i++)
 			{
 				_user->SetSlot(slotdata[i]);
 			}
 			// 슬롯 로드완료
 			_user->SlotLoadComplete();
+			// ****
 
 			// 프로토콜 데이터 패킹
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
@@ -337,6 +344,10 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 				memcpy(ptr, slotdata[i]->nick, nicklen);
 				ptr += nicklen;
 				size += nicklen;
+
+				memcpy(ptr, &slotdata[i]->code, sizeof(int));
+				ptr += sizeof(int);
+				size += sizeof(int);
 			}
 
 			_user->pack(sendprotocol, buf, size);
