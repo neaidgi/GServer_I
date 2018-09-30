@@ -43,13 +43,17 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	_slot->code = tcode;
 	_slot->level = tlevel;
 	_slot->jobname = new char[len + 1]();
+	memset(_slot->jobname, 0, len + 1);
 	_slot->jobname[len] = '0';
-	memcpy(_slot->jobname, tjobname, len);
+	strcpy_s(_slot->jobname, len + 1, tjobname);
+	//memcpy(_slot->jobname, tjobname, len);
 
 	len = strlen(tnick);
 	_slot->nick = new char[len + 1]();
+	memset(_slot->nick, 0, len + 1);
 	_slot->nick[len] = '0';
-	memcpy(_slot->nick, tnick, len);
+	strcpy_s(_slot->nick, len + 1, tnick);
+	//memcpy(_slot->nick, tnick, len);
 
 	return result;
 }
