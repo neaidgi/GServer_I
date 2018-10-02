@@ -178,6 +178,39 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	// 인게임에 접속중인 유저 리스트(카운트, 캐릭터코드, 캐릭터코드, ...)
 	// 
 
+	// count자리 비워두기. 나중에 count 넣어줄때는 ptr 사용하기
+	char* ptr_temp = ptr;
+	ptr_temp += sizeof(int);
+
+	int usercount = 0;
+	int character_uniquecode;
+	User* user_temp;
+	Character* character_temp;
+	UserManager::GetInstance()->startSearch();
+	while (1)
+	{
+		if (UserManager::GetInstance()->searchData(user_temp) == true)
+		{
+			if (user_temp->isIngame() == true)
+			{
+				character_temp = user_temp->GetCurCharacter();
+				character_uniquecode = character_temp->GetCharacter_UniqueCode();
+				memcpy(ptr_temp, &character_uniquecode, sizeof(int));
+				ptr_temp += sizeof(int);
+				size += sizeof(int);
+
+				usercount++;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	memcpy(ptr, &usercount, sizeof(int));
+	size += sizeof(int);
+
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 	_user->pack(sendprotocol, data, size);
 }
@@ -217,6 +250,7 @@ bool CharacterManager::InitializeManager()
 		// 로그
 		return false;
 	}
+
 	return true;
 }
 
@@ -401,6 +435,7 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 		}
 		break;
 	case CLIENT_CHARACTER_EXIT:				// 캐릭터 생성 취소
+		_user->pack(SERVER_CHARACTER_EXIT_RESULT, buf, 0);
 		result = RT_CHARACTER_EXIT;
 		break;
 	default:
