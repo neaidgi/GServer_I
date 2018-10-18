@@ -71,9 +71,6 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 
 	check = DBManager::GetInstance()->Character_reqCharacterCheckName(nick);
 
-	//_user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
-	//_user->include_wset = true;
-
 	if (check)
 	{
 		return true;
