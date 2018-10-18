@@ -98,10 +98,3 @@ INSERT INTO ItemInfo VALUES (1,'HealthPotion',1,1,1,'체력을 50 회복해준�
                             (3,'Sword',2,1,2,'전사의 기본무기',2),
                             (4,'Staff',2,1,2,'마법사의 기본무기',3),
                             (5,'ClothAmor',3,1,3,'기본 천갑옷',4);
-
-
-
-drop table usercharacterinfo;
-drop table CharacterPos;
-drop table characterinfo;
-drop table iteminfo;
