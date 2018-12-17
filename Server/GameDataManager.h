@@ -22,6 +22,8 @@ public:
 
 	bool InitializeManager();
 	void EndManager();
+
+	void Character_SpawnPos_Vector(Vector3 * _pos);
 };
 
 #endif

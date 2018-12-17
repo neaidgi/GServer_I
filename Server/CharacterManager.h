@@ -4,6 +4,7 @@
 #include "Global.h"
 #include "DBManager.h"
 #include "UserManager.h"
+#include "GameDataManager.h"
 
 class CharacterManager 
 {

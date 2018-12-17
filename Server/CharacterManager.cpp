@@ -132,6 +132,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	int index = 0;
 	int size = 0;
 	Vector3 pos;
+	Vector3* spawnpos;
 
 	memcpy(&index, _buf, sizeof(int));
 
@@ -156,16 +157,33 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	}
 	else
 	{
+		// 캐릭터 위치 정보 없을 경우 스폰위치로
+		GameDataManager::GetInstance()->Character_SpawnPos_Vector(spawnpos);
+		pos = spawnpos[0];
 		bool ispos = false;
+
 		memcpy(ptr, &ispos, sizeof(bool));
 		ptr += sizeof(bool);
 		size = sizeof(bool);
+
+		memcpy(ptr, &pos.x, sizeof(float));
+		ptr += sizeof(float);
+		size = sizeof(float);
+
+		memcpy(ptr, &pos.y, sizeof(float));
+		ptr += sizeof(float);
+		size = sizeof(float);
+
+		memcpy(ptr, &pos.z, sizeof(float));
+		ptr += sizeof(float);
+		size = sizeof(float);
 	}
 
 	Character* player = CharacterSelect(_user, _user->GetSlot(index)->origincode);
 	player->SetCharacter_UniqueCode(_user->GetSlot(index)->code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
+	_user->SetEnterGame();
 
 	// 
 	// 캐릭터 스테이터스 패킹 // 추가예정
