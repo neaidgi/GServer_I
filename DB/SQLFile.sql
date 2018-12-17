@@ -9,11 +9,13 @@ create table info
     nick varchar(20) not null
 );
 
+use userinfo;
+
 create table SpawnPos
 (
-	num int not null primary key auto_incremant,
+	num int not null primary key auto_increment,
 	x float not null,
-        y float not null,
+	y float not null,
 	z float not null
 );
 
