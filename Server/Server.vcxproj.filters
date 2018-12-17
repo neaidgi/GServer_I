@@ -70,6 +70,12 @@
     <Filter Include="헤더 파일\State\InGameState">
       <UniqueIdentifier>{e42e1421-90dd-4587-ac50-506215454448}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\GameData">
+      <UniqueIdentifier>{0bd162a1-0593-4fd1-bdbc-4f5ed66bb0eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\GameData">
+      <UniqueIdentifier>{ea46c6e6-970f-41f5-ad60-7a5368cfa255}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -143,6 +149,12 @@
     </ClCompile>
     <ClCompile Include="GameInitializer.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SpawnData.cpp">
+      <Filter>소스 파일\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="GameDataManager.cpp">
+      <Filter>소스 파일\GameData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -229,6 +241,12 @@
     </ClInclude>
     <ClInclude Include="GameInitializer.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameDataManager.h">
+      <Filter>헤더 파일\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnData.h">
+      <Filter>헤더 파일\GameData</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

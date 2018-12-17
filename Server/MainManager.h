@@ -10,6 +10,7 @@
 #include "LogManager.h"
 #include "DBManager.h"
 #include "CharacterManager.h"
+#include "GameDataManager.h"
 
 class MainManager
 {
@@ -27,7 +28,7 @@ public:
 	static BOOL CtrlHandle(DWORD _ctrl);
 
 	bool Acceptprocess();
-	void Run();													// 메인
+	void Run();														// 메인
 	bool Initialize();											    // Wsa 초기화
 	bool MangerInitialize();
 	void EndManager();

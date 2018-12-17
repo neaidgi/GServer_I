@@ -25,10 +25,10 @@ void MainManager::CreateInstance()
 		UserManager::CreateInstance();
 		DBManager::CreateInstance();
 		ThreadManager::CreateInstance();
-		TenderManager::CreateInstance();
 		LoginManager::CreateInstance();
 		CharacterManager::CreateInstance();
 		GameManager::CreateInstance();
+		GameDataManager::CreateInstance();
 		EncryptManager::CreateInstance(ENCRYPT_KEY);
 	}
 }
@@ -43,8 +43,8 @@ void MainManager::DestroyInstance()
 		delete Instance;
 		Instance = nullptr;
 
+		GameDataManager::DestroyInstance();
 		UserManager::DestroyInstance();
-		TenderManager::DestroyInstance();
 		ThreadManager::DestroyInstance();
 		LoginManager::DestroyInstance();
 		CharacterManager::DestroyInstance();
@@ -145,13 +145,12 @@ bool MainManager::MangerInitialize()
 	// DB 연동
 	if (DBManager::GetInstance()->InitializeDB() == false)
 	{
-		ErrorManager::GetInstance()->err_display("데이터베이스");
+		ErrorManager::GetInstance()->err_display("데이터베이스 초기화 실패");
 		return false;
 	}
 
 	UserManager::GetInstance()->InitializeManager();
 	ThreadManager::GetInstance()->InitializeManager();
-	TenderManager::GetInstance()->InitializeManager();
 	LoginManager::GetInstance()->InitializeManager();
 	if (CharacterManager::GetInstance()->InitializeManager() == false)
 	{
@@ -166,6 +165,13 @@ bool MainManager::MangerInitialize()
 
 		return false;
 	}
+
+	if (GameDataManager::GetInstance()->InitializeManager() == false)
+	{
+		ErrorManager::GetInstance()->err_quit("게임 데이터 로드 실패");
+		return false;
+	}
+
 	return true;
 }
 
@@ -176,6 +182,7 @@ void MainManager::EndManager()
 	delete server;
 
 	// 각 매니저들 End 호출
+	GameDataManager::GetInstance()->EndManager();
 	LogManager::GetInstance()->EndManager();
 	UserManager::GetInstance()->EndManager();
 	ThreadManager::GetInstance()->EndManager();

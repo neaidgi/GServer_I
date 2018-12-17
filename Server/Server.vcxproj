@@ -136,6 +136,7 @@
     </ClCompile>
     <ClCompile Include="EncryptManager.cpp" />
     <ClCompile Include="ErrorManager.cpp" />
+    <ClCompile Include="GameDataManager.cpp" />
     <ClCompile Include="GameInitializer.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="InGameState.cpp" />
@@ -147,6 +148,7 @@
     <ClCompile Include="MainManager.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="SpawnData.cpp" />
     <ClCompile Include="TCPClient.cpp" />
     <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="TenderState.cpp" />
@@ -165,6 +167,7 @@
     </ClInclude>
     <ClInclude Include="EnryptManager.h" />
     <ClInclude Include="ErrorManager.h" />
+    <ClInclude Include="GameDataManager.h" />
     <ClInclude Include="GameInitializer.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Global.h" />
@@ -177,6 +180,7 @@
     <ClInclude Include="MainManager.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Socket.h" />
+    <ClInclude Include="SpawnData.h" />
     <ClInclude Include="TCPClient.h" />
     <ClInclude Include="TCPServer.h" />
     <ClInclude Include="TenderState.h" />
