@@ -729,7 +729,7 @@ bool DBManager::Charactor_CharacterPosAdd(int _code)
 	}
 }
 
-bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * pos)
+bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -763,11 +763,13 @@ bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * pos)
 				break;
 			}
 
-			pos[i].x = atof(sql_row[1]);
-			pos[i].y = atof(sql_row[2]);
-			pos[i].z = atof(sql_row[3]);
+			_pos[i].x = atof(sql_row[1]);
+			_pos[i].y = atof(sql_row[2]);
+			_pos[i].z = atof(sql_row[3]);
 		}
 		
+		_count = mysql_num_rows(sql_result);
+
 		return true;
 	}
 	else

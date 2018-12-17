@@ -40,7 +40,7 @@ public:
 	bool Character_Req_CharacterPos(int _code, Vector3& _pos);
 	bool Charactor_CharacterPosAdd(int _code);
 
-	bool Charactor_Req_CharacterSpawnPos(Vector3* pos);
+	bool Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count);
 };
 
 #endif
