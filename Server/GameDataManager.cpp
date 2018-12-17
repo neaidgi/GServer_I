@@ -52,5 +52,5 @@ void GameDataManager::EndManager()
 
 void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 {
-	_pos = spawndata->Character_Spawn_PosData();
+	memcpy(_pos, spawndata->Character_Spawn_PosData(), sizeof(Vector3));
 }
