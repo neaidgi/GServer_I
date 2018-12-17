@@ -131,6 +131,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	char* ptr = data;
 	int index = 0;
 	int size = 0;
+	bool enter = true;
 	Vector3 pos;
 	Vector3* spawnpos;
 
@@ -138,8 +139,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	if (DBManager::GetInstance()->Character_Req_CharacterPos(_user->GetSlot(index)->code, pos))
 	{
-		bool ispos = true;
-		memcpy(ptr, &ispos, sizeof(bool));
+		memcpy(ptr, &enter, sizeof(bool));
 		ptr += sizeof(bool);
 		size = sizeof(bool);
 
@@ -160,9 +160,8 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 		// 캐릭터 위치 정보 없을 경우 스폰위치로
 		GameDataManager::GetInstance()->Character_SpawnPos_Vector(spawnpos);
 		pos = spawnpos[0];
-		bool ispos = false;
 
-		memcpy(ptr, &ispos, sizeof(bool));
+		memcpy(ptr, &enter, sizeof(bool));
 		ptr += sizeof(bool);
 		size = sizeof(bool);
 
@@ -183,7 +182,6 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	player->SetCharacter_UniqueCode(_user->GetSlot(index)->code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
-	_user->SetEnterGame();
 
 	// 
 	// 캐릭터 스테이터스 패킹 // 추가예정
@@ -199,6 +197,9 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	int usercount = 0;
 	int character_uniquecode;
+	int character_code;
+	int nicksize;
+	
 	User* user_temp;
 	Character* character_temp;
 	UserManager::GetInstance()->startSearch();
@@ -210,9 +211,25 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 			{
 				character_temp = user_temp->GetCurCharacter();
 				character_uniquecode = character_temp->GetCharacter_UniqueCode();
-				memcpy(ptr_temp, &character_uniquecode, sizeof(int));
+				character_code = character_temp->GetCharacter_Code();
+				nicksize = strlen(character_temp->GetCharacter_Name());
+				
+				// 캐릭터 코드
+				memcpy(ptr_temp, &character_code, sizeof(int));
 				ptr_temp += sizeof(int);
 				size += sizeof(int);
+				// 닉네임 사이즈
+				memcpy(ptr_temp, &nicksize, sizeof(int));
+				ptr_temp += sizeof(int);
+				size += sizeof(int);
+				// 닉네임
+				memcpy(ptr_temp, character_temp->GetCharacter_Name(), nicksize);
+				ptr_temp += nicksize;
+				size += nicksize;
+				// 위치
+				memcpy(ptr_temp, &character_temp->GetPosition(), sizeof(Vector3));
+				ptr_temp += sizeof(Vector3);
+				size += sizeof(Vector3);
 
 				usercount++;
 			}
@@ -228,6 +245,8 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 	_user->pack(sendprotocol, data, size);
+
+	_user->SetEnterGame();
 }
 
 void CharacterManager::CreateInstance()
