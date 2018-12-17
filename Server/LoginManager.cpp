@@ -79,7 +79,7 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 	{
 		user->setID(id);
 	}
-	sprintf(msg, "%s : %s", check ? "중복" : "중복아님", user->getID());
+	sprintf(msg, "%s : %s", id, check ? "중복" : "중복아님");
 	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 	user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
 }
