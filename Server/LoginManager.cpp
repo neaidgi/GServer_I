@@ -114,7 +114,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	strcpy(info->id, user->getID());
 	strcpy(info->pw, pw);
 
-	result = DBManager::GetInstance()->Login_reqJoin(info->id, info->pw, NULL);
+	result = DBManager::GetInstance()->Login_Req_Join(info->id, info->pw, NULL);
 
 	if (result)
 	{
@@ -154,7 +154,7 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 
 	bool result;
 
-	result = DBManager::GetInstance()->Login_reqLogin(id, pw);
+	result = DBManager::GetInstance()->Login_Req_Login(id, pw);
 
 	if (result)
 	{
@@ -278,7 +278,7 @@ RESULT LoginManager::loginMenuChoice(User* _user)
 			char id[IDSIZE];
 
 			strcpy(id, _user->getID());
-			result = DBManager::GetInstance()->Login_reqLeave(id);
+			result = DBManager::GetInstance()->Login_Req_Leave(id);
 
 			_user->setID("");
 			_user->setPW("");

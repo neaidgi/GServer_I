@@ -27,7 +27,7 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	char tnick[20];
 	int tlevel;
 
-	bool result = DBManager::GetInstance()->Character_reqCharacterSlot
+	bool result = DBManager::GetInstance()->Character_Req_CharacterSlot
 	(_user->getID(), _index, torigincode, tjobname, tnick, tlevel, tcode);
 
 	// 슬롯에 캐릭터 없으면 false 반환
@@ -69,7 +69,7 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 
 	memcpy(nick, _buf, len);
 
-	check = DBManager::GetInstance()->Character_reqCharacterCheckName(nick);
+	check = DBManager::GetInstance()->Character_Req_CharacterCheckName(nick);
 
 	if (check)
 	{
@@ -135,7 +135,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	memcpy(&index, _buf, sizeof(int));
 
-	if (DBManager::GetInstance()->Character_reqCharacterPos(_user->GetSlot(index)->code, pos))
+	if (DBManager::GetInstance()->Character_Req_CharacterPos(_user->GetSlot(index)->code, pos))
 	{
 		bool ispos = true;
 		memcpy(ptr, &ispos, sizeof(bool));
@@ -242,7 +242,7 @@ bool CharacterManager::InitializeManager()
 	}
 
 	// 캐릭터 정보 가져오기
-	if (DBManager::GetInstance()->Character_reqCharacterInfo(CharacterOrigin) == false)
+	if (DBManager::GetInstance()->Character_Req_CharacterInfo(CharacterOrigin) == false)
 	{
 		// 로그
 		return false;
@@ -476,10 +476,6 @@ void CharacterManager::CharacterMove(User * _user, char * _buf, int & _datasize)
 	Vector3 character_pos;
 	character_pos = _user->GetCurCharacter()->GetPosition();
 	character_pos = character_pos + (dirvector * _user->GetCurCharacter()->GetCharacter_Speed());
-
-	// 
-	//	이동한 위치가 지형에 막히는지?
-	//
 
 	_user->GetCurCharacter()->SetPosition(character_pos);
 

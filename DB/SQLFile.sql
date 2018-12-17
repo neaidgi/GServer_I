@@ -1,4 +1,4 @@
-create database userinfo;
+﻿create database userinfo;
 
 use userinfo;
 
@@ -7,6 +7,14 @@ create table info
 	id varchar(20) not null primary key,
 	pw varchar(20) not null,
     nick varchar(20) not null
+);
+
+create table SpawnPos
+(
+	num int not null primary key auto_incremant,
+	x float not null,
+        y float not null,
+	z float not null
 );
 
 use userinfo;

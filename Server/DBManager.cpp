@@ -126,7 +126,7 @@ bool DBManager::Login_CheckID(char * _id)
 	}
 }
 
-bool DBManager::Login_reqJoin(char * _id, char * _pw, char * _nick)
+bool DBManager::Login_Req_Join(char * _id, char * _pw, char * _nick)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -203,7 +203,7 @@ bool DBManager::Login_JoinCharacterSlot(char * _id)
 	}
 }
 
-bool DBManager::Login_reqLogin(char * _id, char * _pw)
+bool DBManager::Login_Req_Login(char * _id, char * _pw)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -248,7 +248,7 @@ bool DBManager::Login_reqLogin(char * _id, char * _pw)
 	}
 }
 
-bool DBManager::Login_reqLeave(char * _id)
+bool DBManager::Login_Req_Leave(char * _id)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -332,7 +332,7 @@ bool DBManager::Character_CharacterSlotAdd(const char* _id, int _index, int _ori
 // 캐릭터 설계도 요청
 // 현재 code받아서 하나씩 외부로 제공하는 함수
 // 수정 >> 배열 받아서 모든 캐릭터 정보 output으로 전달 
-bool DBManager::Character_reqCharacterInfo(Character * _character_out[])
+bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -438,7 +438,7 @@ bool DBManager::Character_reqCharacterInfo(Character * _character_out[])
 	}
 }
 
-bool DBManager::Character_reqCharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code)
+bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -519,7 +519,7 @@ bool DBManager::Character_reqCharacterSlot(const char* _id, int _index, int& _or
 	}
 }
 
-bool DBManager::Character_reqCharacterDelete(const char * _id, int _index)
+bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -584,7 +584,7 @@ bool DBManager::Character_reqCharacterDelete(const char * _id, int _index)
 	}
 }
 
-bool DBManager::Character_reqCharacterCheckName(const char * _nick)
+bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -636,7 +636,7 @@ bool DBManager::Character_reqCharacterCheckName(const char * _nick)
 	}
 }
 
-bool DBManager::Character_reqCharacterPos(int _code, Vector3& _pos)
+bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -725,6 +725,54 @@ bool DBManager::Charactor_CharacterPosAdd(int _code)
 	else
 	{
 		fprintf(stderr, "Mysql Character_Pos error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * pos)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT * FROM SpawnPos";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, base_query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		int i = 0;
+
+		while (1)
+		{
+			if (sql_row == NULL)
+			{
+				break;
+			}
+
+			pos[i].x = atof(sql_row[1]);
+			pos[i].y = atof(sql_row[2]);
+			pos[i].z = atof(sql_row[3]);
+		}
+		
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Charactor_Req_CharacterSpawnPos error : %s \n", mysql_error(mysql));
 		return false;
 	}
 }

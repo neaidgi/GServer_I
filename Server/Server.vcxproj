@@ -136,6 +136,7 @@
     </ClCompile>
     <ClCompile Include="EncryptManager.cpp" />
     <ClCompile Include="ErrorManager.cpp" />
+    <ClCompile Include="GameInitializer.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="InGameState.cpp" />
     <ClCompile Include="IocpModel.cpp" />
@@ -164,6 +165,7 @@
     </ClInclude>
     <ClInclude Include="EnryptManager.h" />
     <ClInclude Include="ErrorManager.h" />
+    <ClInclude Include="GameInitializer.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="InGameState.h" />
