@@ -117,7 +117,7 @@ void MainManager::Run()
 	{
 		ErrorManager::GetInstance()->err_quit("메인 : TCP서버 시작 실패");
 	}
-	MsgManager::GetInstance()->DisplayMsg("메인 : TCP서버 시작 성공");
+	MsgManager::GetInstance()->DisplayMsg("메인","TCP서버 시작 성공");
 	// while 
 	Acceptprocess();
 
@@ -145,14 +145,14 @@ bool MainManager::MangerInitialize()
 	LogManager::GetInstance()->InitializeManager();
 	ErrorManager::GetInstance()->InitializeManager();
 
-	MsgManager::GetInstance()->DisplayMsg("메인 : 데이터베이스 초기화중");
+	MsgManager::GetInstance()->DisplayMsg("메인","데이터베이스 초기화중");
 	// DB 연동
 	if (DBManager::GetInstance()->InitializeDB() == false)
 	{
 		ErrorManager::GetInstance()->err_display("데이터베이스 초기화 실패");
 		return false;
 	}
-	MsgManager::GetInstance()->DisplayMsg("메인 : 데이터베이스 초기화 성공");
+	MsgManager::GetInstance()->DisplayMsg("메인","데이터베이스 초기화 성공");
 	UserManager::GetInstance()->InitializeManager();
 	ThreadManager::GetInstance()->InitializeManager();
 	LoginManager::GetInstance()->InitializeManager();
@@ -162,14 +162,14 @@ bool MainManager::MangerInitialize()
 		ErrorManager::GetInstance()->err_quit("CharacterManager Init fail");
 	}
 	EncryptManager::GetInstance()->InitializeManager();
-	MsgManager::GetInstance()->DisplayMsg("메인 : IOCP 초기화 중");
+	MsgManager::GetInstance()->DisplayMsg("메인", "IOCP 초기화 중");
 	if (GameManager::GetInstance()->InitializeManager() == false)
 	{
 		ErrorManager::GetInstance()->err_quit("IOCP Init fail");
 
 		return false;
 	}
-	MsgManager::GetInstance()->DisplayMsg("메인 : IOCP 초기화 성공");
+	MsgManager::GetInstance()->DisplayMsg("메인", "IOCP 초기화 성공");
 	if (GameDataManager::GetInstance()->InitializeManager() == false)
 	{
 		ErrorManager::GetInstance()->err_quit("게임 데이터 로드 실패");

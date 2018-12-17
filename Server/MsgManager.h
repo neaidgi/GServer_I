@@ -18,7 +18,7 @@ public:
 	bool InitializeManager();
 	void EndManager();
 
-	void DisplayMsg(char* _msg);
+	void DisplayMsg(char* _type, char* _msg);
 };
 
 #endif

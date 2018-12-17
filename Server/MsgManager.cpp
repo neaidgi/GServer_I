@@ -43,12 +43,12 @@ void MsgManager::EndManager()
 {
 }
 
-void MsgManager::DisplayMsg(char * _msg)
+void MsgManager::DisplayMsg(char* _type, char * _msg)
 {
 	SYSTEMTIME time;
 	GetLocalTime(&time);
 	char buf[12];
 
 	sprintf(buf, "[%d:%d:%d]", time.wHour, time.wMinute, time.wSecond);
-	printf("%s :: %s\n", buf, _msg);
+	printf("%s :: %s : %s\n", buf, _type, _msg);
 }

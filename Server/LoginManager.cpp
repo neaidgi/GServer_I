@@ -1,6 +1,7 @@
 #include "LoginManager.h"
 #include "LogManager.h"
 #include "DBManager.h"
+#include "MsgManager.h"
 
 LoginManager* LoginManager::Instance = nullptr;
 
@@ -63,6 +64,7 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 {
 	int len;
 	char id[IDSIZE];
+	char msg[BUFSIZE];
 	bool check = false;
 
 	memcpy(&len, _buf, sizeof(int));
@@ -77,7 +79,8 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 	{
 		user->setID(id);
 	}
-
+	sprintf(msg, "%s : %s", check ? "중복" : "중복아님", user->getID());
+	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 	user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
 }
 
@@ -132,6 +135,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 
 	sprintf(tempbuf, "%s [회원가입].", user->getID());
 	LogManager::GetInstance()->LogWrite(tempbuf);
+	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
 }
 
 bool LoginManager::reqLogin(User* user, char* _buf)
@@ -167,7 +171,8 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	{
 		sprintf(tempbuf, "[로그인 실패]");
 	}
-	
+
+	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
 	user->include_wset = true;
 	user->pack(SERVER_LOGIN_SUCCESS, &result, sizeof(bool));
 	
@@ -179,6 +184,7 @@ RESULT LoginManager::loginProcess(User * _user)
 {
 	PROTOCOL protocol;
 	char buf[BUFSIZE];
+	char msg[BUFSIZE];
 	bool check;
 	_user->unPack(&protocol, &buf);
 
@@ -190,6 +196,8 @@ RESULT LoginManager::loginProcess(User * _user)
 		result = RT_ID_OVERLAP;
 		break;
 	case CLIENT_REQ_JOIN:
+		sprintf(msg, "%s : 가입 요청", _user->getID());
+		MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 		reqJoin(_user, buf);
 		result = RT_JOIN;
 		break;
@@ -206,6 +214,7 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 {
 	PROTOCOL protocol;
 	char buf[BUFSIZE];
+	char msg[BUFSIZE];
 	bool check;
 	int choice;
 
@@ -219,6 +228,8 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 	switch (protocol)
 	{
 	case CLIENT_REQ_LOGIN:
+		sprintf(msg, "%s : 로그인 요청", _user->getID());
+		MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 		check = reqLogin(_user, buf);
 		if (check == false)
 		{
@@ -291,6 +302,8 @@ RESULT LoginManager::loginMenuChoice(User* _user)
 			{
 				sprintf(tempbuf, "[회원탈퇴 실패]");
 			}
+
+			MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
 		}
 		sendprotocol = SERVER_LEAVE;
 		_user->setLogout();
@@ -301,6 +314,7 @@ RESULT LoginManager::loginMenuChoice(User* _user)
 		break;
 	case LoginMenu.LOGOUT:
 		sprintf(tempbuf, "%s [로그아웃].", _user->getID());
+		MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
 		LogManager::GetInstance()->LogWrite(tempbuf);
 
 		sendprotocol = SERVER_LOGOUT;
