@@ -16,12 +16,10 @@ bool LoginState::Read(User* _user)
 		{
 			state = INIT_SEND;
 		}
-		// 수정했음
 		else if (result == RT_LOGIN)
 		{
 			state = LOGIN_RESULT_SEND;
 		}
-		// 수정했음
 		else if (result == RT_LOGINFAIL)
 		{
 			state = LOGINFAIL_RESULT_SEND;
@@ -43,7 +41,7 @@ bool LoginState::Read(User* _user)
 		}
 		else if (result == RT_JOIN)
 		{
-			state = REQUEST_RESULT_SEND;
+			state = JOIN_RESULT_SEND;
 		}
 		else if (result = RT_EXIT_JOIN)
 		{
@@ -85,6 +83,9 @@ bool LoginState::Write(User* _user)
 		break;
 	case LoginState::REQUEST_RESULT_SEND:
 		state = REQUEST_RECV;
+		break;
+	case LoginState::JOIN_RESULT_SEND:
+		state = INIT_RECV;
 		break;
 	case LoginState::JOIN_EXIT_SEND:
 		state = INIT_RECV;
