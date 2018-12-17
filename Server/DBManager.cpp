@@ -1,6 +1,7 @@
 #include "DBManager.h"
 #include "LogManager.h"
 #include "ErrorManager.h"
+#include "MsgManager.h"
 
 DBManager* DBManager::Instance = nullptr;
 
@@ -746,18 +747,18 @@ bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 
 	// 쿼리 날리기
 	state = mysql_query(mysql, base_query);
-
+	MsgManager::GetInstance()->DisplayMsg("DB : 플레이어 스폰 위치 요청 중");
 	// 성공
 	if (state == 0)
 	{
+		MsgManager::GetInstance()->DisplayMsg("DB : 플레이어 스폰 위치 요청 성공");
 		sql_result = mysql_store_result(mysql);
-
-		sql_row = mysql_fetch_row(sql_result);
 
 		int i = 0;
 
 		while (1)
 		{
+			sql_row = mysql_fetch_row(sql_result);
 			if (sql_row == NULL)
 			{
 				break;

@@ -44,7 +44,7 @@ bool GameDataManager::InitializeManager()
 	}
 	else
 	{
-		MsgManager::GetInstance()->DisplayMsg("메인 : 스폰위치 로드완료");
+		MsgManager::GetInstance()->DisplayMsg("메인 : 게임데이터 로드완료");
 		return true;
 	}
 }
