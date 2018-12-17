@@ -146,6 +146,7 @@
     <ClCompile Include="LogManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainManager.cpp" />
+    <ClCompile Include="MsgManager.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="SpawnData.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="LoginState.h" />
     <ClInclude Include="LogManager.h" />
     <ClInclude Include="MainManager.h" />
+    <ClInclude Include="MsgManager.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="SpawnData.h" />

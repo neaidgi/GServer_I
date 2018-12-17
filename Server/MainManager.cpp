@@ -20,6 +20,7 @@ void MainManager::CreateInstance()
 	if (Instance == nullptr)
 	{
 		Instance = new MainManager();
+		MsgManager::CreateInstance();
 		LogManager::CreateInstance();
 		ErrorManager::CreateInstance();
 		UserManager::CreateInstance();
@@ -53,6 +54,7 @@ void MainManager::DestroyInstance()
 		DBManager::DestroyInstance();
 		LogManager::DestroyInstance();
 		ErrorManager::DestroyInstance();
+		MsgManager::DestroyInstance();
 	}
 }
 BOOL MainManager::CtrlHandle(DWORD _ctrl)
@@ -113,9 +115,9 @@ void MainManager::Run()
 
 	if (server->start(SERVERPORT) == false)
 	{
-		ErrorManager::GetInstance()->err_quit("start() Error");
+		ErrorManager::GetInstance()->err_quit("메인 : TCP서버 시작 실패");
 	}
-
+	MsgManager::GetInstance()->DisplayMsg("메인 : TCP서버 시작 성공");
 	// while 
 	Acceptprocess();
 
@@ -139,16 +141,18 @@ bool MainManager::Initialize()
 
 bool MainManager::MangerInitialize()
 {
+	MsgManager::GetInstance()->InitializeManager();
 	LogManager::GetInstance()->InitializeManager();
 	ErrorManager::GetInstance()->InitializeManager();
 
+	MsgManager::GetInstance()->DisplayMsg("메인 : 데이터베이스 초기화중");
 	// DB 연동
 	if (DBManager::GetInstance()->InitializeDB() == false)
 	{
 		ErrorManager::GetInstance()->err_display("데이터베이스 초기화 실패");
 		return false;
 	}
-
+	MsgManager::GetInstance()->DisplayMsg("메인 : 데이터베이스 초기화 성공");
 	UserManager::GetInstance()->InitializeManager();
 	ThreadManager::GetInstance()->InitializeManager();
 	LoginManager::GetInstance()->InitializeManager();
@@ -158,14 +162,14 @@ bool MainManager::MangerInitialize()
 		ErrorManager::GetInstance()->err_quit("CharacterManager Init fail");
 	}
 	EncryptManager::GetInstance()->InitializeManager();
-
+	MsgManager::GetInstance()->DisplayMsg("메인 : IOCP 초기화 중");
 	if (GameManager::GetInstance()->InitializeManager() == false)
 	{
 		ErrorManager::GetInstance()->err_quit("IOCP Init fail");
 
 		return false;
 	}
-
+	MsgManager::GetInstance()->DisplayMsg("메인 : IOCP 초기화 성공");
 	if (GameDataManager::GetInstance()->InitializeManager() == false)
 	{
 		ErrorManager::GetInstance()->err_quit("게임 데이터 로드 실패");
@@ -194,6 +198,7 @@ void MainManager::EndManager()
 	GameManager::GetInstance()->EndManager();
 	// DB 연결 해제
 	DBManager::GetInstance()->EndManager();
+	MsgManager::GetInstance()->EndManager();
 
 	// 윈속 종료
 	WSACleanup();	// 소켓 DLL 메모리 해제

@@ -1,6 +1,7 @@
 #include "TCPServer.h"
 #include "ErrorManager.h"
 #include "LogManager.h"
+#include "MsgManager.h"
 
 TCPServer::TCPServer()
 {
@@ -65,7 +66,7 @@ SOCKET TCPServer::acceptClient()
 	ZeroMemory(&clientaddr, sizeof(clientaddr));
 
 	int addrlen = sizeof(clientaddr);
-
+	MsgManager::GetInstance()->DisplayMsg("메인 : 클라이언트 연결 대기중...");
 	SOCKET socket = accept(sock, (SOCKADDR*)&clientaddr, &addrlen);
 	if (socket == INVALID_SOCKET)
 	{

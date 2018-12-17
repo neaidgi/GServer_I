@@ -1,4 +1,6 @@
 #include "GameDataManager.h"
+#include "ErrorManager.h"
+#include "MsgManager.h"
 
 GameDataManager* GameDataManager::Instance = nullptr;
 
@@ -35,12 +37,14 @@ void GameDataManager::DestroyInstance()
 // 게임데이터 매니저 초기화
 bool GameDataManager::InitializeManager()
 {
+	MsgManager::GetInstance()->DisplayMsg("메인 : 게임데이터 로드중");
 	if (spawndata->Init_Spawn_Data() == false)
 	{
 		return false;
 	}
 	else
 	{
+		MsgManager::GetInstance()->DisplayMsg("메인 : 스폰위치 로드완료");
 		return true;
 	}
 }
