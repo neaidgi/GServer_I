@@ -184,15 +184,34 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	_user->GetCurCharacter()->SetPosition(pos);
 
 	// 
-	// 캐릭터 스테이터스 패킹 // 추가예정
+	// 현재 접속한 캐릭터 패킹
 	// 
+	char* ptr_temp = ptr;
+
+	// 캐릭터 코드
+	int code = player->GetCharacter_Code();
+	memcpy(ptr_temp, &code, sizeof(int));
+	ptr_temp += sizeof(int);
+	size += sizeof(int);
+	// 닉네임 사이즈
+	int len = strlen(player->GetCharacter_Name());
+	memcpy(ptr_temp, &len, sizeof(int));
+	ptr_temp += sizeof(int);
+	size += sizeof(int);
+	// 닉네임
+	memcpy(ptr_temp, player->GetCharacter_Name(), len);
+	ptr_temp += len;
+	size += len;
+	// 위치
+	memcpy(ptr_temp, &player->GetPosition(), sizeof(Vector3));
+	ptr_temp += sizeof(Vector3);
+	size += sizeof(Vector3);
 
 	//
 	// 인게임에 접속중인 유저 리스트(카운트, 캐릭터코드, 캐릭터코드, ...)
 	// 
 
 	// count자리 비워두기. 나중에 count 넣어줄때는 ptr 사용하기
-	char* ptr_temp = ptr;
 	ptr_temp += sizeof(int);
 
 	int usercount = 0;
