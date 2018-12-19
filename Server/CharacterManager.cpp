@@ -4,18 +4,11 @@ CharacterManager* CharacterManager::Instance = nullptr;
 
 CharacterManager::CharacterManager()
 {
-	memset(CharacterOrigin, 0, sizeof(CharacterOrigin));
+	
 }
 
 CharacterManager::~CharacterManager()
 {
-	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
-	{
-		if (CharacterOrigin[i] != NULL)
-		{
-			delete CharacterOrigin[i];
-		}
-	}
 }
 
 // 슬롯 데이터 가져오기 index 1 ~ 3 // 슬롯 데이터가 없다면 false 반환
@@ -101,23 +94,28 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	// 고유코드 만들기 (minute + second + millisecond)
 	code = CharacterCode();
 	
+	Character origin[MAXCHARACTERORIGIN];
+
+	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
+		GameDataManager::GetInstance()->Character_Origin_Data(i, origin[i]);
+
 	switch (jobcode)
 	{
 	case TANKER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[0]->GetCharacter_Code(),
-			CharacterOrigin[0]->GetCharacter_Name(), nick, 1, code);
+		(_user->getID(), _user->GetSlotCount() + 1, origin[0].GetCharacter_Code(),
+			origin[0].GetCharacter_Name(), nick, 1, code);
 
 		break;
 	case WARRIOR:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[1]->GetCharacter_Code(),
-			CharacterOrigin[1]->GetCharacter_Name(), nick, 1, code);
+		(_user->getID(), _user->GetSlotCount() + 1, origin[1].GetCharacter_Code(),
+			origin[1].GetCharacter_Name(), nick, 1, code);
 		break;
 	case MAGICIAN:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(), _user->GetSlotCount() + 1, CharacterOrigin[2]->GetCharacter_Code(),
-			CharacterOrigin[2]->GetCharacter_Name(), nick, 1, code);
+		(_user->getID(), _user->GetSlotCount() + 1, origin[2].GetCharacter_Code(),
+			origin[2].GetCharacter_Name(), nick, 1, code);
 		break;
 	}
 
@@ -207,61 +205,6 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	ptr_temp += sizeof(Vector3);
 	size += sizeof(Vector3);
 
-	//
-	// 인게임에 접속중인 유저 리스트(카운트, 캐릭터코드, 캐릭터코드, ...)
-	// 
-
-	// count자리 비워두기. 나중에 count 넣어줄때는 ptr 사용하기
-	ptr_temp += sizeof(int);
-
-	int usercount = 0;
-	int character_uniquecode;
-	int character_code;
-	int nicksize;
-	
-	User* user_temp;
-	Character* character_temp;
-	UserManager::GetInstance()->startSearch();
-	while (1)
-	{
-		if (UserManager::GetInstance()->searchData(user_temp) == true)
-		{
-			if (user_temp->isIngame() == true)
-			{
-				character_temp = user_temp->GetCurCharacter();
-				character_uniquecode = character_temp->GetCharacter_UniqueCode();
-				character_code = character_temp->GetCharacter_Code();
-				nicksize = strlen(character_temp->GetCharacter_Name());
-				
-				// 캐릭터 코드
-				memcpy(ptr_temp, &character_code, sizeof(int));
-				ptr_temp += sizeof(int);
-				size += sizeof(int);
-				// 닉네임 사이즈
-				memcpy(ptr_temp, &nicksize, sizeof(int));
-				ptr_temp += sizeof(int);
-				size += sizeof(int);
-				// 닉네임
-				memcpy(ptr_temp, character_temp->GetCharacter_Name(), nicksize);
-				ptr_temp += nicksize;
-				size += nicksize;
-				// 위치
-				memcpy(ptr_temp, &character_temp->GetPosition(), sizeof(Vector3));
-				ptr_temp += sizeof(Vector3);
-				size += sizeof(Vector3);
-
-				usercount++;
-			}
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	memcpy(ptr, &usercount, sizeof(int));
-	size += sizeof(int);
-
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 	_user->pack(sendprotocol, data, size);
 
@@ -292,18 +235,6 @@ void CharacterManager::DestroyInstance()
 
 bool CharacterManager::InitializeManager()
 {
-	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
-	{
-		CharacterOrigin[i] = new Character();
-	}
-
-	// 캐릭터 정보 가져오기
-	if (DBManager::GetInstance()->Character_Req_CharacterInfo(CharacterOrigin) == false)
-	{
-		// 로그
-		return false;
-	}
-
 	return true;
 }
 
@@ -319,20 +250,16 @@ void CharacterManager::Character_Slot_Send(User * _user)
 
 Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
 {
-	Character* temp;
-	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
-	{
-		if (CharacterOrigin[i]->GetCharacter_Code() == _origincode)
-		{
-			temp = CharacterOrigin[i];
-		}
-	}
+	Character temp;
+	GameDataManager::GetInstance()->Character_Origin_Data(_origincode, temp);
 
 	Character* player = new Character();
 
 	//
 	//	실제 스테이터스 셋팅 
 	//  player
+
+	*player = temp;
 
 	return player;
 }
