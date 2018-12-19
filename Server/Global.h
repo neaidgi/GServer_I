@@ -46,23 +46,11 @@ enum PROTOCOL {
 	SERVER_LEAVE,							// 서버 회원탈퇴 결과			[프로토콜][bool]
 	SERVER_LOGOUT,							// 서버 로그아웃 결과			[프로토콜][bool]
 
-	SERVER_TENDER,							//입찰 선택
-	CLIENT_TENDER_MENU_CHOICE,				//입찰메뉴 선택 확인
-	SERVER_TENDER_CREATE,					//입찰물품 생성 선택 
-	SERVER_TENDER_PARTICIPATE,				//입찰 참여 선택
-	SERVER_BACK,							//뒤로가기
-	CLIENT_REQ_TENDER_CREATE,				//입찰물품 생성 요청	 [프로토콜][char* 물품이름][int 가격][int 입찰자수]
-	SERVER_TENDER_CREATE_RESULT,			//입찰물품 생성 요청 결과
-	CLIENT_REQ_TENDER_LIST,					//입찰 리스트 요청
-	SERVER_TENDER_LIST_RESULT,				//입찰 리스트 요청 결과
-	CLIENT_REQ_TENDER_PARTICIPATE,			//입찰 요청
-	SERVER_TENDER_PARTICIPATE_RESULT,		//입찰 요청 결과
-	SERVER_TENDER_END_RESULT,				//입찰 종료 결과 [프로토콜][char* 메세지]
-
+	CLIENT_INGAME_OTHERPLAYERLIST,			// 클라 다른플레이어 리스트 요청	[프로토콜][]
 	CLIENT_INGAME_MOVE,						// 클라 이동					[프로토콜][방향벡터 or WASD]
-
 	SEVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
-	SEVER_INGAME_OTHERPLAYER_INFO			// 다른플레이어 정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
+	SEVER_INGAME_OTHERPLAYER_INFO,			// 다른플레이어 정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
+	SEVER_INGAME_OTHERPLAYERLIST_RESULT		// 플레이어 리스트 			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
 };
 
 
@@ -106,10 +94,6 @@ enum RESULT {
 	RT_LOGINMENU = 100, RT_JOINMENU, RT_TENDER, RT_MEMBER_LEAVE, RT_LOGOUT, RT_USER_DISCONNECT,
 	RT_ID_OVERLAP, RT_JOIN, RT_EXIT_JOIN, RT_LOGIN, RT_LOGINFAIL,
 
-	// 텐더매니저 결과
-	RT_MENUCREATE, RT_MENUPARTICIPATE, RT_MENUBACK,
-	RT_TENDERCREATE, RT_TENDERPARTICIPATE, RT_TENDERLIST,
-
 	RT_CHARACTER_SLOTRESULT = 200,
 	RT_CHARACTER_ENTERGAME,				// 게임 접속
 	RT_CHARACTER_DELETE,				// 캐릭터 삭제
@@ -119,7 +103,8 @@ enum RESULT {
 	RT_CHARACTER_EXIT,					// 생성 취소
 
 	RT_INGAME_MOVE = 300,				// 이동
-	RT_INGAME_OTHERPLAYER_INFO			// 다른 플레이어 정보
+	RT_INGAME_OTHERPLAYER_INFO,			// 다른 플레이어 정보
+	RT_INGAME_OTHERPLAYER_LIST			// 다른 플레이어 리스트
 };
 
 // 직업코드
