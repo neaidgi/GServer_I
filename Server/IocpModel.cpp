@@ -19,9 +19,9 @@ void IocpModel::IocpProcess()
 		SOCKET client_sock;
 		WSAOVERLAPPEDEx* overlappedex;
 		retval = GetQueuedCompletionStatus(hcp, &cbTransferred,(PULONG_PTR)&client_sock, (LPOVERLAPPED*)&overlappedex, INFINITE);
-
+		
 		User* user = (User*)overlappedex->p;
-
+		
 		if (retval == 0 || cbTransferred == 0)
 		{
 			if (retval == 0)
@@ -36,7 +36,11 @@ void IocpModel::IocpProcess()
 				user->stop();
 				UserManager::GetInstance()->removeUser(user);
 			}
-
+			continue;
+		}
+		
+		if (user == nullptr)
+		{
 			continue;
 		}
 
