@@ -3,6 +3,7 @@
 #include "TenderState.h"
 #include "IocpModel.h"
 #include "GameManager.h"
+#include "InGameManager.h"
 
 MainManager* MainManager::Instance = nullptr;
 
@@ -31,6 +32,7 @@ void MainManager::CreateInstance()
 		GameManager::CreateInstance();
 		GameDataManager::CreateInstance();
 		EncryptManager::CreateInstance(ENCRYPT_KEY);
+		InGameManager::CreateInstance();
 	}
 }
 MainManager* MainManager::GetInstance()
@@ -44,6 +46,7 @@ void MainManager::DestroyInstance()
 		delete Instance;
 		Instance = nullptr;
 
+		InGameManager::DestroyInstance();
 		GameDataManager::DestroyInstance();
 		UserManager::DestroyInstance();
 		ThreadManager::DestroyInstance();
@@ -175,7 +178,7 @@ bool MainManager::MangerInitialize()
 		ErrorManager::GetInstance()->err_quit("게임 데이터 로드 실패");
 		return false;
 	}
-
+	InGameManager::GetInstance()->MangerInitialize();
 	return true;
 }
 
@@ -186,11 +189,12 @@ void MainManager::EndManager()
 	delete server;
 
 	// 각 매니저들 End 호출
+	InGameManager::GetInstance()->EndManager();
 	GameDataManager::GetInstance()->EndManager();
 	LogManager::GetInstance()->EndManager();
 	UserManager::GetInstance()->EndManager();
 	ThreadManager::GetInstance()->EndManager();
-	TenderManager::GetInstance()->EndManager();
+	//TenderManager::GetInstance()->EndManager();
 	LoginManager::GetInstance()->EndManager();
 	CharacterManager::GetInstance()->EndManager();
 	ErrorManager::GetInstance()->EndManager();

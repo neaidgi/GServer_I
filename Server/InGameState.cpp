@@ -1,15 +1,15 @@
 #include"InGameState.h"
-#include "CharacterManager.h"
+#include "InGameManager.h"
 
 bool InGameState::Read(User * _user)
 {
-	CharacterManager* charactermanager = CharacterManager::GetInstance();
+	InGameManager* ingamemanager = InGameManager::GetInstance();
 	int result;
 
 	switch (state)
 	{
 	case INGAME_INIT_RECV:
-		//charactermanager->
+		result = ingamemanager->InGame_Init_Packet(_user);
 		break;
 	default:
 		break;

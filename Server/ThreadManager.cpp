@@ -1,7 +1,6 @@
 #include "ThreadManager.h"
 #include "MainManager.h"
 #include "GameManager.h"
-#include "TenderSystem.h"
 
 ThreadManager* ThreadManager::Instance = nullptr;
 
@@ -73,12 +72,6 @@ void ThreadManager::removeThread(HANDLE thread)
 DWORD WINAPI ThreadManager::ThreadProcess(LPVOID arg)
 {
 	//((SelectManager*)arg)->SelectProcess((void*)GetCurrentThreadId());
-	return 1;
-}
-
-DWORD WINAPI ThreadManager::TenderProcess(LPVOID arg)
-{
-	((TenderManager*)arg)->TenderProcess();
 	return 1;
 }
 

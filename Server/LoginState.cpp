@@ -1,7 +1,6 @@
 #include "LoginState.h"
 #include "LoginManager.h"
 
-
 bool LoginState::Read(User* _user)
 {
 	LoginManager* loginmanager = LoginManager::GetInstance();
@@ -99,7 +98,7 @@ bool LoginState::Write(User* _user)
 		break;
 	case LoginState::TENDER_SEND:
 		state = LOGIN_RECV;		// Àü ´Ü°è
-		_user->SetState(_user->getTenderState());
+		//_user->SetState(_user->getTenderState());
 		break;
 	case LoginState::LEAVE_SEND:
 		state = INIT_RECV;

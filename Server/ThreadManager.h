@@ -33,7 +33,7 @@ public:
 	HANDLE addThread(LPTHREAD_START_ROUTINE routine, LPVOID data, LPVOID _pthis);
 	void removeThread(HANDLE thread);
 	static DWORD WINAPI ThreadProcess(LPVOID arg);
-	static DWORD WINAPI TenderProcess(LPVOID arg);
+	//static DWORD WINAPI TenderProcess(LPVOID arg);
 	static DWORD WINAPI CommunicationProcess(LPVOID arg);
 	void* getData(DWORD threadID);
 	void startSearch();

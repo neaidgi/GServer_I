@@ -21,7 +21,6 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 User::~User()
 {
 	delete loginstate;
-	delete tenderstate;
 	delete characterstate;
 	delete ingamestate;
 
@@ -39,11 +38,6 @@ UserState* User::getState()
 LoginState * User::getLoginState()
 {
 	return loginstate;
-}
-
-TenderState * User::getTenderState()
-{
-	return tenderstate;
 }
 
 CharacterState * User::getCharacterState()
@@ -136,7 +130,6 @@ void User::setmoney(int money)
 void User::InitState()
 {
 	loginstate = new LoginState();
-	tenderstate = new TenderState();
 	characterstate = new CharacterState();
 	ingamestate = new InGameState();
 	state = loginstate;

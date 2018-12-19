@@ -6,7 +6,6 @@
 #include "ThreadManager.h"
 #include "ErrorManager.h"
 #include "LoginManager.h"
-#include "TenderSystem.h"
 #include "LogManager.h"
 #include "DBManager.h"
 #include "CharacterManager.h"

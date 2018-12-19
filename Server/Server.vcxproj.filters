@@ -25,14 +25,8 @@
     <Filter Include="헤더 파일\State\LoginState">
       <UniqueIdentifier>{2399e570-aba4-40f0-bd96-27afee87be62}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\State\TenderState">
-      <UniqueIdentifier>{e893306b-bf75-46d4-8a52-d3bb8127b27d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\State">
       <UniqueIdentifier>{d1db7439-89f4-4a29-8d91-ad7174f58b32}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\State\TenderState">
-      <UniqueIdentifier>{d7a64bde-f4a3-4a77-9b56-100822058d60}</UniqueIdentifier>
     </Filter>
     <Filter Include="헤더 파일\State\CloseState">
       <UniqueIdentifier>{8359c787-5fd4-4523-8f52-27fa0d9635af}</UniqueIdentifier>
@@ -76,6 +70,12 @@
     <Filter Include="소스 파일\GameData">
       <UniqueIdentifier>{ea46c6e6-970f-41f5-ad60-7a5368cfa255}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Ingame">
+      <UniqueIdentifier>{433a51e3-35ba-421e-9d37-6a782f92beea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\InGame">
+      <UniqueIdentifier>{eb45b3de-3c10-48b6-bdb7-c75da58dd220}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -110,12 +110,6 @@
     </ClCompile>
     <ClCompile Include="LogManager.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="TenderSystem.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="TenderState.cpp">
-      <Filter>소스 파일\State\TenderState</Filter>
     </ClCompile>
     <ClCompile Include="LoginState.cpp">
       <Filter>소스 파일\State\LoginState</Filter>
@@ -159,6 +153,15 @@
     <ClCompile Include="MsgManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="InGameManager.cpp">
+      <Filter>소스 파일\InGame</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterData.cpp">
+      <Filter>소스 파일\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>소스 파일\GameData</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Packet.h">
@@ -194,9 +197,6 @@
     <ClInclude Include="LogManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="TenderSystem.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="EnryptManager.h">
       <Filter>헤더 파일\Security</Filter>
     </ClInclude>
@@ -211,9 +211,6 @@
     </ClInclude>
     <ClInclude Include="LoginState.h">
       <Filter>헤더 파일\State\LoginState</Filter>
-    </ClInclude>
-    <ClInclude Include="TenderState.h">
-      <Filter>헤더 파일\State\TenderState</Filter>
     </ClInclude>
     <ClInclude Include="CloseState.h">
       <Filter>헤더 파일\State\CloseState</Filter>
@@ -239,9 +236,6 @@
     <ClInclude Include="InGameState.h">
       <Filter>헤더 파일\State\InGameState</Filter>
     </ClInclude>
-    <ClInclude Include="Character.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="GameInitializer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -253,6 +247,18 @@
     </ClInclude>
     <ClInclude Include="MsgManager.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="InGameManager.h">
+      <Filter>헤더 파일\Ingame</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterMovement.h">
+      <Filter>헤더 파일\Ingame</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterData.h">
+      <Filter>헤더 파일\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>헤더 파일\GameData</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

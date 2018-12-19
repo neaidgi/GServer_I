@@ -3,7 +3,6 @@
 
 #include"UserState.h"
 
-
 class LoginState :public UserState
 {
 private:

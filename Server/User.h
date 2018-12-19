@@ -4,7 +4,6 @@
 #include "Packet.h"
 #include "UserState.h"
 #include "LoginState.h"
-#include "TenderState.h"
 #include "CharacterState.h"
 #include "InGameState.h"
 #include "Character.h"
@@ -42,7 +41,6 @@ private:
 	UserState* state;
 
 	LoginState* loginstate;
-	TenderState* tenderstate;
 	CharacterState* characterstate;
 	InGameState* ingamestate;
 
@@ -56,7 +54,6 @@ public:
 	~User();
 	UserState* getState();
 	LoginState* getLoginState();
-	TenderState* getTenderState();
 	CharacterState* getCharacterState();
 	InGameState* getInGameState();
 	void SetCurCharacter(Character* _player);

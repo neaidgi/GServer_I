@@ -276,12 +276,12 @@ RESULT LoginManager::loginMenuChoice(User* _user)
 	PROTOCOL sendprotocol;
 	switch (choice)
 	{
-	case LoginMenu.TENDER:
+	/*case LoginMenu.TENDER:
 		sendprotocol = SERVER_TENDER;
 		_user->pack(sendprotocol, buf, 0);
 		_user->include_wset = true;
 		result = RT_TENDER;
-		break;
+		break;*/
 	case LoginMenu.LEAVE:
 		{
 			bool result;
