@@ -97,7 +97,7 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	Character origin[MAXCHARACTERORIGIN];
 
 	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
-		GameDataManager::GetInstance()->Character_Origin_Data(i, origin[i]);
+		GameDataManager::GetInstance()->Character_Origin_Data((i + 1) * 1000, &origin[i]);	// <- 버그
 
 	switch (jobcode)
 	{
@@ -250,7 +250,7 @@ void CharacterManager::Character_Slot_Send(User * _user)
 
 Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
 {
-	Character temp;
+	Character* temp;
 	GameDataManager::GetInstance()->Character_Origin_Data(_origincode, temp);
 
 	Character* player = new Character();
@@ -259,7 +259,7 @@ Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
 	//	실제 스테이터스 셋팅 
 	//  player
 
-	*player = temp;
+	*player = *temp;
 
 	return player;
 }

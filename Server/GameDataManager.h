@@ -30,7 +30,7 @@ public:
 	void EndManager();
 
 	void Character_SpawnPos_Vector(Vector3 * _pos);
-	void Character_Origin_Data(int _code, Character _job);
+	void Character_Origin_Data(int _code, Character* _job);
 };
 
 #endif
