@@ -72,6 +72,7 @@ void UserManager::removeUser(User* _user)
 	// 유저 찾아서 삭제
 	ConnectUserlist.remove(_user);
 	delete _user;
+	_user = nullptr;
 }
 
 User* UserManager::getUser(SOCKET _sock)
