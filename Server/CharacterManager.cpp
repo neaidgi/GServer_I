@@ -176,7 +176,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 		size = sizeof(float);
 	}
 
-	Character* player = CharacterSelect(_user, _user->GetSlot(index)->origincode);
+	Character* player = CharacterSelect(_user, index);
 	player->SetCharacter_UniqueCode(_user->GetSlot(index)->code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
@@ -192,11 +192,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	ptr_temp += sizeof(int);
 	size += sizeof(int);
 	// 닉네임 사이즈
-	char name[NICKNAMESIZE];
-	const char* temp = player->GetCharacter_Name();
-	memset(name, 0, sizeof(name));
-	memcpy(name, temp, sizeof(name));
-	int len = strlen(name);
+	int len = strlen(player->GetCharacter_Name());
 	memcpy(ptr_temp, &len, sizeof(int));
 	ptr_temp += sizeof(int);
 	size += sizeof(int);
@@ -252,10 +248,10 @@ void CharacterManager::Character_Slot_Send(User * _user)
 
 }
 
-Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
+Character* CharacterManager::CharacterSelect(User* _user, int _index)
 {
 	Character temp;
-	GameDataManager::GetInstance()->Character_Origin_Data(_origincode, &temp);
+	GameDataManager::GetInstance()->Character_Origin_Data(_user->GetSlot(_index)->origincode, &temp);
 
 	Character* player = new Character();
 
@@ -264,6 +260,10 @@ Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
 	//  player
 
 	*player = temp;
+
+	//DBManager::GetInstance()->Character_Req_CharacterName(_user->getID(), _user->GetSlot(_index)->)
+
+	player->SetCharacter_Name(_user->GetSlot(_index)->jobname);
 
 	return player;
 }

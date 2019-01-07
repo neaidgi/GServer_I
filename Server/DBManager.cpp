@@ -637,6 +637,74 @@ bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 	}
 }
 
+bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* _nick)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT ";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	switch (_index)
+	{
+	case 1:
+		sprintf(query,
+			"%s character_nickname_first FROM usercharacterinfo WHERE user_id = '%s'", base_query, _id);
+		break;
+	case 2:
+		sprintf(query,
+			"%s character_nickname_second FROM usercharacterinfo WHERE user_id = '%s'", base_query, _id);
+		break;
+	case 3:
+		sprintf(query,
+			"%s character_nickname_third FROM usercharacterinfo WHERE user_id = '%s'", base_query, _id);
+		break;
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row == NULL)
+		{
+			return false;
+		}
+
+		// DB 데이터 아웃풋 저장
+		memcpy(_nick, sql_row[0], NICKNAMESIZE);
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Pos error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
 bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 {
 	MYSQL_RES *sql_result;  // the results

@@ -32,7 +32,7 @@ public:
 
 	void Character_Slot_Send(User* _user);					// 현재 사용X
 
-	Character* CharacterSelect(User* _user, int _origincode);
+	Character* CharacterSelect(User* _user, int _index);
 
 	RESULT Character_Init_Choice(User* _user);				// 캐릭터 초기화면
 	RESULT Character_Management_Process(User* _user);		// 캐릭터 생성창

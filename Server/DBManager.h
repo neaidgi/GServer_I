@@ -37,6 +37,7 @@ public:
 	
 	bool Character_Req_CharacterDelete(const char* _id, int _index);
 	bool Character_Req_CharacterCheckName(const char* _nick);
+	bool Character_Req_CharacterName(const char* _id, int _index, char* _nick);
 	bool Character_Req_CharacterPos(int _code, Vector3& _pos);
 	bool Charactor_CharacterPosAdd(int _code);
 
