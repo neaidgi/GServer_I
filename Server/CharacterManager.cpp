@@ -131,7 +131,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	int size = 0;
 	bool enter = true;
 	Vector3 pos;
-	Vector3* spawnpos;
+	Vector3 spawnpos[CHARACTER_SPAWNPOS_MAXCOUNT];
 
 	memcpy(&index, _buf, sizeof(int));
 
@@ -192,7 +192,11 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	ptr_temp += sizeof(int);
 	size += sizeof(int);
 	// 닉네임 사이즈
-	int len = strlen(player->GetCharacter_Name());
+	char name[NICKNAMESIZE];
+	const char* temp = player->GetCharacter_Name();
+	memset(name, 0, sizeof(name));
+	memcpy(name, temp, sizeof(name));
+	int len = strlen(name);
 	memcpy(ptr_temp, &len, sizeof(int));
 	ptr_temp += sizeof(int);
 	size += sizeof(int);
@@ -250,8 +254,8 @@ void CharacterManager::Character_Slot_Send(User * _user)
 
 Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
 {
-	Character* temp;
-	GameDataManager::GetInstance()->Character_Origin_Data(_origincode, temp);
+	Character temp;
+	GameDataManager::GetInstance()->Character_Origin_Data(_origincode, &temp);
 
 	Character* player = new Character();
 
@@ -259,7 +263,7 @@ Character* CharacterManager::CharacterSelect(User* _user, int _origincode)
 	//	실제 스테이터스 셋팅 
 	//  player
 
-	*player = *temp;
+	*player = temp;
 
 	return player;
 }
