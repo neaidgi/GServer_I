@@ -525,7 +525,7 @@ bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "UPDATE";
+	char* base_query = "UPDATE usercharacterinfo SET";
 	int state = 0;
 
 	char query[255];
@@ -777,7 +777,7 @@ bool DBManager::Charactor_CharacterPosAdd(int _code)
 	*/
 
 	// Äõ¸® ÀÔ·Â 
-	sprintf(query, "(%d, null, null, null)", base_query, _code);
+	sprintf(query, "%s (%d, null, null, null)", base_query, _code);
 
 	/*
 	*	³¡
