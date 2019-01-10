@@ -104,18 +104,18 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	case TANKER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, origin[0].GetCharacter_Code(),
-			origin[0].GetCharacter_Name(), nick, 1, code);
+			"TANKER", nick, 1, code);
 
 		break;
 	case WARRIOR:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, origin[1].GetCharacter_Code(),
-			origin[1].GetCharacter_Name(), nick, 1, code);
+			"WARRIOR", nick, 1, code);
 		break;
 	case MAGICIAN:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
 		(_user->getID(), _user->GetSlotCount() + 1, origin[2].GetCharacter_Code(),
-			origin[2].GetCharacter_Name(), nick, 1, code);
+			"MAGICIAN", nick, 1, code);
 		break;
 	}
 

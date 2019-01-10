@@ -40,17 +40,42 @@ enum PROTOCOL {
 	SERVER_CHARACTER_ENTER_RESULT,			// 서버 케릭터 접속결과			[프로토콜][bool]
 	SERVER_CHARACTER_DELETE_RESULT,			// 서버 케릭터 삭제 결과		[프로토콜][bool]
 	SERVER_CHARACTER_MENU,					// 서버 케릭터 메뉴 결과		[프로토콜]
+	SERVER_CHARACTER_ENTER_INFO,			// 서버 케릭터 접속 정보		[DataProtocol용]
 	//SERVER_NICK_OVERLAP_CHECK,			// 서버 닉네임 중복 결과		[프로토콜][bool]
 	SERVER_CHARACTER_RESULT,				// 서버 케릭터 생성 확인 결과	[프로토콜][bool]
 	SERVER_CHARACTER_EXIT_RESULT,			// 서버 케릭터 생성 취소 결과	[프로토콜[
 	SERVER_LEAVE,							// 서버 회원탈퇴 결과			[프로토콜][bool]
 	SERVER_LOGOUT,							// 서버 로그아웃 결과			[프로토콜][bool]
 
+	SERVER_TENDER,							// 입찰 선택
+	CLIENT_TENDER_MENU_CHOICE,				// 입찰메뉴 선택 확인
+	SERVER_TENDER_CREATE,					// 입찰물품 생성 선택 
+	SERVER_TENDER_PARTICIPATE,				// 입찰 참여 선택
+	SERVER_BACK,							// 뒤로가기
+	CLIENT_REQ_TENDER_CREATE,				// 입찰물품 생성 요청	 [프로토콜][char* 물품이름][int 가격][int 입찰자수]
+	SERVER_TENDER_CREATE_RESULT,			// 입찰물품 생성 요청 결과
+	CLIENT_REQ_TENDER_LIST,					// 입찰 리스트 요청
+	SERVER_TENDER_LIST_RESULT,				// 입찰 리스트 요청 결과
+	CLIENT_REQ_TENDER_PARTICIPATE,			// 입찰 요청
+	SERVER_TENDER_PARTICIPATE_RESULT,		// 입찰 요청 결과
+	SERVER_TENDER_END_RESULT,				// 입찰 종료 결과 [프로토콜][char* 메세지]
+
 	CLIENT_INGAME_OTHERPLAYERLIST,			// 클라 다른플레이어 리스트 요청	[프로토콜][]
 	CLIENT_INGAME_MOVE,						// 클라 이동					[프로토콜][방향벡터 or WASD]
 	SEVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
 	SEVER_INGAME_OTHERPLAYER_INFO,			// 다른플레이어 정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
-	SEVER_INGAME_OTHERPLAYERLIST_RESULT		// 플레이어 리스트 			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
+	SEVER_INGAME_OTHERPLAYERLIST_RESULT,		// 플레이어 리스트 			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
+	
+	// 채팅 프로토콜
+	CLIENT_REQ_CHAT_LIST,					// 현재 로그인한 회원리스트 요청 			 프로토콜만
+	SERVER_CHAT_LIST_RESULT,				// 현재 로그인한 회원리스트 요청 결과 		[인원 수] [닉네임 사이즈] [닉네임]...
+	CLIENT_REQ_CHAT_START,					// 채팅 요청 								[인원 수] [닉네임 사이즈] [닉네임]
+	SERVER_CHAT_START_RESULT,				// 채팅 요청 결과 							[BOOL값]  ?  [방 번호] : [에러 코드] [메세지 사이즈] [메세지]
+	SERVER_CHAT_MSG,						// 채팅 메세지 : 서버 --> 클라				[방 번호] [메세지 사이즈] [메세지]
+	CLIENT_CHAT_MSG,						// 채팅 메세지 : 클라 --> 서버				[방 번호] [메세지 사이즈] [메세지]
+	SERVER_CHAT_ENTER,						// 현재 채팅방 입장 : 서버 --> 클라			[방 번호] [닉네임 사이즈] [닉네임]
+	CLIENT_CHAT_EXIT,						// 현재 채팅방 퇴장 : 클라 --> 서버			[방 번호] [닉네임 사이즈] [닉네임]
+	SERVER_CHAT_EXIT						// 채팅방 퇴장 : 서버 --> 클라				[방 번호]
 };
 
 
