@@ -425,6 +425,26 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[2]->SetCharacter_GrowHealth(atoi(sql_row[13]));
 		_character_out[2]->SetCharacter_GrowMana(atoi(sql_row[14]));
 
+		sql_row = mysql_fetch_row(sql_result);
+
+		// 4번
+		_character_out[3]->SetCharacter_Code(atoi(sql_row[0]));
+		_character_out[3]->SetCharacter_Name(sql_row[1]);
+		_character_out[3]->SetCharacter_STR(atoi(sql_row[2]));
+		_character_out[3]->SetCharacter_DEX(atoi(sql_row[3]));
+		_character_out[3]->SetCharacter_INT(atoi(sql_row[4]));
+		_character_out[3]->SetCharacter_Health(atoi(sql_row[5]));
+		_character_out[3]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[3]->SetCharacter_AttackPoint(atoi(sql_row[7]));
+		_character_out[3]->SetCharacter_DefensePoint(atoi(sql_row[8]));
+		_character_out[3]->SetCharacter_Speed(atoi(sql_row[9]));
+
+		_character_out[3]->SetCharacter_GrowSTR(atoi(sql_row[10]));
+		_character_out[3]->SetCharacter_GrowDEX(atoi(sql_row[11]));
+		_character_out[3]->SetCharacter_GrowINT(atoi(sql_row[12]));
+		_character_out[3]->SetCharacter_GrowHealth(atoi(sql_row[13]));
+		_character_out[3]->SetCharacter_GrowMana(atoi(sql_row[14]));
+
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
 		*/

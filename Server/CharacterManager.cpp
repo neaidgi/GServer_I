@@ -117,6 +117,12 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 		(_user->getID(), _user->GetSlotCount() + 1, origin[2].GetCharacter_Code(),
 			"MAGICIAN", nick, 1, code);
 		break;
+
+	case GUNNER:
+		DBManager::GetInstance()->Character_CharacterSlotAdd
+		(_user->getID(), _user->GetSlotCount() + 1, origin[3].GetCharacter_Code(),
+			"GUNNER", nick, 1, code);
+		break;
 	}
 
 	DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
