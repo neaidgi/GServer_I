@@ -79,6 +79,7 @@ public:
 	void SetPosition(const Vector3& _position) { Position = _position; }
 	void SetRotation(const Vector3& _rotation) { Rotation = _rotation; }
 	void SetScale(const Vector3& _scale) { Scale = _scale; }
+	Character() { character_name = nullptr; }
 	~Character() { delete[]character_name; }
 
 	Character& operator=(const Character &rhs);

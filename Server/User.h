@@ -23,9 +23,9 @@ struct SlotData {
 	}
 	~SlotData() {
 		if (jobname != nullptr)
-			delete jobname;
+			delete[] jobname;
 		if (nick != nullptr)
-			delete nick;
+			delete[] nick;
 	}
 };
 
@@ -61,6 +61,7 @@ public:
 	bool SetSlot(SlotData* _slotdata);
 	const SlotData* GetSlot(int _index) { return characterslot[_index - 1]; }		// 슬롯데이터 접근지정자
 	const int GetSlotCount() { return slotcount; }
+	void SetSlotCount(int _count) { slotcount = _count; }
 	bool DeleteCharacter(int _index);
 	bool isSlotLoaded() { return is_slotload; }
 	void SlotLoadComplete() { is_slotload = true; }
