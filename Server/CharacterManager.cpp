@@ -143,21 +143,21 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	if (DBManager::GetInstance()->Character_Req_CharacterPos(_user->GetSlot(index)->code, pos))
 	{
-		memcpy(ptr, &enter, sizeof(bool));
-		ptr += sizeof(bool);
-		size = sizeof(bool);
+		//memcpy(ptr, &enter, sizeof(bool));
+		//ptr += sizeof(bool);
+		//size = sizeof(bool);
 
-		memcpy(ptr, &pos.x, sizeof(float));
-		ptr += sizeof(float);
-		size = sizeof(float);
+		//memcpy(ptr, &pos.x, sizeof(float));
+		//ptr += sizeof(float);
+		//size = sizeof(float);
 
-		memcpy(ptr, &pos.y, sizeof(float));
-		ptr += sizeof(float);
-		size = sizeof(float);
+		//memcpy(ptr, &pos.y, sizeof(float));
+		//ptr += sizeof(float);
+		//size = sizeof(float);
 
-		memcpy(ptr, &pos.z, sizeof(float));
-		ptr += sizeof(float);
-		size = sizeof(float);
+		//memcpy(ptr, &pos.z, sizeof(float));
+		//ptr += sizeof(float);
+		//size = sizeof(float);
 	}
 	else
 	{
@@ -169,17 +169,17 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 		ptr += sizeof(bool);
 		size = sizeof(bool);
 
-		memcpy(ptr, &pos.x, sizeof(float));
-		ptr += sizeof(float);
-		size = sizeof(float);
+		//memcpy(ptr, &pos.x, sizeof(float));
+		//ptr += sizeof(float);
+		//size = sizeof(float);
 
-		memcpy(ptr, &pos.y, sizeof(float));
-		ptr += sizeof(float);
-		size = sizeof(float);
+		//memcpy(ptr, &pos.y, sizeof(float));
+		//ptr += sizeof(float);
+		//size = sizeof(float);
 
-		memcpy(ptr, &pos.z, sizeof(float));
-		ptr += sizeof(float);
-		size = sizeof(float);
+		//memcpy(ptr, &pos.z, sizeof(float));
+		//ptr += sizeof(float);
+		//size = sizeof(float);
 	}
 
 	Character* player = CharacterSelect(_user, index);
@@ -269,7 +269,7 @@ Character* CharacterManager::CharacterSelect(User* _user, int _index)
 
 	//DBManager::GetInstance()->Character_Req_CharacterName(_user->getID(), _user->GetSlot(_index)->)
 
-	player->SetCharacter_Name(_user->GetSlot(_index)->jobname);
+	player->SetCharacter_Name(_user->GetSlot(_index)->nick);
 
 	return player;
 }

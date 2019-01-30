@@ -730,7 +730,7 @@ bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT * IF(isnull(character_pos_x)) WHERE character_code = ";
+	char* base_query = "SELECT character_pos_x FROM characterpos  WHERE character_code = ";
 	int state = 0;
 
 	char query[255];
@@ -757,7 +757,7 @@ bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 
 		sql_row = mysql_fetch_row(sql_result);
 
-		if (sql_row == NULL || !sql_row[1])
+		if (sql_row[0] == NULL || !sql_row[1])
 		{
 			return false;
 		}
