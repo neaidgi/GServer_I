@@ -425,6 +425,26 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[2]->SetCharacter_GrowHealth(atoi(sql_row[13]));
 		_character_out[2]->SetCharacter_GrowMana(atoi(sql_row[14]));
 
+		sql_row = mysql_fetch_row(sql_result);
+
+		// 4번
+		_character_out[3]->SetCharacter_Code(atoi(sql_row[0]));
+		_character_out[3]->SetCharacter_Name(sql_row[1]);
+		_character_out[3]->SetCharacter_STR(atoi(sql_row[2]));
+		_character_out[3]->SetCharacter_DEX(atoi(sql_row[3]));
+		_character_out[3]->SetCharacter_INT(atoi(sql_row[4]));
+		_character_out[3]->SetCharacter_Health(atoi(sql_row[5]));
+		_character_out[3]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[3]->SetCharacter_AttackPoint(atoi(sql_row[7]));
+		_character_out[3]->SetCharacter_DefensePoint(atoi(sql_row[8]));
+		_character_out[3]->SetCharacter_Speed(atoi(sql_row[9]));
+
+		_character_out[3]->SetCharacter_GrowSTR(atoi(sql_row[10]));
+		_character_out[3]->SetCharacter_GrowDEX(atoi(sql_row[11]));
+		_character_out[3]->SetCharacter_GrowINT(atoi(sql_row[12]));
+		_character_out[3]->SetCharacter_GrowHealth(atoi(sql_row[13]));
+		_character_out[3]->SetCharacter_GrowMana(atoi(sql_row[14]));
+
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
 		*/
@@ -710,7 +730,7 @@ bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT * IF(isnull(character_pos_x)) WHERE character_code = ";
+	char* base_query = "SELECT character_pos_x FROM characterpos  WHERE character_code = ";
 	int state = 0;
 
 	char query[255];
@@ -737,7 +757,7 @@ bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 
 		sql_row = mysql_fetch_row(sql_result);
 
-		if (sql_row == NULL || !sql_row[1])
+		if (sql_row[0] == NULL || !sql_row[1])
 		{
 			return false;
 		}

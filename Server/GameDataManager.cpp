@@ -129,5 +129,8 @@ void GameDataManager::Character_Origin_Data(int _code, Character* _job)
 	case MAGICIAN:
 		characterdata->GetMagician(_job);
 		break;
+	case GUNNER:
+		characterdata->GetGunner(_job);
+		break;
 	}
 }
