@@ -485,6 +485,11 @@ void CharacterManager::CharacterMove(User * _user, char * _buf, int & _datasize)
 	_datasize = datasize;
 }
 
+bool CharacterManager::CharacterMoveVerificate(User * _user, char * _buf)
+{
+	return false;
+}
+
 // 캐릭터 정보 다른 플레이어에게 전송
 void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
 {
