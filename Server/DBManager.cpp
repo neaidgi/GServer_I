@@ -127,7 +127,7 @@ bool DBManager::Login_CheckID(char * _id)
 	}
 }
 
-bool DBManager::Login_Req_Join(char * _id, char * _pw, char * _nick)
+bool DBManager::Login_Req_Join(char * _id, char * _pw)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -143,14 +143,8 @@ bool DBManager::Login_Req_Join(char * _id, char * _pw, char * _nick)
 	*/
 
 	// 클라, userinfo 에서 닉네임을 받게 변경 후에 else문 안의 구문만 남기도록
-	if (_nick == NULL)
-	{
-		sprintf(query, "%s ('%s','%s','%s')", base_query, _id, _pw, "0");
-	}
-	else
-	{
-		sprintf(query, "%s ('%s','%s','%s')", base_query, _id, _pw, _nick);
-	}
+
+	sprintf(query, "%s ('%s','%s','%s')", base_query, _id, _pw, "0");
 
 	/*
 	*	끝
