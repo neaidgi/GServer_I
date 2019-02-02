@@ -2,11 +2,39 @@
 
 use userinfo;
 
-create table info
+create table UserCharacterInfo
 (
+	character_code varchar(20) not null primary key,
+
+	character_origin_code INT not null,
+
+	character_jobname VARCHAR(20) not null,
+
+	character_nickname VARCHAR(20) not null,
+
+	character_level INT not null
+
+);
+
+use userinfo;
+
+create table info
+(	
 	id varchar(20) not null primary key,
+
 	pw varchar(20) not null,
-    nick varchar(20) not null
+
+	slot_1 varchar(20),
+
+	slot_2 varchar(20),
+
+	slot_3 varchar(20),
+
+	FOREIGN KEY(slot_1) REFERENCES UserCharacterInfo(character_code),
+
+	FOREIGN KEY(slot_2) REFERENCES UserCharacterInfo(character_code),
+
+	FOREIGN KEY(slot_3) REFERENCES UserCharacterInfo(character_code)
 );
 
 use userinfo;
@@ -23,7 +51,7 @@ use userinfo;
 
 create table CharacterInfo
 (
-	character_code INT NOT NULL primary key,
+	character_jobcode INT NOT NULL primary key,
     character_jobname VARCHAR(20) NOT NULL,
     character_str INT NOT NULL,
     character_dex INT NOT NULL,
@@ -60,38 +88,11 @@ character_code = 0000 00 00 00 00 00 0000
 */
 create table CharacterPos
 (
-	character_code INT NOT NULL PRIMARY KEY,
+	character_code VARCHAR(20) NOT NULL PRIMARY KEY,
 	character_pos_x FLOAT,
 	chatacter_pos_y FLOAT,
-	character_pos_z FLOAT
-);
-
-use userinfo;
-
-create table UserCharacterInfo
-(
-	user_id VARCHAR(20) NOT NULL,
-    
-	character_origin_code_first INT,
-    character_jobname_first VARCHAR(20),
-    character_nickname_first VARCHAR(20),
-    character_level_first INT,
-    character_code_first INT,
-    
-    character_origin_code_second INT,
-    character_jobname_second VARCHAR(20),
-    character_nickname_second VARCHAR(20),
-    character_level_second INT,
-    character_code_second INT,
-    
-    character_origin_code_third INT,
-    character_jobname_third VARCHAR(20),
-    character_nickname_third VARCHAR(20),
-    character_level_third INT,
-    character_code_third INT,
-    
-    PRIMARY KEY(user_id),
-	FOREIGN KEY(user_id) REFERENCES info(id)
+	character_pos_z FLOAT,
+    FOREIGN KEY(character_code) REFERENCES UserCharacterInfo(character_code)
 );
 
 
