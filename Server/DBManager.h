@@ -27,7 +27,7 @@ public:
 
 	bool Login_CheckID(char* _id);
 	bool Login_JoinCharacterSlot(char* _id);
-	bool Login_Req_Join(char* _id, char* _pw, char* _nick);
+	bool Login_Req_Join(char* _id, char* _pw);
 	bool Login_Req_Login(char* _id, char* _pw);
 	bool Login_Req_Leave(char* _id);
 
