@@ -132,7 +132,7 @@ bool DBManager::Login_Req_Join(char * _id, char * _pw)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "INSERT INTO info values";
+	char* base_query = "INSERT INTO info(id,pw) VALUES";
 	int state = 0;
 
 	char query[255];
@@ -144,7 +144,7 @@ bool DBManager::Login_Req_Join(char * _id, char * _pw)
 
 	// 클라, userinfo 에서 닉네임을 받게 변경 후에 else문 안의 구문만 남기도록
 
-	sprintf(query, "%s ('%s','%s','%s')", base_query, _id, _pw, "0");
+	sprintf(query, "%s ('%s','%s')", base_query, _id, _pw);
 
 	/*
 	*	끝
@@ -276,12 +276,12 @@ bool DBManager::Login_Req_Leave(char * _id)
 }
 
 // 실제 생성한 유저 캐릭터 저장
-bool DBManager::Character_CharacterSlotAdd(const char* _id, int _index, int _origincode, const char* _jobname, char* _nick, int _level, int _code)
+bool DBManager::Character_CharacterSlotAdd(char* _code, int  _jobcode, const char* _jobname, char* _nick, int _level)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "update usercharacterinfo set";
+	char* base_query = "INSERT INTO UserCharacterInfo VALUES(";
 	int state = 0;
 
 	char query[255];
@@ -292,18 +292,8 @@ bool DBManager::Character_CharacterSlotAdd(const char* _id, int _index, int _ori
 	*/
 
 	// 쿼리 입력 // code, jobname, nick, level
-	switch (_index)
-	{
-	case 1:
-		sprintf(query, "%s	character_origin_code_first = %d, character_jobname_first = '%s', character_nickname_first = '%s', character_level_first = %d, character_code_first = %d where user_id = %s", base_query, _origincode, _jobname, _nick, _level, _code,_id);
-		break;
-	case 2:
-		sprintf(query, "%s character_origin_code_second = %d, character_jobname_second = '%s', character_nickname_second = '%s', character_level_second = %d, character_code_second = %d where user_id = %s", base_query, _origincode, _jobname, _nick, _level, _code, _id);
-		break;
-	case 3:
-		sprintf(query, "%s character_origin_code_third = %d, character_jobname_third = '%s', character_nickname_third = '%s', character_level_third = %d, character_code_third = %d where user_id = %s", base_query, _origincode, _jobname, _nick, _level, _code, _id);
-		break;
-	}
+
+	sprintf(query, "%s '%s',%d,'%s','%s',%d) ", base_query, _code, _jobcode, _jobname, _nick, _level);
 
 	/*
 	*	끝
@@ -453,6 +443,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 	}
 }
 
+// 19-02-09 수정해야함
 bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -534,6 +525,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _o
 	}
 }
 
+// 19-02-09 수정해야함
 bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -604,7 +596,7 @@ bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT character_nickname_first,character_nickname_second,character_nickname_third FROM usercharacterinfo WHERE character_nickname_first =";
+	char* base_query = "SELECT character_nickname FROM UserCharacterInfo WHERE character_nickname = ";
 	int state = 0;
 
 	char query[255];
@@ -613,7 +605,7 @@ bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 	/*
 	*	쿼리문 만들기
 	*/
-	sprintf(query, "%s '%s' OR character_nickname_second = '%s' OR character_nickname_third = '%s'", base_query, _nick, _nick, _nick);
+	sprintf(query, "%s '%s'", base_query, _nick);
 	/*
 	*	끝
 	*/
@@ -651,6 +643,7 @@ bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 	}
 }
 
+// 19-02-09 수정해야함
 bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* _nick)
 {
 	MYSQL_RES *sql_result;  // the results

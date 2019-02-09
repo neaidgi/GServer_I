@@ -127,11 +127,11 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	//userList[userCount++] = info;
 	user->pack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
 
-	if (result)
-	{
-		// 캐릭터 슬롯에 아이디추가
-		resultslot = DBManager::GetInstance()->Login_JoinCharacterSlot(info->id);
-	}
+	//if (result)
+	//{
+	//	// 캐릭터 슬롯에 아이디추가
+	//	resultslot = DBManager::GetInstance()->Login_JoinCharacterSlot(info->id);
+	//}
 
 	sprintf(tempbuf, "%s [회원가입].", user->getID());
 	LogManager::GetInstance()->LogWrite(tempbuf);

@@ -21,7 +21,6 @@ private:
 	void CharacterMove(User* _user, char* _buf, int& _datasize);				// 캐릭터 이동 
 	bool CharacterMoveVerificate(User* _user, char* _buf);						// 캐릭터 이동 검증
 	void CharacterInfo_toOther(User* _user, char* _data, int _datasize);		// 캐릭터 정보 다른유저에게 전송
-	int CharacterCode();	// 캐릭터 고유 코드 만들기(임시사용)
 
 public:
 	static void CreateInstance();

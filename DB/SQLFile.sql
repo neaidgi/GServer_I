@@ -4,9 +4,9 @@ use userinfo;
 
 create table UserCharacterInfo
 (
-	character_code varchar(20) not null primary key,
+	character_code varchar(40) not null primary key,
 
-	character_origin_code INT not null,
+	character_jobcode INT not null,
 
 	character_jobname VARCHAR(20) not null,
 
@@ -83,9 +83,6 @@ create table ItemInfo
 
 use userinfo;
 
-/* 
-character_code = 0000 00 00 00 00 00 0000
-*/
 create table CharacterPos
 (
 	character_code VARCHAR(20) NOT NULL PRIMARY KEY,
@@ -95,14 +92,12 @@ create table CharacterPos
     FOREIGN KEY(character_code) REFERENCES UserCharacterInfo(character_code)
 );
 
-
 use userinfo;
 
 INSERT INTO CharacterInfo VALUES (1000,'Tanker',15,10,10,150,100,0,0,100,10,5,5,100,50),
 								 (2000,'Warrior',10,15,10,100,100,0,0,100,5,10,5,50,50),
 								 (3000,'Magician',10,10,15,100,150,0,0,100,5,5,10,50,100),
                                  (4000,'Gunner',10,20,5,100,100,0,0,100,5,10,5,50,50);
-               
 use userinfo;
 
 INSERT INTO ItemInfo VALUES (1,'HealthPotion',1,1,1,'체력을 50 회복해준다',4),
@@ -111,11 +106,10 @@ INSERT INTO ItemInfo VALUES (1,'HealthPotion',1,1,1,'체력을 50 회복해준�
                             (4,'Staff',2,1,2,'마법사의 기본무기',3),
                             (5,'ClothAmor',3,1,3,'기본 천갑옷',4);
                             
-INSERT INTO SpawnPos VALUES (1,-3750.0,7510.0,908.0),
-                            (2,-3060.0,7510.0,908.0),
-                            (3,-2380.0,7510.0,908.0),
-                            (4,-1690.0,7510.0,908.0),
-                            (5,-930.0,7510.0,908.0),
-                            (6,-160.0,7510.0,908.0);
-                            
+INSERT INTO SpawnPos( x,y,z) VALUES (-3750.0,28330.0,6848.0),
+									(-3060.0,28330.0,6848.0),
+									(-2380.0,28330.0,6848.0),
+									(-1690.0,28330.0,6848.0),
+									(-930.0,28330.0,6848.0),
+									(-160.0,28330.0,6848.0)
                     

@@ -79,9 +79,16 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	int code;
 	int jobcode;
 	int len;
+	char codebuf[NICKNAMESIZE];
 	char nick[NICKNAMESIZE];
 	bool check = false;
 
+	// 캐릭터 코드용
+	char uniqcode[40];
+	memset(uniqcode, 0, sizeof(uniqcode));
+	char* ptr = uniqcode;
+
+	//
 	memcpy(&len, _buf, sizeof(int));
 	_buf += sizeof(int);
 
@@ -91,9 +98,21 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	memcpy(&jobcode, _buf, sizeof(int));
 	_buf += sizeof(int);
 
-	// 고유코드 만들기 (minute + second + millisecond)
-	code = CharacterCode();
-	
+	// 고유코드 만들기 (유저아이디[20] + 캐릭터닉네임[5] + 직업코드[4])
+	itoa(jobcode, codebuf, 10);
+
+	memcpy(ptr, _user->getID(), strlen(_user->getID()));
+	ptr += strlen(_user->getID());
+
+	memcpy(ptr, nick, 5);
+	ptr += 5;
+
+	memcpy(ptr, codebuf, strlen(codebuf));
+	ptr += strlen(codebuf);
+
+	printf("uniqcode %s \n", uniqcode);
+
+	//
 	Character origin[MAXCHARACTERORIGIN];
 
 	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
@@ -103,29 +122,23 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	{
 	case TANKER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(), _user->GetSlotCount() + 1, origin[0].GetCharacter_Code(),
-			"TANKER", nick, 1, code);
-
+		(uniqcode, origin[0].GetCharacter_Code(),"Tanker",nick,1);
 		break;
 	case WARRIOR:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(), _user->GetSlotCount() + 1, origin[1].GetCharacter_Code(),
-			"WARRIOR", nick, 1, code);
+		(uniqcode, origin[1].GetCharacter_Code(), "Warrior", nick, 1);
 		break;
 	case MAGICIAN:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(), _user->GetSlotCount() + 1, origin[2].GetCharacter_Code(),
-			"MAGICIAN", nick, 1, code);
+		(uniqcode, origin[2].GetCharacter_Code(), "Magician", nick, 1);
 		break;
-
 	case GUNNER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(), _user->GetSlotCount() + 1, origin[3].GetCharacter_Code(),
-			"GUNNER", nick, 1, code);
+		(uniqcode, origin[3].GetCharacter_Code(), "Gunner", nick, 1);
 		break;
 	}
 
-	DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
+	// DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
 }
 
 void CharacterManager::InitEnterGame(User * _user, char * _buf)
@@ -143,21 +156,9 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	if (DBManager::GetInstance()->Character_Req_CharacterPos(_user->GetSlot(index)->code, pos))
 	{
-		//memcpy(ptr, &enter, sizeof(bool));
-		//ptr += sizeof(bool);
-		//size = sizeof(bool);
-
-		//memcpy(ptr, &pos.x, sizeof(float));
-		//ptr += sizeof(float);
-		//size = sizeof(float);
-
-		//memcpy(ptr, &pos.y, sizeof(float));
-		//ptr += sizeof(float);
-		//size = sizeof(float);
-
-		//memcpy(ptr, &pos.z, sizeof(float));
-		//ptr += sizeof(float);
-		//size = sizeof(float);
+		memcpy(ptr, &enter, sizeof(bool));
+		ptr += sizeof(bool);
+		size = sizeof(bool);
 	}
 	else
 	{
@@ -168,18 +169,6 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 		memcpy(ptr, &enter, sizeof(bool));
 		ptr += sizeof(bool);
 		size = sizeof(bool);
-
-		//memcpy(ptr, &pos.x, sizeof(float));
-		//ptr += sizeof(float);
-		//size = sizeof(float);
-
-		//memcpy(ptr, &pos.y, sizeof(float));
-		//ptr += sizeof(float);
-		//size = sizeof(float);
-
-		//memcpy(ptr, &pos.z, sizeof(float));
-		//ptr += sizeof(float);
-		//size = sizeof(float);
 	}
 
 	Character* player = CharacterSelect(_user, index);
@@ -521,29 +510,6 @@ void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _da
 			user->IOCP_OneSided_SendMsg();
 		}
 	}
-}
-
-int CharacterManager::CharacterCode()
-{
-	// 임시사용 수정할 예정
-
-	SYSTEMTIME lptime;
-
-	GetLocalTime(&lptime);
-
-	int code = 0;
-
-	int minute = 0;
-	int second = 0;
-	int millisecond = 0;
-
-	minute = (lptime.wMinute * 1000000);
-	second = (lptime.wSecond * 10000);
-	millisecond = (lptime.wMilliseconds * 1);
-
-	code = minute + second + millisecond;
-
-	return code;
 }
 
 RESULT CharacterManager::Character_EnterGame_Process(User * _user)
