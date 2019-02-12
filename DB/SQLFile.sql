@@ -15,7 +15,7 @@ create table UserCharacterInfo(
 	
 	id varchar(20) not null, 
 
-	character_origin_code INT not null,
+	character_jobcode INT not null,
 
 	character_jobname VARCHAR(20) not null,
 
@@ -23,7 +23,7 @@ create table UserCharacterInfo(
 
 	character_level INT not null,
     
-    	character_slotnum int not null,
+	character_slotnum int not null,
     
 	FOREIGN KEY(id)REFERENCES User(id)
 );
