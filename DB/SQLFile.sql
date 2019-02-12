@@ -2,11 +2,17 @@
 
 use userinfo;
 
-create table UserCharacterInfo
-(
-	character_code varchar(40) not null primary key,
+create table User(
+	
+	id varchar(20) not null primary key,
 
-	character_jobcode INT not null,
+	pw varchar(20) not null
+);
+
+create table UserCharacterInfo(
+	character_code varchar(20) not null primary key,
+
+	character_origin_code INT not null,
 
 	character_jobname VARCHAR(20) not null,
 
@@ -16,25 +22,15 @@ create table UserCharacterInfo
 
 );
 
-use userinfo;
 
-create table info
-(	
+
+create table SlotNum(
 	id varchar(20) not null primary key,
+	character_code varchar(20) not null,
+	character_slotnum int not null,
 
-	pw varchar(20) not null,
-
-	slot_1 varchar(20),
-
-	slot_2 varchar(20),
-
-	slot_3 varchar(20),
-
-	FOREIGN KEY(slot_1) REFERENCES UserCharacterInfo(character_code),
-
-	FOREIGN KEY(slot_2) REFERENCES UserCharacterInfo(character_code),
-
-	FOREIGN KEY(slot_3) REFERENCES UserCharacterInfo(character_code)
+	FOREIGN KEY(id)REFERENCES User(id),
+	FOREIGN KEY(character_code)REFERENCES UserCharacterInfo(character_code)
 );
 
 use userinfo;
