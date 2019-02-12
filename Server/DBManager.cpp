@@ -80,7 +80,7 @@ bool DBManager::Login_CheckID(char * _id)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT id FROM info WHERE id =";
+	char* base_query = "SELECT id FROM User WHERE id =";
 	int state = 0;
 
 	char query[255];
@@ -132,7 +132,7 @@ bool DBManager::Login_Req_Join(char * _id, char * _pw)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "INSERT INTO info(id,pw) VALUES";
+	char* base_query = "INSERT INTO User(id,pw) VALUES";
 	int state = 0;
 
 	char query[255];
@@ -203,7 +203,7 @@ bool DBManager::Login_Req_Login(char * _id, char * _pw)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT id, pw FROM info WHERE id";
+	char* base_query = "SELECT id, pw FROM User WHERE id";
 	int state = 0;
 
 	char query[255];
@@ -248,7 +248,7 @@ bool DBManager::Login_Req_Leave(char * _id)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "DELETE FROM info WHERE id =";
+	char* base_query = "DELETE FROM User WHERE id =";
 	int state = 0;
 
 	char query[255];
