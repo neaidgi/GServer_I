@@ -18,7 +18,7 @@ create table User(
 
 	pw varchar(20) not null,
 );
-create table SlotNum(
+create table UserCharacterSlot(
 	id varchar(20) not null primary key,
 	character_code varchar(20) not null,
 	character_slotnum int not null,
