@@ -281,7 +281,7 @@ bool DBManager::Character_CharacterSlotAdd(char* _code, int  _jobcode, const cha
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "INSERT INTO UserCharacterInfo VALUES(";
+	char* base_query = "INSERT INTO UserCharacterOrigin VALUES(";
 	int state = 0;
 
 	char query[255];
@@ -334,7 +334,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 
 	// Äõ¸® ÀÔ·Â // code, jobname, nick, level
 	{
-		sprintf(query, "%s FROM CharacterInfo", base_query);
+		sprintf(query, "%s FROM CharacterOrigin", base_query);
 	}
 
 	/*
