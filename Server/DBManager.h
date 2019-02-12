@@ -26,12 +26,12 @@ public:
 	bool SelectDB(char* _dbname);
 
 	bool Login_CheckID(char* _id);
-	bool Login_JoinCharacterSlot(char* _id);
 	bool Login_Req_Join(char* _id, char* _pw);
 	bool Login_Req_Login(char* _id, char* _pw);
 	bool Login_Req_Leave(char* _id);
 
-	bool Character_CharacterSlotAdd(char* _code,int  _jobcode,const char* _jobname, char* _nick, int _level);
+	bool Character_Req_CharacterSlotCount(const char * _id, int& _count);
+	bool Character_CharacterSlotAdd(const char* _id, char* _code,int  _jobcode,const char* _jobname, char* _nick, int _level, int _num);
 	bool Character_Req_CharacterInfo(Character* _character_out[]);
 	bool Character_Req_CharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code);
 	

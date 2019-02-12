@@ -118,23 +118,29 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
 		GameDataManager::GetInstance()->Character_Origin_Data((i + 1) * 1000, &origin[i]);	// <- 버그
 
+	int count = 0;
+	DBManager::GetInstance()->Character_Req_CharacterSlotCount(_user->getID(), count);
+	
+	// 다음 슬롯
+	count += 1;
+
 	switch (jobcode)
 	{
 	case TANKER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(uniqcode, origin[0].GetCharacter_Code(),"Tanker",nick,1);
+		(_user->getID(),uniqcode, origin[0].GetCharacter_Code(),"Tanker",nick,1, count);
 		break;
 	case WARRIOR:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(uniqcode, origin[1].GetCharacter_Code(), "Warrior", nick, 1);
+		(_user->getID(),uniqcode, origin[1].GetCharacter_Code(), "Warrior", nick, 1, count);
 		break;
 	case MAGICIAN:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(uniqcode, origin[2].GetCharacter_Code(), "Magician", nick, 1);
+		(_user->getID(),uniqcode, origin[2].GetCharacter_Code(), "Magician", nick, 1, count);
 		break;
 	case GUNNER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(uniqcode, origin[3].GetCharacter_Code(), "Gunner", nick, 1);
+		(_user->getID(),uniqcode, origin[3].GetCharacter_Code(), "Gunner", nick, 1, count);
 		break;
 	}
 
@@ -421,6 +427,7 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 		else
 		{
 			// 중복 없음
+			// 캐릭터 개수 제한 체크 추가
 			check = true;
 			result = RT_CHARACTER_CREATE;
 			CreateCharacter(_user, buf);

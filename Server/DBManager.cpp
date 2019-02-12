@@ -58,6 +58,7 @@ void DBManager::EndManager()
 	mysql_close(mysql);
 }
 
+//DB 선택
 bool DBManager::SelectDB(char * _dbname)
 {
 	if (mysql_select_db(mysql, _dbname)) // 데이터베이스 선택
@@ -75,6 +76,7 @@ bool DBManager::SelectDB(char * _dbname)
 	}
 }
 
+// ID 중복체크
 bool DBManager::Login_CheckID(char * _id)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -127,6 +129,7 @@ bool DBManager::Login_CheckID(char * _id)
 	}
 }
 
+// 회원가입 
 bool DBManager::Login_Req_Join(char * _id, char * _pw)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -164,40 +167,7 @@ bool DBManager::Login_Req_Join(char * _id, char * _pw)
 		return false;
 	}
 }
-
-bool DBManager::Login_JoinCharacterSlot(char * _id)
-{
-	MYSQL_RES *sql_result;  // the results
-	MYSQL_ROW sql_row;      // the results row (line by line)
-
-	char* base_query = "INSERT INTO UserCharacterInfo(user_id) VALUES(";
-	int state = 0;
-
-	char query[255];
-	memset(query, 0, sizeof(query));
-
-	/*
-	*	쿼리문 만들기
-	*/
-	sprintf(query, "%s '%s')", base_query, _id);
-	/*
-	*	끝
-	*/
-
-	state = mysql_query(mysql, query);
-
-	// 성공
-	if (state == 0)
-	{
-		return true;
-	}
-	else
-	{
-		fprintf(stderr, "Mysql JoinCharacterSlot error : %s \n", mysql_error(mysql));
-		return true;
-	}
-}
-
+// 로그인
 bool DBManager::Login_Req_Login(char * _id, char * _pw)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -242,7 +212,7 @@ bool DBManager::Login_Req_Login(char * _id, char * _pw)
 		return false;
 	}
 }
-
+// 회원탈퇴
 bool DBManager::Login_Req_Leave(char * _id)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -275,13 +245,46 @@ bool DBManager::Login_Req_Leave(char * _id)
 	}
 }
 
-// 실제 생성한 유저 캐릭터 저장
-bool DBManager::Character_CharacterSlotAdd(char* _code, int  _jobcode, const char* _jobname, char* _nick, int _level)
+// 슬롯 개수 요청
+bool DBManager::Character_Req_CharacterSlotCount(const char * _id, int& _count)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "INSERT INTO UserCharacterOrigin VALUES(";
+	char* base_query = "SELECT COUNT(character_slotnum) FROM usercharacterinfo WHERE id";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	//	쿼리문 만들기
+	sprintf(query, "%s = '%s'", base_query, _id);
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		// 결과 카운트 저장
+		int count = atoi(sql_row[0]);
+		_count = count;
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql 슬롯 카운트 에러: %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+// 실제 생성한 유저 캐릭터 저장
+bool DBManager::Character_CharacterSlotAdd(const char* _id, char* _code, int  _jobcode, const char* _jobname, char* _nick, int _level, int _num)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "INSERT INTO UserCharacterInfo VALUES(";
 	int state = 0;
 
 	char query[255];
@@ -291,9 +294,8 @@ bool DBManager::Character_CharacterSlotAdd(char* _code, int  _jobcode, const cha
 	*	쿼리문 만들기
 	*/
 
-	// 쿼리 입력 // code, jobname, nick, level
-
-	sprintf(query, "%s '%s',%d,'%s','%s',%d) ", base_query, _code, _jobcode, _jobname, _nick, _level);
+	// 쿼리 입력
+	sprintf(query, "'%s', '%s', %d, '%s', '%s', %d, %d);", _code, _id, _jobcode, _jobname, _nick, _level, _num);
 
 	/*
 	*	끝
@@ -309,7 +311,7 @@ bool DBManager::Character_CharacterSlotAdd(char* _code, int  _jobcode, const cha
 	}
 	else
 	{
-		fprintf(stderr, "Mysql Character_Create error : %s \n", mysql_error(mysql));
+		fprintf(stderr, "Mysql 캐릭터 추가 에러 : %s \n", mysql_error(mysql));
 		return false;
 	}
 }
@@ -648,21 +650,7 @@ bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* 
 	*/
 
 	// 쿼리 입력 // code, jobname, nick, level
-	switch (_index)
-	{
-	case 1:
-		sprintf(query,
-			"%s character_nickname_first FROM usercharacterinfo WHERE user_id = '%s'", base_query, _id);
-		break;
-	case 2:
-		sprintf(query,
-			"%s character_nickname_second FROM usercharacterinfo WHERE user_id = '%s'", base_query, _id);
-		break;
-	case 3:
-		sprintf(query,
-			"%s character_nickname_third FROM usercharacterinfo WHERE user_id = '%s'", base_query, _id);
-		break;
-	}
+	sprintf("%s character_nickname FROM usercharacterinfo WHERE user_id = '%s' AND character_slotnum = '%d'", base_query, _id, _index);
 
 	/*
 	*	끝
