@@ -334,7 +334,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 
 	// Äõ¸® ÀÔ·Â // code, jobname, nick, level
 	{
-		sprintf(query, "%s FROM CharacterInfo", base_query);
+		sprintf(query, "%s FROM CharacterOrigin", base_query);
 	}
 
 	/*
