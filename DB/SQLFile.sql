@@ -45,7 +45,7 @@ create table SpawnPos
 
 use userinfo;
 
-create table CharacterInfo
+create table CharacterOrigin
 (
 	character_jobcode INT NOT NULL primary key,
     character_jobname VARCHAR(20) NOT NULL,
