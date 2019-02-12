@@ -13,7 +13,7 @@ create table UserCharacterInfo(
 
 	character_code varchar(20) not null primary key,
 	
-	id varchar(20) not null,
+	id varchar(20) not null, 
 
 	character_origin_code INT not null,
 
@@ -85,7 +85,7 @@ create table CharacterPos
 
 use userinfo;
 
-INSERT INTO CharacterInfo VALUES (1000,'Tanker',15,10,10,150,100,0,0,100,10,5,5,100,50),
+INSERT INTO CharacterOrigin VALUES (1000,'Tanker',15,10,10,150,100,0,0,100,10,5,5,100,50),
 								 (2000,'Warrior',10,15,10,100,100,0,0,100,5,10,5,50,50),
 								 (3000,'Magician',10,10,15,100,150,0,0,100,5,5,10,50,100),
                                  (4000,'Gunner',10,20,5,100,100,0,0,100,5,10,5,50,50);
