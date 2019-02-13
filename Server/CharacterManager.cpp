@@ -35,20 +35,35 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	_slot->origincode = torigincode;
 	_slot->code = tcode;
 	_slot->level = tlevel;
-	_slot->jobname = new char[len + 1]();
-	memset(_slot->jobname, 0, len + 1);
+	_slot->jobname = new char[len + 1];
+	//memset(_slot->jobname, 0, len + 1);
 	_slot->jobname[len] = '0';
 	strcpy_s(_slot->jobname, len + 1, tjobname);
 	//memcpy(_slot->jobname, tjobname, len);
 
 	len = strlen(tnick);
-	_slot->nick = new char[len + 1]();
-	memset(_slot->nick, 0, len + 1);
+	_slot->nick = new char[len + 1];
+	//memset(_slot->nick, 0, len + 1);
 	_slot->nick[len] = '0';
 	strcpy_s(_slot->nick, len + 1, tnick);
 	//memcpy(_slot->nick, tnick, len);
 
 	return result;
+}
+
+// 캐릭터 슬롯 개수
+bool CharacterManager::GetCharacter_SlotCount(User * _user, int & _count)
+{
+	bool result = DBManager::GetInstance()->Character_Req_CharacterSlotCount(_user->getID(), _count);
+
+	if (result)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
@@ -160,7 +175,11 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	memcpy(&index, _buf, sizeof(int));
 
-	if (DBManager::GetInstance()->Character_Req_CharacterPos(_user->GetSlot(index)->code, pos))
+	SlotData slotdata;
+	DBManager::GetInstance()->Character_Req_CharacterSlot
+	(_user->getID(), index, slotdata.origincode, slotdata.jobname, slotdata.nick, slotdata.level, slotdata.code);
+
+	if (DBManager::GetInstance()->Character_Req_CharacterPos(slotdata.code, pos))
 	{
 		memcpy(ptr, &enter, sizeof(bool));
 		ptr += sizeof(bool);
@@ -177,8 +196,8 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 		size = sizeof(bool);
 	}
 
-	Character* player = CharacterSelect(_user, index);
-	player->SetCharacter_UniqueCode(_user->GetSlot(index)->code);
+	Character* player = CharacterSelect(_user, slotdata, index);
+	player->SetCharacter_UniqueCode(slotdata.code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
 
@@ -249,10 +268,10 @@ void CharacterManager::Character_Slot_Send(User * _user)
 
 }
 
-Character* CharacterManager::CharacterSelect(User* _user, int _index)
+Character* CharacterManager::CharacterSelect(User* _user, SlotData _slotdata, int _index)
 {
 	Character temp;
-	GameDataManager::GetInstance()->Character_Origin_Data(_user->GetSlot(_index)->origincode, &temp);
+	GameDataManager::GetInstance()->Character_Origin_Data(_slotdata.origincode, &temp);
 
 	Character* player = new Character();
 
@@ -264,7 +283,7 @@ Character* CharacterManager::CharacterSelect(User* _user, int _index)
 
 	//DBManager::GetInstance()->Character_Req_CharacterName(_user->getID(), _user->GetSlot(_index)->)
 
-	player->SetCharacter_Name(_user->GetSlot(_index)->nick);
+	player->SetCharacter_Name(_slotdata.nick);
 
 	return player;
 }
@@ -291,23 +310,29 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 	switch (protocol)
 	{
 	case CLIENT_REQ_CHARACTER_SLOT:
-		while (i < SLOTMAXCOUNT)
+		// 슬롯 개수 요청
+		if (GetCharacter_SlotCount(_user, count) == false)
+		{
+			count = 0;
+		}
+
+		// DB에서 슬롯캐릭터 받아오기
+		while (i < count)
 		{
 			slotdata[i] = new SlotData();
 			if (GetCharacter_Slot(_user, i + 1, slotdata[i]) == false)
 			{
-				delete slotdata[i];
 				count = i;
 				break;
 			}
 
 			++i;
-			count = i;
 		}
 
 		bool is_slot;
 		int size;
 
+		// 슬롯에 캐릭터가 없을경우
 		if (count == 0)
 		{
 			is_slot = false;
@@ -323,14 +348,15 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 			is_slot = true;
 			size = 0;
 
-			// **슬롯 저장 안하게 수정 예정**
-			for (int i = 0; i < count; i++)
-			{
-				_user->SetSlot(slotdata[i]);
-			}
-			// 슬롯 로드완료
-			_user->SlotLoadComplete();
-			// ****
+			//// **슬롯 저장 안하게 수정 예정**
+			//for (int i = 0; i < count; i++)
+			//{
+			//	_user->SetSlot(slotdata[i]);
+			//}
+			//// 슬롯 로드완료
+			//_user->SetSlotCount(count);
+			//_user->SlotLoadComplete();
+			//// ****
 
 			// 프로토콜 데이터 패킹
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
@@ -375,6 +401,10 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 
 			_user->pack(sendprotocol, buf, size);
 			result = RT_CHARACTER_SLOTRESULT;
+
+			//뒤처리 받아온 슬롯데이터 삭제
+			for (int i = 0; i < count; i++)
+				delete slotdata[i];
 		}
 		break;
 	case CLIENT_NEW_CHARACTER_MENU:

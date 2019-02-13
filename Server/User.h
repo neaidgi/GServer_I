@@ -59,9 +59,10 @@ public:
 	void SetCurCharacter(Character* _player);
 	Character* GetCurCharacter() { return current_character; }
 	bool SetSlot(SlotData* _slotdata);
-	const SlotData* GetSlot(int _index) { return characterslot[_index - 1]; }		// 슬롯데이터 접근지정자
+	//const SlotData* GetSlot(int _index) { return characterslot[_index - 1]; }		// 슬롯데이터 접근지정자
 	const int GetSlotCount() { return slotcount; }
 	void SetSlotCount(int _count) { slotcount = _count; }
+	void ResetSlot() { for (int i = 0; i < slotcount; i++) delete characterslot[i]; memset(characterslot, 0, sizeof(characterslot)); }
 	bool DeleteCharacter(int _index);
 	bool isSlotLoaded() { return is_slotload; }
 	void SlotLoadComplete() { is_slotload = true; }
