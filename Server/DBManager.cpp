@@ -527,13 +527,13 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _o
 	}
 }
 
-// 19-02-09 수정해야함
-bool DBManager::Character_Req_CharacterDelete(const char * _id,int _slotnum)
+// 2019-02-13 수정함
+bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "DELETE FROM usercharacterinfo where id = '";
+	char* base_query = "DELETE FROM UserCharacterInfo WHERE id = ";
 
 	int state = 0;
 
@@ -545,7 +545,7 @@ bool DBManager::Character_Req_CharacterDelete(const char * _id,int _slotnum)
 	*/
 
 	// 쿼리 입력 //
-	sprintf(query, "%s %s' AND character_slotnum = %d) ", base_query, _id, _slotnum);
+	sprintf(query, "%s '%s' AND character_slotnum = ) ", base_query, _id, _index);
 
 	/*
 	*	끝
@@ -777,6 +777,115 @@ bool DBManager::Charactor_CharacterPosAdd(int _code)
 	else
 	{
 		fprintf(stderr, "Mysql Character_Pos error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+// 삭제한 유저캐릭터 슬롯 뒤에 슬롯이 몇개있는지
+bool DBManager::Character_Req_SlotCount(const char * _id, int _slotnum,int& _index)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT COUNT(*) FROM  usercharacterinfo WHERE id = ";
+
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 //
+	sprintf(query, "%s '%s' AND character_slotnum > %d) ", base_query, _id, _slotnum);
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row == NULL)
+		{
+			return false;
+		}
+
+		// DB 데이터 아웃풋 저장
+		_slotnum = atoi(sql_row[0]);
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Req_SlotCount error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+// 슬롯 당기기
+bool DBManager::Character_Slot_Pull(const char * _id, int _afterslot, int _beforeslot)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "UPDATE usercharacterinfo SET character_slotnum = ";
+
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 //
+	sprintf(query, "%s %d WHERE id= '%s' AND character_slotnum = %d) ", base_query, _id, _beforeslot, _afterslot);
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row == NULL)
+		{
+			return false;
+		}
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Slot_Pull error : %s \n", mysql_error(mysql));
 		return false;
 	}
 }
