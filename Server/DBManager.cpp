@@ -445,13 +445,13 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 	}
 }
 
-// 19-02-09 수정해야함
-bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _origincode, char * _jobname, char * _nick, int& _level, int& _code)
+// 캐릭터 슬롯 요청 (번호 받아서 해당 레코드 가져옴) 19-2-13 수정완료
+bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, int& _code)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT";
+	char* base_query = "SELECT *";
 	int state = 0;
 
 	char query[255];
@@ -462,21 +462,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _o
 	*/
 
 	// 쿼리 입력 // code, jobname, nick, level
-	switch (_index)
-	{
-	case 1:
-		sprintf(query,
-			"%s character_origin_code_first, character_jobname_first, character_nickname_first, character_level_first, character_code_first FROM UserCharacterInfo WHERE user_id = '%s'", base_query, _id);
-		break;
-	case 2:
-		sprintf(query,
-			"%s character_origin_code_second, character_jobname_second, character_nickname_second, character_level_second, character_code_second FROM UserCharacterInfo WHERE user_id = '%s'", base_query, _id);
-		break;
-	case 3:
-		sprintf(query,
-			"%s character_origin_code_third, character_jobname_third, character_nickname_third, character_level_third, character_code_third FROM UserCharacterInfo WHERE user_id = '%s'", base_query, _id);
-		break;
-	}
+		sprintf(query,"%s FROM UserCharacterInfo WHERE user_id = '%s' AND character_slotnum = %d",base_query, _id, _index);
 
 	/*
 	*	끝
@@ -498,20 +484,23 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _o
 		}
 
 		// DB 데이터 아웃풋 저장
-		_origincode = atoi(sql_row[0]);
+		// 캐릭터 코드
+		_code = atoi(sql_row[0]);
+		
+		// 직업코드
+		_jobcode = atoi(sql_row[2]);
 
-		int len = strlen(sql_row[1]);
-		strcpy_s(_jobname, len + 1, sql_row[1]);
+		int len = strlen(sql_row[3]);
+		strcpy_s(_jobname, len + 1, sql_row[3]);
 
 		//memcpy(_jobname, sql_row[1], len);
 
-		len = strlen(sql_row[2]);
-		strcpy_s(_nick, len + 1, sql_row[2]);
+		len = strlen(sql_row[4]);
+		strcpy_s(_nick, len + 1, sql_row[4]);
 
 		//memcpy(_nick, sql_row[2], len);
 
-		_level = atoi(sql_row[3]);
-		_code = atoi(sql_row[4]);
+		_level = atoi(sql_row[5]);
 
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
