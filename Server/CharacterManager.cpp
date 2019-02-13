@@ -388,9 +388,19 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		result = RT_CHARACTER_ENTERGAME;
 		break;
 	case CLIENT_CHARACTER_DELETE:
-		DeleateCharacter(_user,buf);
+		if (DeleateCharacter(_user, buf))
+		{
+			MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 성공");
+			check = true;
+		}
+		else
+		{
+			MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 실패");
+			check = false;
+		}
+		_user->pack(SERVER_CHARACTER_DELETE_RESULT, &check, sizeof(bool));
 
-
+		result = RT_CHARACTER_DELETE;
 		break;
 	default:
 		break;
@@ -523,26 +533,83 @@ void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _da
 	}
 }
 
-void CharacterManager::DeleateCharacter(User * _user, char * _buf)
+bool CharacterManager::DeleateCharacter(User * _user, char * _buf)
 {
 	PROTOCOL sendprotocol;
-	char data[BUFSIZE];
-	char* ptr = data;
 	int index = 0;
 	int size = 0;
 	bool enter = true;
 
+	int slot_count = 0;
+
 	memcpy(&index, _buf, sizeof(int));
+
+	MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 요청");
 
 	if (DBManager::GetInstance()->Character_Req_CharacterDelete(_user->getID(), index))
 	{
-
+		// 스와핑
+		if (Character_SlotCount_Calculation(_user,index,slot_count))
+		{
+			// 뒤에 slot_count만큼 슬롯이더있음
+			if (slot_count > 0)
+			{
+				if (Character_SlotPull(_user, index, slot_count)) 
+				{
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		else
+		{
+			// 오류
+			return false;
+		}
 	}
 	else
 	{
-
+		// 삭제 실패
+		return false;
 	}
 
+}
+
+bool CharacterManager::Character_SlotCount_Calculation(User* _user,int _index, int& _slotcount)
+{
+	int slot_count = 0;
+
+	if (DBManager::GetInstance()->Character_Req_SlotCount(_user->getID(), _index, slot_count))
+	{
+		_slotcount = slot_count;
+		return true;
+	}
+	else
+	{
+		// 검색실패
+		return false;
+	}
+
+	
+}
+
+bool CharacterManager::Character_SlotPull(User * _user, int _index, int _slotcount)
+{
+	int slotnum = _index;
+	for (int i = 0; i < _slotcount; i++)
+	{
+		if (DBManager::GetInstance()->Character_Slot_Pull(_user->getID(), slotnum +1, slotnum))
+		{
+			slotnum++;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 RESULT CharacterManager::Character_EnterGame_Process(User * _user)
