@@ -22,6 +22,10 @@ bool CharacterState::Read(User * _user)
 		{
 			state = CHARACTER_ENTER_SEND;
 		}
+		else if (result == RT_CHARACTER_DELETE)
+		{
+			state = CHARACTER_DELETE_SEND;
+		}
 		break;
 	case CharacterState::CHARACTER_REQ_RECV:
 		result = charactermanager->Character_Management_Process(_user);
@@ -65,6 +69,9 @@ bool CharacterState::Write(User * _user)
 		state = CHARACTER_MENU_RECV;
 		break;
 	case CharacterState::CHARACTER_EXIT_SEND:
+		state = CHARACTER_MENU_RECV;
+		break;
+	case CharacterState::CHARACTER_DELETE_SEND:
 		state = CHARACTER_MENU_RECV;
 		break;
 	default:
