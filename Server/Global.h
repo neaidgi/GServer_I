@@ -1,7 +1,6 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#pragma warning(disable:4996)
 #pragma comment(lib, "ws2_32")
 #include <WinSock2.h>
 #include <stdio.h>

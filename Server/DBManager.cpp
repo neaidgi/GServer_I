@@ -251,7 +251,7 @@ bool DBManager::Character_Req_CharacterSlotCount(const char * _id, int& _count)
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "SELECT COUNT(character_slotnum) FROM usercharacterinfo WHERE id";
+	char* base_query = "SELECT COUNT(*) FROM usercharacterinfo WHERE id";
 	int state = 0;
 
 	char query[255];
@@ -266,6 +266,10 @@ bool DBManager::Character_Req_CharacterSlotCount(const char * _id, int& _count)
 	// 성공
 	if (state == 0)
 	{
+		sql_result = mysql_store_result(mysql);
+
+		sql_row = mysql_fetch_row(sql_result);
+
 		// 결과 카운트 저장
 		int count = atoi(sql_row[0]);
 		_count = count;
@@ -295,7 +299,7 @@ bool DBManager::Character_CharacterSlotAdd(const char* _id, char* _code, int  _j
 	*/
 
 	// 쿼리 입력
-	sprintf(query, "'%s', '%s', %d, '%s', '%s', %d, %d);", _code, _id, _jobcode, _jobname, _nick, _level, _num);
+	sprintf(query, "%s'%s', '%s', %d, '%s', '%s', %d, %d);", base_query, _code, _id, _jobcode, _jobname, _nick, _level, _num);
 
 	/*
 	*	끝
@@ -462,7 +466,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 	*/
 
 	// 쿼리 입력 // code, jobname, nick, level
-		sprintf(query,"%s FROM UserCharacterInfo WHERE user_id = '%s' AND character_slotnum = %d",base_query, _id, _index);
+		sprintf(query,"%s FROM UserCharacterInfo WHERE id = '%s' AND character_slotnum = %d",base_query, _id, _index);
 
 	/*
 	*	끝
@@ -478,8 +482,9 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 
 		sql_row = mysql_fetch_row(sql_result);
 
-		if (sql_row[0] == NULL)
+		if (sql_row == NULL)
 		{
+			fprintf(stderr, "Mysql 캐릭터 정보 없음 : %s \n", mysql_error(mysql));
 			return false;
 		}
 
@@ -676,7 +681,7 @@ bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* 
 		return false;
 	}
 }
-
+// 캐릭터 위치 요청
 bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -732,7 +737,7 @@ bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 		return false;
 	}
 }
-
+// 캐릭터 위치 추가
 bool DBManager::Charactor_CharacterPosAdd(int _code)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -769,7 +774,7 @@ bool DBManager::Charactor_CharacterPosAdd(int _code)
 		return false;
 	}
 }
-
+// 캐릭터 스폰위치 요청
 bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 {
 	MYSQL_RES *sql_result;  // the results

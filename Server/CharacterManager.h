@@ -15,6 +15,7 @@ private:
 	~CharacterManager();
 
 	bool GetCharacter_Slot(User* _user, int _index, SlotData* _slot);			// 캐릭터 슬롯 가져오기
+	bool GetCharacter_SlotCount(User* _user, int& _count);						// 캐릭터 슬롯 개수
 	bool NickOverlapCheck(User* _user, char* _nick);							// 캐릭터 닉네임 중복체크
 	void CreateCharacter(User* _user, char* _buf);								// 캐릭터 생성
 	void InitEnterGame(User* _user, char* _buf);								// 게임 접속 초기화
@@ -33,7 +34,7 @@ public:
 
 	void Character_Slot_Send(User* _user);					// 현재 사용X
 
-	Character* CharacterSelect(User* _user, int _index);
+	Character* CharacterSelect(User* _user, SlotData _slotdata, int _index);
 
 	RESULT Character_Init_Choice(User* _user);				// 캐릭터 초기화면
 	RESULT Character_Management_Process(User* _user);		// 캐릭터 생성창
