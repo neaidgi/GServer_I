@@ -387,6 +387,11 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		_user->SetEnterGame();
 		result = RT_CHARACTER_ENTERGAME;
 		break;
+	case CLIENT_CHARACTER_DELETE:
+		DeleateCharacter(_user,buf);
+
+
+		break;
 	default:
 		break;
 	}
@@ -408,7 +413,6 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 
 	RESULT result;
 
-	// 수정했음
 	switch (protocol)
 	{
 	case CLIENT_REQ_CHARACTER:
@@ -517,6 +521,28 @@ void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _da
 			user->IOCP_OneSided_SendMsg();
 		}
 	}
+}
+
+void CharacterManager::DeleateCharacter(User * _user, char * _buf)
+{
+	PROTOCOL sendprotocol;
+	char data[BUFSIZE];
+	char* ptr = data;
+	int index = 0;
+	int size = 0;
+	bool enter = true;
+
+	memcpy(&index, _buf, sizeof(int));
+
+	if (DBManager::GetInstance()->Character_Req_CharacterDelete(_user->getID(), index))
+	{
+
+	}
+	else
+	{
+
+	}
+
 }
 
 RESULT CharacterManager::Character_EnterGame_Process(User * _user)

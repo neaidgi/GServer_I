@@ -517,12 +517,13 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 }
 
 // 19-02-09 수정해야함
-bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
+bool DBManager::Character_Req_CharacterDelete(const char * _id,int _slotnum)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
-	char* base_query = "UPDATE usercharacterinfo SET";
+	char* base_query = "DELETE FROM usercharacterinfo where id = '";
+
 	int state = 0;
 
 	char query[255];
@@ -532,22 +533,8 @@ bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 	*	쿼리문 만들기
 	*/
 
-	// 쿼리 입력 // code, jobname, nick, level
-	switch (_index)
-	{
-	case 1:
-		sprintf(query,
-			"%s UserCharacterInfo SET character_origin_code_first = NULL, character_code_first = NULL,character_jobname_first = NULL,character_nickname_first = NULL, character_level_first = NULL WHERE user_id = '%s'", base_query, _id);
-		break;
-	case 2:
-		sprintf(query,
-			"%s UserCharacterInfo SET character_origin_code_second = NULL, character_code_second = NULL,character_jobname_second = NULL,character_nickname_second = NULL, character_level_second = NULL WHERE user_id = %s", base_query, _id);
-		break;
-	case 3:
-		sprintf(query,
-			"%s UserCharacterInfo SET character_origin_code_third = NULL, character_code_third = NULL,character_jobname_third = NULL,character_nickname_third = NULL, character_level_third = NULL WHERE user_id = %s", base_query, _id);
-		break;
-	}
+	// 쿼리 입력 //
+	sprintf(query, "%s %s' AND character_slotnum = %d) ", base_query, _id, _slotnum);
 
 	/*
 	*	끝
@@ -582,6 +569,7 @@ bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 	}
 }
 
+// 캐릭터 닉네임 중복확인
 bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 {
 	MYSQL_RES *sql_result;  // the results
