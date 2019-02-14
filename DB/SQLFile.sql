@@ -78,7 +78,7 @@ create table CharacterPos
 (
 	character_code VARCHAR(20) NOT NULL PRIMARY KEY,
 	character_pos_x FLOAT,
-	chatacter_pos_y FLOAT,
+	character_pos_y FLOAT,
 	character_pos_z FLOAT,
     FOREIGN KEY(character_code) REFERENCES UserCharacterInfo(character_code)
 );
