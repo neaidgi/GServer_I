@@ -358,7 +358,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 1번
-		_character_out[0]->SetCharacter_Code(atoi(sql_row[0]));
+		_character_out[0]->SetCharacter_Code(sql_row[0]);
 		_character_out[0]->SetCharacter_Name(sql_row[1]);
 		_character_out[0]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[0]->SetCharacter_DEX(atoi(sql_row[3]));
@@ -378,7 +378,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 2번
-		_character_out[1]->SetCharacter_Code(atoi(sql_row[0]));
+		_character_out[1]->SetCharacter_Code(sql_row[0]);
 		_character_out[1]->SetCharacter_Name(sql_row[1]);
 		_character_out[1]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[1]->SetCharacter_DEX(atoi(sql_row[3]));
@@ -398,7 +398,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 3번
-		_character_out[2]->SetCharacter_Code(atoi(sql_row[0]));
+		_character_out[2]->SetCharacter_Code(sql_row[0]);
 		_character_out[2]->SetCharacter_Name(sql_row[1]);
 		_character_out[2]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[2]->SetCharacter_DEX(atoi(sql_row[3]));
@@ -418,7 +418,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 4번
-		_character_out[3]->SetCharacter_Code(atoi(sql_row[0]));
+		_character_out[3]->SetCharacter_Code(sql_row[0]);
 		_character_out[3]->SetCharacter_Name(sql_row[1]);
 		_character_out[3]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[3]->SetCharacter_DEX(atoi(sql_row[3]));
@@ -538,7 +538,7 @@ bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 	*/
 
 	// 쿼리 입력 //
-	sprintf(query, "%s '%s' AND character_slotnum = ) ", base_query, _id, _index);
+	sprintf(query, "%s '%s' AND character_slotnum = %d", base_query, _id, _index);
 
 	/*
 	*	끝
@@ -550,20 +550,6 @@ bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 	// 성공
 	if (state == 0)
 	{
-		sql_result = mysql_store_result(mysql);
-
-		sql_row = mysql_fetch_row(sql_result);
-
-		if (sql_row == NULL)
-		{
-			return false;
-		}
-
-		/*
-		* result 지시자와 관련된 점유 메모리를 해제한다.
-		*/
-		mysql_free_result(sql_result);
-
 		return true;
 	}
 	else
@@ -798,7 +784,7 @@ bool DBManager::Character_Req_SlotCount(const char * _id, int _slotnum,int& _ind
 	*/
 
 	// 쿼리 입력 //
-	sprintf(query, "%s '%s' AND character_slotnum > %d) ", base_query, _id, _slotnum);
+	sprintf(query, "%s '%s' AND character_slotnum > %d ", base_query, _id, _slotnum);
 
 	/*
 	*	끝
@@ -820,7 +806,7 @@ bool DBManager::Character_Req_SlotCount(const char * _id, int _slotnum,int& _ind
 		}
 
 		// DB 데이터 아웃풋 저장
-		_slotnum = atoi(sql_row[0]);
+		_index = atoi(sql_row[0]);
 
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
@@ -854,7 +840,7 @@ bool DBManager::Character_Slot_Pull(const char * _id, int _afterslot, int _befor
 	*/
 
 	// 쿼리 입력 //
-	sprintf(query, "%s %d WHERE id= '%s' AND character_slotnum = %d) ", base_query, _id, _beforeslot, _afterslot);
+	sprintf(query, "%s %d WHERE id= '%s' AND character_slotnum = %d ", base_query, _beforeslot, _id, _afterslot);
 
 	/*
 	*	끝
@@ -866,20 +852,6 @@ bool DBManager::Character_Slot_Pull(const char * _id, int _afterslot, int _befor
 	// 성공
 	if (state == 0)
 	{
-		sql_result = mysql_store_result(mysql);
-
-		sql_row = mysql_fetch_row(sql_result);
-
-		if (sql_row == NULL)
-		{
-			return false;
-		}
-
-		/*
-		* result 지시자와 관련된 점유 메모리를 해제한다.
-		*/
-		mysql_free_result(sql_result);
-
 		return true;
 	}
 	else
