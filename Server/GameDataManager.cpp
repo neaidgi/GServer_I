@@ -116,9 +116,9 @@ void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 
 }
 // 직업에따라 설계도 가져옴
-void GameDataManager::Character_Origin_Data(int _code, Character* _job)
+void GameDataManager::Character_Origin_Data(int _jobcode, Character* _job)
 {
-	switch (_code)
+	switch (_jobcode)
 	{
 	case TANKER:
 		characterdata->GetTanker(_job);

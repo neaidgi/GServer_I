@@ -14,7 +14,7 @@ CharacterManager::~CharacterManager()
 // 슬롯 데이터 가져오기 index 1 ~ 3 // 슬롯 데이터가 없다면 false 반환
 bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _slot)
 {
-	int torigincode;
+	int tjobcode;
 	char tcode[30];
 	char tjobname[20];
 	char tnick[20];
@@ -25,7 +25,7 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	memset(tnick, 0, sizeof(tnick));
 
 	bool result = DBManager::GetInstance()->Character_Req_CharacterSlot
-	(_user->getID(), _index, torigincode, tjobname, tnick, tlevel, tcode);
+	(_user->getID(), _index, tjobcode, tjobname, tnick, tlevel, tcode);
 
 	// 슬롯에 캐릭터 없으면 false 반환
 	if (result == false)
@@ -34,10 +34,11 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 		return result;
 	}
 
-	_slot->origincode = torigincode;
+	_slot->jobcode = tjobcode;
 	_slot->level = tlevel;
 
 	int len;
+	
 	len = strlen(tjobname);
 	char* name = new char[len+1];
 	memset(name, 0, len);
@@ -45,7 +46,6 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	name[len] = 0;
 	_slot->jobname = name;
 	
-
 	len = strlen(tnick);
 	_slot->nick = new char[len+1];
 	memset(_slot->nick, 0, len);
@@ -109,7 +109,7 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	bool check = false;
 
 	// 캐릭터 코드용
-	char uniqcode[40];
+	char uniqcode[30];
 	memset(uniqcode, 0, sizeof(uniqcode));
 	char* ptr = uniqcode;
 
@@ -154,21 +154,23 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	{
 	case TANKER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, origin[0].GetCharacter_Code(),"Tanker",nick,1, count);
+		(_user->getID(),uniqcode, jobcode,"Tanker",nick,1, count);
 		break;
 	case WARRIOR:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, origin[1].GetCharacter_Code(), "Warrior", nick, 1, count);
+		(_user->getID(),uniqcode, jobcode, "Warrior", nick, 1, count);
 		break;
 	case MAGICIAN:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, origin[2].GetCharacter_Code(), "Magician", nick, 1, count);
+		(_user->getID(),uniqcode, jobcode, "Magician", nick, 1, count);
 		break;
 	case GUNNER:
 		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, origin[3].GetCharacter_Code(), "Gunner", nick, 1, count);
+		(_user->getID(),uniqcode, jobcode, "Gunner", nick, 1, count);
 		break;
 	}
+
+	//delete[] origin;
 
 	// DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
 }
@@ -210,7 +212,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	}
 
 	Character* player = CharacterSelect(_user, slotdata, index);
-	//player->SetCharacter_UniqueCode(slotdata.code);
+	player->SetCharacter_Code(slotdata->code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
 
@@ -220,7 +222,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	char* ptr_temp = ptr;
 
 	// 캐릭터 코드
-	int code = player->GetCharacter_Code();
+	int code = player->GetCharacter_JobCode();
 	memcpy(ptr_temp, &code, sizeof(int));
 	ptr_temp += sizeof(int);
 	size += sizeof(int);
@@ -284,7 +286,7 @@ void CharacterManager::Character_Slot_Send(User * _user)
 Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, int _index)
 {
 	Character temp;
-	GameDataManager::GetInstance()->Character_Origin_Data(_slotdata->origincode, &temp);
+	GameDataManager::GetInstance()->Character_Origin_Data(_slotdata->jobcode, &temp);
 
 	Character* player = new Character();
 
@@ -601,6 +603,8 @@ bool CharacterManager::DeleateCharacter(User * _user, char * _buf)
 			{
 				if (Character_SlotPull(_user, index, slot_count)) 
 				{
+					// 당기기 성공
+					return true;
 				}
 				else
 				{

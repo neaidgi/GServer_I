@@ -11,7 +11,7 @@
 #define SLOTMAXCOUNT 3 
 
 struct SlotData {
-	int origincode;
+	int jobcode;
 	char* jobname;
 	char* nick;
 	int level;
@@ -27,7 +27,7 @@ struct SlotData {
 			delete[] jobname;
 		if (nick != nullptr)
 			delete[] nick;
-		if (nick != nullptr)
+		if (code != nullptr)
 			delete[] code;
 	}
 };

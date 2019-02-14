@@ -2,8 +2,8 @@
 
 Character & Character::operator=(const Character & rhs)
 {
+	character_jobcode = rhs.character_jobcode;
 	character_code = rhs.character_code;
-	character_uniquecode = rhs.character_uniquecode;
 	character_str = rhs.character_str;
 	character_dex = rhs.character_dex;
 	character_int = rhs.character_int;

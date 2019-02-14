@@ -11,8 +11,8 @@ private:
 	Vector3 Rotation;				// 방향
 	Vector3 Scale;					// 크기
 	char* character_name;			// 캐릭터 닉네임
-	int character_code;				// 코드
-	int character_uniquecode;		// 코드
+	int character_jobcode;			// 직업코드
+	char* character_code;				// 고유코드
 	int character_level;			// 레벨
 	int	character_str;				// 힘
 	int	character_dex;				// 민
@@ -30,8 +30,8 @@ private:
 
 public:
 	const char* GetCharacter_Name() { return character_name; }
-	int GetCharacter_Code() { return character_code; }
-	int GetCharacter_UniqueCode() { return character_uniquecode; }
+	int GetCharacter_JobCode() { return character_jobcode; }
+	const char* GetCharacter_Code() { return character_code; }
 	int GetCharacter_Level() { return character_level; }
 	int GetCharacter_STR() { return character_str; }
 	int GetCharacter_DEX() { return character_dex; }
@@ -59,8 +59,15 @@ public:
 		strcpy_s(name, len + 1, _character_name);
 		character_name = name;
 	}
-	void SetCharacter_Code(int _character_code) { character_code = _character_code; }
-	void SetCharacter_UniqueCode(int _character_uniquecode) { character_uniquecode = _character_uniquecode; }
+	void SetCharacter_JobCode(int _character_code) { character_jobcode = _character_code; }
+	void SetCharacter_Code(char* _character_code) 
+	{
+		int len = strlen(_character_code);
+		char* code = new char[len + 1];
+		memset(code, 0, len + 1);
+		strcpy_s(code, len + 1, _character_code);
+		character_code = code;
+	}
 	void SetCharacter_Level(int _character_level) { character_level = _character_level; }
 	void SetCharacter_STR(int _character_str) { character_str = _character_str; }
 	void SetCharacter_DEX(int _character_dex) { character_dex = _character_dex; }
@@ -79,8 +86,8 @@ public:
 	void SetPosition(const Vector3& _position) { Position = _position; }
 	void SetRotation(const Vector3& _rotation) { Rotation = _rotation; }
 	void SetScale(const Vector3& _scale) { Scale = _scale; }
-	Character() { character_name = nullptr; }
-	~Character() { delete[]character_name; }
+	Character() { character_name = nullptr; character_code = nullptr; }
+	~Character() { delete[] character_name; delete[] character_code; }
 
 	Character& operator=(const Character &rhs);
 };
