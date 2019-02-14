@@ -57,8 +57,8 @@ void InGameManager::User_Req_OtherUserPosData(User * _user)
 	ptr += sizeof(int);
 
 	int usercount = 0;
-	int character_uniquecode;
-	int character_code;
+	//char* character_uniquecode;
+	int character_jobcode;
 	int nicksize;
 
 	User* user_temp;
@@ -71,12 +71,12 @@ void InGameManager::User_Req_OtherUserPosData(User * _user)
 			if (user_temp->isIngame() == true)
 			{
 				character_temp = user_temp->GetCurCharacter();
-				character_uniquecode = character_temp->GetCharacter_UniqueCode();
-				character_code = character_temp->GetCharacter_Code();
+				//character_uniquecode = character_temp->GetCharacter_Code();
+				character_jobcode = character_temp->GetCharacter_JobCode();
 				nicksize = strlen(character_temp->GetCharacter_Name());
 
 				// 캐릭터 코드
-				memcpy(ptr, &character_code, sizeof(int));
+				memcpy(ptr, &character_jobcode, sizeof(int));
 				ptr += sizeof(int);
 				size += sizeof(int);
 				// 닉네임 사이즈
@@ -91,6 +91,10 @@ void InGameManager::User_Req_OtherUserPosData(User * _user)
 				memcpy(ptr, &character_temp->GetPosition(), sizeof(Vector3));
 				ptr += sizeof(Vector3);
 				size += sizeof(Vector3);
+				//// 회전
+				//memcpy(ptr, &character_temp->GetRotation(), sizeof(Vector3));
+				//ptr += sizeof(Vector3);
+				//size += sizeof(Vector3);
 
 				usercount++;
 			}
