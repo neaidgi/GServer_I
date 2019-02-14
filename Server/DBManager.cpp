@@ -358,7 +358,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 1번
-		_character_out[0]->SetCharacter_Code(sql_row[0]);
+		_character_out[0]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[0]->SetCharacter_Name(sql_row[1]);
 		_character_out[0]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[0]->SetCharacter_DEX(atoi(sql_row[3]));
@@ -378,7 +378,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 2번
-		_character_out[1]->SetCharacter_Code(sql_row[0]);
+		_character_out[1]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[1]->SetCharacter_Name(sql_row[1]);
 		_character_out[1]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[1]->SetCharacter_DEX(atoi(sql_row[3]));
@@ -398,7 +398,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 3번
-		_character_out[2]->SetCharacter_Code(sql_row[0]);
+		_character_out[2]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[2]->SetCharacter_Name(sql_row[1]);
 		_character_out[2]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[2]->SetCharacter_DEX(atoi(sql_row[3]));
@@ -418,7 +418,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 4번
-		_character_out[3]->SetCharacter_Code(sql_row[0]);
+		_character_out[3]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[3]->SetCharacter_Name(sql_row[1]);
 		_character_out[3]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[3]->SetCharacter_DEX(atoi(sql_row[3]));
