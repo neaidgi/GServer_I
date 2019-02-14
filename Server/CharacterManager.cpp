@@ -15,10 +15,14 @@ CharacterManager::~CharacterManager()
 bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _slot)
 {
 	int torigincode;
-	int tcode;
+	char tcode[30];
 	char tjobname[20];
 	char tnick[20];
 	int tlevel;
+
+	memset(tcode, 0, sizeof(tcode));
+	memset(tjobname, 0, sizeof(tjobname));
+	memset(tnick, 0, sizeof(tnick));
 
 	bool result = DBManager::GetInstance()->Character_Req_CharacterSlot
 	(_user->getID(), _index, torigincode, tjobname, tnick, tlevel, tcode);
@@ -30,23 +34,29 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 		return result;
 	}
 
+	_slot->origincode = torigincode;
+	_slot->level = tlevel;
+
 	int len;
 	len = strlen(tjobname);
-	_slot->origincode = torigincode;
-	_slot->code = tcode;
-	_slot->level = tlevel;
-	_slot->jobname = new char[len + 1];
-	//memset(_slot->jobname, 0, len + 1);
-	_slot->jobname[len] = '0';
-	strcpy_s(_slot->jobname, len + 1, tjobname);
-	//memcpy(_slot->jobname, tjobname, len);
+	char* name = new char[len+1];
+	memset(name, 0, len);
+	memcpy(name, tjobname, len);
+	name[len] = 0;
+	_slot->jobname = name;
+	
 
 	len = strlen(tnick);
-	_slot->nick = new char[len + 1];
-	//memset(_slot->nick, 0, len + 1);
-	_slot->nick[len] = '0';
-	strcpy_s(_slot->nick, len + 1, tnick);
-	//memcpy(_slot->nick, tnick, len);
+	_slot->nick = new char[len+1];
+	memset(_slot->nick, 0, len);
+	memcpy(_slot->nick, tnick, len);
+	_slot->nick[len] = 0;
+
+	len = strlen(tcode);
+	_slot->code = new char[len+1];
+	memset(_slot->code, 0, len);
+	memcpy(_slot->code, tcode, len);
+	_slot->code[len] = 0;
 
 	return result;
 }
@@ -109,22 +119,23 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 
 	memcpy(nick, _buf, len);
 	_buf += len;
-
+	
 	memcpy(&jobcode, _buf, sizeof(int));
 	_buf += sizeof(int);
 
-	// 고유코드 만들기 (유저아이디[20] + 캐릭터닉네임[5] + 직업코드[4])
+	// 고유코드 만들기 (유저아이디[20] + 캐릭터닉네임[6] + 직업코드[4])
 	itoa(jobcode, codebuf, 10);
 
 	memcpy(ptr, _user->getID(), strlen(_user->getID()));
 	ptr += strlen(_user->getID());
 
-	memcpy(ptr, nick, 5);
-	ptr += 5;
+	memcpy(ptr, nick, 6);
+	ptr += 6;
 
 	memcpy(ptr, codebuf, strlen(codebuf));
 	ptr += strlen(codebuf);
 
+	printf("nick %s \n", nick);
 	printf("uniqcode %s \n", uniqcode);
 
 	//
@@ -175,11 +186,13 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	memcpy(&index, _buf, sizeof(int));
 
-	SlotData slotdata;
-	DBManager::GetInstance()->Character_Req_CharacterSlot
-	(_user->getID(), index, slotdata.origincode, slotdata.jobname, slotdata.nick, slotdata.level, slotdata.code);
+	SlotData* slotdata = new SlotData();
+	memset(slotdata, 0, sizeof(SlotData));
+	GetCharacter_Slot(_user, index, slotdata);
+	//DBManager::GetInstance()->Character_Req_CharacterSlot
+	//(_user->getID(), index, slotdata.origincode, slotdata.jobname, slotdata.nick, slotdata.level, slotdata.code);
 
-	if (DBManager::GetInstance()->Character_Req_CharacterPos(slotdata.code, pos))
+	if (DBManager::GetInstance()->Character_Req_CharacterPos(slotdata->code, pos))
 	{
 		memcpy(ptr, &enter, sizeof(bool));
 		ptr += sizeof(bool);
@@ -197,7 +210,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	}
 
 	Character* player = CharacterSelect(_user, slotdata, index);
-	player->SetCharacter_UniqueCode(slotdata.code);
+	//player->SetCharacter_UniqueCode(slotdata.code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
 
@@ -268,10 +281,10 @@ void CharacterManager::Character_Slot_Send(User * _user)
 
 }
 
-Character* CharacterManager::CharacterSelect(User* _user, SlotData _slotdata, int _index)
+Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, int _index)
 {
 	Character temp;
-	GameDataManager::GetInstance()->Character_Origin_Data(_slotdata.origincode, &temp);
+	GameDataManager::GetInstance()->Character_Origin_Data(_slotdata->origincode, &temp);
 
 	Character* player = new Character();
 
@@ -283,7 +296,7 @@ Character* CharacterManager::CharacterSelect(User* _user, SlotData _slotdata, in
 
 	//DBManager::GetInstance()->Character_Req_CharacterName(_user->getID(), _user->GetSlot(_index)->)
 
-	player->SetCharacter_Name(_slotdata.nick);
+	player->SetCharacter_Name(_slotdata->nick);
 
 	return player;
 }
@@ -295,6 +308,8 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 	char* ptr = buf;
 	bool check;
 	int choice;
+
+	memset(buf, 0, sizeof(buf));
 
 	_user->unPack(&protocol, &buf);
 

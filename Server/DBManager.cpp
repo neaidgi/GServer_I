@@ -450,7 +450,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 }
 
 // 캐릭터 슬롯 요청 (번호 받아서 해당 레코드 가져옴) 19-2-13 수정완료
-bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, int& _code)
+bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, char * _code)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -490,18 +490,17 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 
 		// DB 데이터 아웃풋 저장
 		// 캐릭터 코드
-		_code = atoi(sql_row[0]);
+		memcpy(_code, sql_row[0], sizeof(_code));
 		
 		// 직업코드
 		_jobcode = atoi(sql_row[2]);
 
 		int len = strlen(sql_row[3]);
-		strcpy_s(_jobname, len + 1, sql_row[3]);
+		memcpy(_jobname, sql_row[3], len);
 
 		//memcpy(_jobname, sql_row[1], len);
 
-		len = strlen(sql_row[4]);
-		strcpy_s(_nick, len + 1, sql_row[4]);
+		memcpy(_nick, sql_row[4],sizeof(_nick));
 
 		//memcpy(_nick, sql_row[2], len);
 
@@ -682,7 +681,7 @@ bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* 
 	}
 }
 // 캐릭터 위치 요청
-bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
+bool DBManager::Character_Req_CharacterPos(char* _code, Vector3& _pos)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -713,6 +712,12 @@ bool DBManager::Character_Req_CharacterPos(int _code, Vector3& _pos)
 		sql_result = mysql_store_result(mysql);
 
 		sql_row = mysql_fetch_row(sql_result);
+
+		if (sql_row == nullptr)
+		{
+			fprintf(stderr, "Mysql 해당캐릭터 없음 : %s \n", mysql_error(mysql));
+			return false;
+		}
 
 		if (sql_row[0] == NULL || !sql_row[1])
 		{

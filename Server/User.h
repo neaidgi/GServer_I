@@ -15,9 +15,10 @@ struct SlotData {
 	char* jobname;
 	char* nick;
 	int level;
-	int code;
+	char* code;
 
 	SlotData() {
+		code = nullptr;
 		jobname = nullptr;
 		nick = nullptr;
 	}
@@ -26,6 +27,8 @@ struct SlotData {
 			delete[] jobname;
 		if (nick != nullptr)
 			delete[] nick;
+		if (nick != nullptr)
+			delete[] code;
 	}
 };
 

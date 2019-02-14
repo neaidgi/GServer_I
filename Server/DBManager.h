@@ -33,12 +33,12 @@ public:
 	bool Character_Req_CharacterSlotCount(const char * _id, int& _count);
 	bool Character_CharacterSlotAdd(const char* _id, char* _code,int  _jobcode,const char* _jobname, char* _nick, int _level, int _num);
 	bool Character_Req_CharacterInfo(Character* _character_out[]);
-	bool Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, int& _code);
+	bool Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, char* _code);
 	
 	bool Character_Req_CharacterDelete(const char* _id,int _slotnum);
 	bool Character_Req_CharacterCheckName(const char* _nick);
 	bool Character_Req_CharacterName(const char* _id, int _index, char* _nick);
-	bool Character_Req_CharacterPos(int _code, Vector3& _pos);
+	bool Character_Req_CharacterPos(char* _code, Vector3& _pos);
 	bool Charactor_CharacterPosAdd(int _code);
 
 	bool Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count);
