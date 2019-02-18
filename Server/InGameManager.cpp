@@ -206,14 +206,21 @@ bool InGameManager::User_Req_Move(User * _user, char* _buf, int& _datasize)
 	_datasize = datasize;
 }
 
+// 유저위치 다른유저에게 전송해줌
 void InGameManager::User_Send_MoveInfotoOther(User* _user, char * _data, int & _datasize)
 {
+	char* ptr = _data;
+
+	// 첫번째 값 결과는 무시
+	ptr += sizeof(bool);
+	_datasize -= sizeof(bool);
+
 	User* user;
 	while (UserManager::GetInstance()->searchData(user))
 	{
 		if (user->isIngame() && user->getSocket() != _user->getSocket())
 		{
-			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, _data, _datasize);
+			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, ptr, _datasize);
 			user->IOCP_OneSided_SendMsg();
 		}
 	}
