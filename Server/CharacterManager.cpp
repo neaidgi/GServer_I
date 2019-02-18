@@ -221,7 +221,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	// 
 	char* ptr_temp = ptr;
 
-	// 캐릭터 코드
+	// 캐릭터 직업코드
 	int code = player->GetCharacter_JobCode();
 	memcpy(ptr_temp, &code, sizeof(int));
 	ptr_temp += sizeof(int);
@@ -283,6 +283,7 @@ void CharacterManager::Character_Slot_Send(User * _user)
 
 }
 
+// 게임 시작시 실제 캐릭터 조립
 Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, int _index)
 {
 	Character temp;
@@ -295,8 +296,6 @@ Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, 
 	//  player
 
 	*player = temp;
-
-	//DBManager::GetInstance()->Character_Req_CharacterName(_user->getID(), _user->GetSlot(_index)->)
 
 	player->SetCharacter_Name(_slotdata->nick);
 
@@ -364,16 +363,6 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		{
 			is_slot = true;
 			size = 0;
-
-			//// **슬롯 저장 안하게 수정 예정**
-			//for (int i = 0; i < count; i++)
-			//{
-			//	_user->SetSlot(slotdata[i]);
-			//}
-			//// 슬롯 로드완료
-			//_user->SetSlotCount(count);
-			//_user->SlotLoadComplete();
-			//// ****
 
 			// 프로토콜 데이터 패킹
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
@@ -503,56 +492,6 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 	return result;
 }
 
-void CharacterManager::CharacterMove(User * _user, char * _buf, int & _datasize)
-{
-	Vector3 dirvector;
-	int datasize;
-	float time = MOVETIME;
-	char* ptr = _buf;
-
-	memcpy(&dirvector.x, ptr, sizeof(float));
-	ptr += sizeof(float);
-
-	memcpy(&dirvector.y, ptr, sizeof(float));
-	ptr += sizeof(float);
-
-	memcpy(&dirvector.z, ptr, sizeof(float));
-	ptr += sizeof(float);
-
-	memset(_buf, 0, sizeof(_buf));
-
-	ptr = _buf;
-
-	Vector3 character_pos;
-	character_pos = _user->GetCurCharacter()->GetPosition();
-	character_pos = character_pos + (dirvector * _user->GetCurCharacter()->GetCharacter_Speed());
-
-	_user->GetCurCharacter()->SetPosition(character_pos);
-
-	memcpy(ptr, &character_pos.x, sizeof(float));
-	ptr += sizeof(float);
-	datasize += sizeof(float);
-
-	memcpy(ptr, &character_pos.y, sizeof(float));
-	ptr += sizeof(float);
-	datasize += sizeof(float);
-
-	memcpy(ptr, &character_pos.z, sizeof(float));
-	ptr += sizeof(float);
-	datasize += sizeof(float);
-
-	memcpy(ptr, &time, sizeof(float));
-	ptr += sizeof(float);
-	datasize += sizeof(float);
-
-	_datasize = datasize;
-}
-
-bool CharacterManager::CharacterMoveVerificate(User * _user, char * _buf)
-{
-	return false;
-}
-
 // 캐릭터 정보 다른 플레이어에게 전송
 void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
 {
@@ -661,31 +600,31 @@ bool CharacterManager::Character_SlotPull(User * _user, int _index, int _slotcou
 	return true;
 }
 
-RESULT CharacterManager::Character_EnterGame_Process(User * _user)
-{
-	PROTOCOL protocol;
-	char buf[BUFSIZE];
-	char* ptr = buf;
-	bool check;
-	int datasize = 0;
-
-	_user->unPack(&protocol, &buf);
-
-	RESULT result;
-	PROTOCOL sendprotocol;
-
-	// 수정했음
-	switch (protocol)
-	{
-	case CLIENT_INGAME_MOVE:
-		CharacterMove(_user, buf, datasize);
-		sendprotocol = SEVER_INGAME_MOVE_RESULT;
-		_user->pack(sendprotocol, buf, datasize);
-		result = RT_INGAME_MOVE;
-		CharacterInfo_toOther(_user, buf, datasize);
-	default:
-		break;
-	}
-
-	return result;
-}
+//RESULT CharacterManager::Character_EnterGame_Process(User * _user)
+//{
+//	PROTOCOL protocol;
+//	char buf[BUFSIZE];
+//	char* ptr = buf;
+//	bool check;
+//	int datasize = 0;
+//
+//	_user->unPack(&protocol, &buf);
+//
+//	RESULT result;
+//	PROTOCOL sendprotocol;
+//
+//	// 수정했음
+//	switch (protocol)
+//	{
+//	case CLIENT_INGAME_MOVE:
+//		CharacterMove(_user, buf, datasize);
+//		sendprotocol = SEVER_INGAME_MOVE_RESULT;
+//		_user->pack(sendprotocol, buf, datasize);
+//		result = RT_INGAME_MOVE;
+//		CharacterInfo_toOther(_user, buf, datasize);
+//	default:
+//		break;
+//	}
+//
+//	return result;
+//}

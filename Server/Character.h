@@ -12,7 +12,7 @@ private:
 	Vector3 Scale;					// 크기
 	char* character_name;			// 캐릭터 닉네임
 	int character_jobcode;			// 직업코드
-	char* character_code;				// 고유코드
+	char* character_code;			// 고유코드
 	int character_level;			// 레벨
 	int	character_str;				// 힘
 	int	character_dex;				// 민

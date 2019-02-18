@@ -6,7 +6,7 @@
 #include "LogManager.h"
 #include "MsgManager.h"
 #include "UserManager.h"
-#include "User.h"
+#include "CharacterVerification.h"
 
 class InGameManager
 {
@@ -16,7 +16,11 @@ private:
 	InGameManager();
 	~InGameManager();
 
+	CharacterVerification* verification;
+
 	void User_Req_OtherUserPosData(User * _user);
+	bool User_Req_Move(User * _user, char* _buf, int& _datasize);
+	void User_Send_MoveInfotoOther(User* _user, char* _data, int& _datasize);
 public:
 	static void CreateInstance();
 	static InGameManager* GetInstance();

@@ -4,12 +4,12 @@ InGameManager* InGameManager::Instance = nullptr;
 
 InGameManager::InGameManager()
 {
-
+	verification = new CharacterVerification();
 }
 
 InGameManager::~InGameManager()
 {
-
+	delete verification;
 }
 
 void InGameManager::CreateInstance()
@@ -35,6 +35,7 @@ void InGameManager::DestroyInstance()
 
 bool InGameManager::MangerInitialize()
 {
+	//verification->Initalize();
 	return true;
 }
 
@@ -45,7 +46,7 @@ void InGameManager::EndManager()
 
 void InGameManager::User_Req_OtherUserPosData(User * _user)
 {
-	// 인게임에 접속중인 유저 리스트(카운트, 캐릭터 코드, 닉네임, 위치...rep)
+	// 인게임에 접속중인 유저 리스트(카운트, 직업 코드, 닉네임, 위치...rep)
 	// 
 	// count자리 비워두기. 나중에 count 넣어줄때는 ptr 사용하기
 	PROTOCOL sendprotocol;
@@ -57,7 +58,6 @@ void InGameManager::User_Req_OtherUserPosData(User * _user)
 	ptr += sizeof(int);
 
 	int usercount = 0;
-	//char* character_uniquecode;
 	int character_jobcode;
 	int nicksize;
 
@@ -66,16 +66,16 @@ void InGameManager::User_Req_OtherUserPosData(User * _user)
 	UserManager::GetInstance()->startSearch();
 	while (1)
 	{
+		// 유저 검색
 		if (UserManager::GetInstance()->searchData(user_temp) == true)
 		{
-			if (user_temp->isIngame() == true)
+			if (_user->getSocket() != user_temp->getSocket() && user_temp->isIngame() == true)
 			{
 				character_temp = user_temp->GetCurCharacter();
-				//character_uniquecode = character_temp->GetCharacter_Code();
 				character_jobcode = character_temp->GetCharacter_JobCode();
 				nicksize = strlen(character_temp->GetCharacter_Name());
 
-				// 캐릭터 코드
+				// 직업 코드
 				memcpy(ptr, &character_jobcode, sizeof(int));
 				ptr += sizeof(int);
 				size += sizeof(int);
@@ -91,10 +91,10 @@ void InGameManager::User_Req_OtherUserPosData(User * _user)
 				memcpy(ptr, &character_temp->GetPosition(), sizeof(Vector3));
 				ptr += sizeof(Vector3);
 				size += sizeof(Vector3);
-				//// 회전
-				//memcpy(ptr, &character_temp->GetRotation(), sizeof(Vector3));
-				//ptr += sizeof(Vector3);
-				//size += sizeof(Vector3);
+				// 회전
+				memcpy(ptr, &character_temp->GetRotation(), sizeof(Vector3));
+				ptr += sizeof(Vector3);
+				size += sizeof(Vector3);
 
 				usercount++;
 			}
@@ -105,11 +105,118 @@ void InGameManager::User_Req_OtherUserPosData(User * _user)
 		}
 	}
 
-	memcpy(ptr, &usercount, sizeof(int));
+	char msg[BUFSIZE];
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "유저리스트 전송 %d명", usercount);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	memcpy(data, &usercount, sizeof(int));
 	size += sizeof(int);
 
 	sendprotocol = SEVER_INGAME_OTHERPLAYERLIST_RESULT;
 	_user->pack(sendprotocol, data, size);
+}
+
+bool InGameManager::User_Req_Move(User * _user, char* _buf, int& _datasize)
+{
+	Vector3 prePos;
+	Vector3 curPos;
+	Vector3 curRot;
+	bool lesult;
+	int datasize;
+	int len;
+	char data[BUFSIZE];
+	char* ptr = _buf;
+	char* ptr_data = data;
+
+	memset(data, 0, sizeof(data));
+
+	prePos = _user->GetCurCharacter()->GetPosition();
+	memcpy(&curPos, ptr, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+
+	memcpy(&curRot, ptr, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+
+	// 이동검증
+	//
+	//
+	lesult = true;
+
+	_user->GetCurCharacter()->SetPosition(curPos);
+	_user->GetCurCharacter()->SetRotation(curRot);
+
+	memcpy(ptr_data, &lesult, sizeof(bool));
+	datasize += sizeof(bool);
+	ptr_data += sizeof(bool);
+
+	// 정상이동
+	if (lesult)
+	{
+		// 닉네임 사이즈
+		len = strlen(_user->GetCurCharacter()->GetCharacter_Name());
+		memcpy(ptr_data, &len, sizeof(int));
+		datasize += sizeof(int);
+		ptr_data += sizeof(int);
+
+		// 닉네임
+		memcpy(ptr_data, _user->GetCurCharacter()->GetCharacter_Name(), len);
+		datasize += len;
+		ptr_data += len;
+
+		// 위치
+		memcpy(ptr_data, &curPos, sizeof(Vector3));
+		datasize += sizeof(Vector3);
+		ptr_data += sizeof(Vector3);
+
+		// 방향
+		memcpy(ptr_data, &curRot, sizeof(Vector3));
+		datasize += sizeof(Vector3);
+		ptr_data += sizeof(Vector3);
+
+		return true;
+	}
+	// 비정상이동
+	else
+	{
+		// 닉네임 사이즈
+		len = strlen(_user->GetCurCharacter()->GetCharacter_Name());
+		memcpy(ptr_data, &len, sizeof(int));
+		datasize += sizeof(int);
+		ptr_data += sizeof(int);
+
+		// 닉네임
+		memcpy(ptr_data, _user->GetCurCharacter()->GetCharacter_Name(), len);
+		datasize += len;
+		ptr_data += len;
+
+		// 위치
+		memcpy(ptr_data, &prePos, sizeof(Vector3));
+		datasize += sizeof(Vector3);
+		ptr_data += sizeof(Vector3);
+
+		// 방향
+		memcpy(ptr_data, &curRot, sizeof(Vector3));
+		datasize += sizeof(Vector3);
+		ptr_data += sizeof(Vector3);
+
+		return false;
+	}
+	
+	_datasize = datasize;
+}
+
+void InGameManager::User_Send_MoveInfotoOther(User* _user, char * _data, int & _datasize)
+{
+	User* user;
+	while (UserManager::GetInstance()->searchData(user))
+	{
+		if (user->isIngame() && user->getSocket() != _user->getSocket())
+		{
+			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, _data, _datasize);
+			user->IOCP_OneSided_SendMsg();
+		}
+	}
 }
 
 RESULT InGameManager::InGame_Init_Packet(User * _user)
@@ -119,6 +226,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	char* ptr = buf;
 	bool check;
 	int choice;
+	int datasize;
 
 	_user->unPack(&protocol, &buf);
 
@@ -133,6 +241,18 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_Req_OtherUserPosData(_user);
 		result = RT_INGAME_OTHERPLAYER_LIST;
 		break;
+	case CLIENT_INGAME_MOVE:
+		if (User_Req_Move(_user, buf, datasize))
+		{
+			sendprotocol = SEVER_INGAME_MOVE_RESULT;
+			_user->pack(sendprotocol, buf, datasize);
+			result = RT_INGAME_MOVE;
+			User_Send_MoveInfotoOther(_user, buf, datasize);
+		}
+		else
+		{
+
+		}
 	default:
 		break;
 	}
