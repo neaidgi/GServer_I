@@ -76,6 +76,12 @@
     <Filter Include="소스 파일\InGame">
       <UniqueIdentifier>{eb45b3de-3c10-48b6-bdb7-c75da58dd220}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\File">
+      <UniqueIdentifier>{215dccf4-9de5-4634-b595-2c64aed08eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\NetworkData">
+      <UniqueIdentifier>{dbc61827-9a28-40b0-beca-394b3a756dc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -161,6 +167,15 @@
     </ClCompile>
     <ClCompile Include="Character.cpp">
       <Filter>소스 파일\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkDataManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterVerification.cpp">
+      <Filter>소스 파일\InGame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -251,14 +266,20 @@
     <ClInclude Include="InGameManager.h">
       <Filter>헤더 파일\Ingame</Filter>
     </ClInclude>
-    <ClInclude Include="CharacterMovement.h">
-      <Filter>헤더 파일\Ingame</Filter>
-    </ClInclude>
     <ClInclude Include="CharacterData.h">
       <Filter>헤더 파일\GameData</Filter>
     </ClInclude>
     <ClInclude Include="Character.h">
       <Filter>헤더 파일\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem.h">
+      <Filter>헤더 파일\File</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkDataManager.h">
+      <Filter>헤더 파일\NetworkData</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterVerification.h">
+      <Filter>헤더 파일\Ingame</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -82,3 +82,5 @@ Log.txt
 # 디버그 파일
 x64/*
 /Server/x64/Debug
+/Server/Debug
+/Server/x64/Release
