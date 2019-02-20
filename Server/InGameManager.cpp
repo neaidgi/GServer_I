@@ -142,6 +142,7 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	int datasize = 0;
 	int len = 0;
 	char* ptr = _buf;
+	char msg[BUFSIZE];
 
 	// 받은 데이터 복사
 	prePos = _user->GetCurCharacter()->GetPosition();
@@ -156,6 +157,11 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	memcpy(&delay_time, ptr, sizeof(float));
 	ptr += sizeof(float);
 	//
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "이동 완료 데이터 :: 위치: %f %f %f 회전: %f %f %f 딜레이타임: %f", curPos.x, curPos.y,
+		curPos.z, curRot.x, curRot.y, curRot.z, delay_time);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 버퍼 클리어
 	ptr = _buf;
@@ -229,6 +235,7 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 	int datasize = 0;
 	int len = 0;
 	char* ptr = _buf;
+	char msg[BUFSIZE];
 
 	// 이전 위치 복사
 	prePos = _user->GetCurCharacter()->GetPosition();
@@ -239,6 +246,12 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 
 	memcpy(&curRot, ptr, sizeof(Vector3));
 	ptr += sizeof(Vector3);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "이동 시작 데이터 :: 위치: %f %f %f 회전: %f %f %f", curPos.x, curPos.y,
+		curPos.z, curRot.x, curRot.y, curRot.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 초기화
 	ptr = _buf;
@@ -307,6 +320,9 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	int datasize = 0;
 	int len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
 	char* ptr = _data;
+	char msg[BUFSIZE];
+
+	Character* curcharacter = _user->GetCurCharacter();
 
 	// 코드 사이즈
 	memcpy(ptr, &len, sizeof(int));
@@ -314,17 +330,17 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	ptr += sizeof(int);
 
 	// 코드
-	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), len);
+	memcpy(ptr, curcharacter->GetCharacter_Code(), len);
 	datasize += len;
 	ptr += len;
 
 	// 위치
-	memcpy(ptr, &_user->GetCurCharacter()->GetPosition(), sizeof(Vector3));
+	memcpy(ptr, &curcharacter->GetPosition(), sizeof(Vector3));
 	datasize += sizeof(Vector3);
 	ptr += sizeof(Vector3);
 
 	// 회전
-	memcpy(ptr, &_user->GetCurCharacter()->GetRotation(), sizeof(Vector3));
+	memcpy(ptr, &curcharacter->GetRotation(), sizeof(Vector3));
 	datasize += sizeof(Vector3);
 	ptr += sizeof(Vector3);
 
@@ -337,6 +353,12 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	memcpy(ptr, &_diry, sizeof(float));
 	datasize += sizeof(float);
 	ptr += sizeof(float);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "다른 유저전송 데이터 :: 위치: %f %f %f 회전: %f %f %f 방향: %f %f", curcharacter->GetPosition().x, curcharacter->GetPosition().y,
+		curcharacter->GetPosition().z, curcharacter->GetRotation().x, curcharacter->GetRotation().y, curcharacter->GetRotation().z, _dirx, _diry);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
 }

@@ -15,9 +15,9 @@ CharacterManager::~CharacterManager()
 bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _slot)
 {
 	int tjobcode;
-	char tcode[30];
+	char tcode[CHARACTERCODESIZE];
 	char tjobname[20];
-	char tnick[20];
+	char tnick[NICKNAMESIZE];
 	int tlevel;
 
 	memset(tcode, 0, sizeof(tcode));
@@ -26,6 +26,12 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 
 	bool result = DBManager::GetInstance()->Character_Req_CharacterSlot
 	(_user->getID(), _index, tjobcode, tjobname, tnick, tlevel, tcode);
+
+	char msg[255];
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "슬롯 데이터 : 인덱스 = %d번 직업코드 = %d 직업이름 = %s 닉네임 = %s 레벨 = %d 코드 = %s",
+		_index, tjobcode, tjobname, tnick, tlevel, tcode);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 슬롯에 캐릭터 없으면 false 반환
 	if (result == false)
@@ -41,22 +47,28 @@ bool CharacterManager::GetCharacter_Slot(User * _user, int _index, SlotData* _sl
 	
 	len = strlen(tjobname);
 	char* name = new char[len+1];
-	memset(name, 0, len);
+	memset(name, 0, len+1);
 	memcpy(name, tjobname, len);
 	name[len] = 0;
 	_slot->jobname = name;
 	
 	len = strlen(tnick);
 	_slot->nick = new char[len+1];
-	memset(_slot->nick, 0, len);
+	memset(_slot->nick, 0, len+1);
 	memcpy(_slot->nick, tnick, len);
 	_slot->nick[len] = 0;
 
 	len = strlen(tcode);
 	_slot->code = new char[len+1];
-	memset(_slot->code, 0, len);
+	memset(_slot->code, 0, len+1);
 	memcpy(_slot->code, tcode, len);
 	_slot->code[len] = 0;
+
+	char msg2[BUFSIZE];
+	memset(msg2, 0, sizeof(msg2));
+	sprintf(msg2, "슬롯 데이터 : 번호 = %d번 직업코드 = %d 직업이름 = %s 닉네임 = %s 레벨 = %d 코드 = %s",
+		_index, tjobcode, tjobname, _slot->nick, tlevel, _slot->code);
+	LogManager::GetInstance()->LogWrite(msg2);
 
 	return result;
 }
@@ -170,6 +182,11 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 		break;
 	}
 
+	char msg2[BUFSIZE];
+	memset(msg2, 0, sizeof(msg2));
+	sprintf(msg2, "캐릭터 생성 : 번호 = %d번 직업코드 = %d 닉네임 = %s 레벨 = 1 코드 = %s",
+		count, jobcode, nick, uniqcode);
+	LogManager::GetInstance()->LogWrite(msg2);
 	//delete[] origin;
 
 	// DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
@@ -321,6 +338,8 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 	memset(slotdata, 0, sizeof(slotdata));
 	int count = 0;
 	int i = 0;
+	bool is_slot;
+	int size = 0;
 
 	// 수정했음
 	switch (protocol)
@@ -336,17 +355,16 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		while (i < count)
 		{
 			slotdata[i] = new SlotData();
+			memset(slotdata[i], 0, sizeof(SlotData));
 			if (GetCharacter_Slot(_user, i + 1, slotdata[i]) == false)
 			{
 				count = i;
+				delete slotdata[i];
 				break;
 			}
 
 			++i;
 		}
-
-		bool is_slot;
-		int size;
 
 		// 슬롯에 캐릭터가 없을경우
 		if (count == 0)
@@ -407,11 +425,12 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 
 			_user->pack(sendprotocol, buf, size);
 			result = RT_CHARACTER_SLOTRESULT;
+		}// else문의 끝
 
-			//뒤처리 받아온 슬롯데이터 삭제
-			for (int i = 0; i < count; i++)
-				delete slotdata[i];
-		}
+		 //뒤처리 받아온 슬롯데이터 삭제
+		for (int i = 0; i < count; i++)
+			delete slotdata[i];
+
 		break;
 	case CLIENT_NEW_CHARACTER_MENU:
 		sendprotocol = SERVER_CHARACTER_MENU;

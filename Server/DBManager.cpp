@@ -359,7 +359,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 
 		// 1번
 		_character_out[0]->SetCharacter_JobCode(atoi(sql_row[0]));
-		_character_out[0]->SetCharacter_Name(sql_row[1]);
+		_character_out[0]->SetCharacter_JobName(sql_row[1]);
 		_character_out[0]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[0]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[0]->SetCharacter_INT(atoi(sql_row[4]));
@@ -379,7 +379,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 
 		// 2번
 		_character_out[1]->SetCharacter_JobCode(atoi(sql_row[0]));
-		_character_out[1]->SetCharacter_Name(sql_row[1]);
+		_character_out[1]->SetCharacter_JobName(sql_row[1]);
 		_character_out[1]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[1]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[1]->SetCharacter_INT(atoi(sql_row[4]));
@@ -399,7 +399,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 
 		// 3번
 		_character_out[2]->SetCharacter_JobCode(atoi(sql_row[0]));
-		_character_out[2]->SetCharacter_Name(sql_row[1]);
+		_character_out[2]->SetCharacter_JobName(sql_row[1]);
 		_character_out[2]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[2]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[2]->SetCharacter_INT(atoi(sql_row[4]));
@@ -419,7 +419,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 
 		// 4번
 		_character_out[3]->SetCharacter_JobCode(atoi(sql_row[0]));
-		_character_out[3]->SetCharacter_Name(sql_row[1]);
+		_character_out[3]->SetCharacter_JobName(sql_row[1]);
 		_character_out[3]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[3]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[3]->SetCharacter_INT(atoi(sql_row[4]));
@@ -490,17 +490,16 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 
 		// DB 데이터 아웃풋 저장
 		// 캐릭터 코드
-		memcpy(_code, sql_row[0], sizeof(_code));
+		memcpy(_code, sql_row[0], strlen(sql_row[0]));
 		
 		// 직업코드
 		_jobcode = atoi(sql_row[2]);
 
-		int len = strlen(sql_row[3]);
-		memcpy(_jobname, sql_row[3], len);
+		memcpy(_jobname, sql_row[3], strlen(sql_row[3]));
 
 		//memcpy(_jobname, sql_row[1], len);
 
-		memcpy(_nick, sql_row[4],sizeof(_nick));
+		memcpy(_nick, sql_row[4], strlen(sql_row[4]));
 
 		//memcpy(_nick, sql_row[2], len);
 

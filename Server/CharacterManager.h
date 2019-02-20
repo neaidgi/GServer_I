@@ -10,10 +10,10 @@
 class CharacterManager 
 {
 private:
-	static CharacterManager* Instance;
-
-	CharacterManager();
-	~CharacterManager();
+	static CharacterManager* Instance;											  
+																				  
+	CharacterManager();															  
+	~CharacterManager();														  
 
 	bool GetCharacter_Slot(User* _user, int _index, SlotData* _slot);					// 캐릭터 슬롯 가져오기
 	bool GetCharacter_SlotCount(User* _user, int& _count);								// 캐릭터 슬롯 개수
