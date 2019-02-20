@@ -193,8 +193,15 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 		memcpy(ptr, &diry, sizeof(float));
 		datasize += sizeof(float);
 		ptr += sizeof(float);
+
+		_user->GetCurCharacter()->SetPosition(curRot);
 	}
-	
+	else	 // 정상이동
+	{
+		_user->GetCurCharacter()->SetPosition(curRot);
+		_user->GetCurCharacter()->SetPosition(curPos);
+	}
+
 	_datasize = datasize;
 
 	// 다른유저에게 줄 정보변수
@@ -202,7 +209,7 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	int rdatasize = 0;
 
 	// 다른유저에게 줄 정보 데이터
-	User_Pack_MoveInfoToOther(relesedata, rdatasize, _user->GetCurCharacter()->GetPosition(), _user->GetCurCharacter()->GetRotation(), dirx, diry);
+	User_Pack_MoveInfoToOther(_user, relesedata, rdatasize, dirx, diry);
 
 	// 외부에 복사
 	memcpy(_releasedata, relesedata, rdatasize);
@@ -269,6 +276,13 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 		memcpy(ptr, &diry, sizeof(float));
 		datasize += sizeof(float);
 		ptr += sizeof(float);
+
+		_user->GetCurCharacter()->SetPosition(curRot);
+	}
+	else	 // 정상이동
+	{
+		_user->GetCurCharacter()->SetPosition(curRot);
+		_user->GetCurCharacter()->SetPosition(curPos);
 	}
 
 	_datasize = datasize;
@@ -278,7 +292,7 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 	int rdatasize = 0;
 
 	// 다른유저에게 줄 정보 데이터
-	User_Pack_MoveInfoToOther(relesedata, rdatasize, _user->GetCurCharacter()->GetPosition(), _user->GetCurCharacter()->GetRotation(), dirx, diry);
+	User_Pack_MoveInfoToOther(_user, relesedata, rdatasize, dirx, diry);
 
 	// 외부에 복사
 	memcpy(_releasedata, relesedata, rdatasize);
@@ -288,19 +302,29 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 }
 
 // 다른유저에게 줄 유저정보 데이터 패킹
-void InGameManager::User_Pack_MoveInfoToOther(char * _data, int & _datasize, Vector3 _position, Vector3 _rotation, float _dirx, float _diry)
+void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _datasize, float _dirx, float _diry)
 {
 	int datasize = 0;
-	int len = 0;
+	int len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
 	char* ptr = _data;
 
+	// 코드 사이즈
+	memcpy(ptr, &len, sizeof(int));
+	datasize += sizeof(int);
+	ptr += sizeof(int);
+
+	// 코드
+	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), len);
+	datasize += len;
+	ptr += len;
+
 	// 위치
-	memcpy(ptr, &_position, sizeof(Vector3));
+	memcpy(ptr, &_user->GetCurCharacter()->GetPosition(), sizeof(Vector3));
 	datasize += sizeof(Vector3);
 	ptr += sizeof(Vector3);
 
 	// 회전
-	memcpy(ptr, &_rotation, sizeof(Vector3));
+	memcpy(ptr, &_user->GetCurCharacter()->GetRotation(), sizeof(Vector3));
 	datasize += sizeof(Vector3);
 	ptr += sizeof(Vector3);
 
