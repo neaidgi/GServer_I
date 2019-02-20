@@ -493,31 +493,31 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 }
 
 // 캐릭터 정보 다른 플레이어에게 전송
-void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
-{
-	char* ptr = _data;
-	int size = _datasize;
-	const char* name = _user->GetCurCharacter()->GetCharacter_Name();
-	int namesize = strlen(name);
-
-	ptr += size;
-	memcpy(ptr, &namesize, sizeof(int));
-	ptr += sizeof(int);
-	size += sizeof(int);
-
-	memcpy(ptr, name, namesize);
-	size += namesize;
-
-	User* user;
-	while (UserManager::GetInstance()->searchData(user))
-	{
-		if (user->isIngame() && user != _user)
-		{
-			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, _data, _datasize);
-			user->IOCP_OneSided_SendMsg();
-		}
-	}
-}
+//void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
+//{
+//	char* ptr = _data;
+//	int size = _datasize;
+//	const char* name = _user->GetCurCharacter()->GetCharacter_Name();
+//	int namesize = strlen(name);
+//
+//	ptr += size;
+//	memcpy(ptr, &namesize, sizeof(int));
+//	ptr += sizeof(int);
+//	size += sizeof(int);
+//
+//	memcpy(ptr, name, namesize);
+//	size += namesize;
+//
+//	User* user;
+//	while (UserManager::GetInstance()->searchData(user))
+//	{
+//		if (user->isIngame() && user != _user)
+//		{
+//			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, _data, _datasize);
+//			user->IOCP_OneSided_SendMsg();
+//		}
+//	}
+//}
 
 bool CharacterManager::DeleateCharacter(User * _user, char * _buf)
 {

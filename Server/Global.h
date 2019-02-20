@@ -60,10 +60,13 @@ enum PROTOCOL {
 	SERVER_TENDER_END_RESULT,				// 입찰 종료 결과 [프로토콜][char* 메세지]
 
 	CLIENT_INGAME_OTHERPLAYERLIST,			// 클라 다른플레이어 리스트 요청	[프로토콜][]
-	CLIENT_INGAME_MOVE,						// 클라 이동					[프로토콜][방향벡터 or WASD]
+	CLIENT_INGAME_MOVE_START,				// 클라 이동 시작					[프로토콜]
+	CLIENT_INGAME_MOVE_REPORT,				// 클라 이동중 보고					[프로토콜]
+	CLIENT_INGAME_MOVE_END,					// 클라 이동 끝					[프로토콜]
+	SEVER_INGAME_MOVE_ORDER,				// 서버 이동 명령				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
 	SEVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
-	SEVER_INGAME_OTHERPLAYER_INFO,			// 다른플레이어 정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
-	SEVER_INGAME_OTHERPLAYERLIST_RESULT,	// 플레이어 리스트 			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
+	SEVER_INGAME_MOVE_OTHERPLAYERINFO,		// 서버 다른플레이어 이동정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
+	SEVER_INGAME_OTHERPLAYERLIST_RESULT,	// 서버 플레이어 리스트 			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
 	
 	// 채팅 프로토콜
 	CLIENT_REQ_CHAT_LIST,					// 현재 로그인한 회원리스트 요청 			 프로토콜만

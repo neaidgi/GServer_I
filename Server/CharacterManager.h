@@ -21,7 +21,7 @@ private:
 	void CreateCharacter(User* _user, char* _buf);										// 캐릭터 생성
 	void InitEnterGame(User* _user, char* _buf);										// 게임 접속 초기화
 	//void CharacterMove(User* _user, char* _buf, int& _datasize);						// 캐릭터 이동 
-	void CharacterInfo_toOther(User* _user, char* _data, int _datasize);				// 캐릭터 정보 다른유저에게 전송
+	//void CharacterInfo_toOther(User* _user, char* _data, int _datasize);				// 캐릭터 정보 다른유저에게 전송
 	bool DeleateCharacter(User* _user, char* _buf);										// 캐릭터 삭제
 	bool Character_SlotCount_Calculation(User* _user, int _index, int& _slotcount);		// 캐릭터 슬롯이 뒤에 몇개있는지 확인용
 	bool Character_SlotPull(User* _user, int _slotnum, int _index);						// 캐릭터 슬롯 당기기(삭제된슬롯번호,당겨야할)
