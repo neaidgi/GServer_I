@@ -397,7 +397,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		sendprotocol = SEVER_INGAME_MOVE_RESULT;
 		_user->pack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
-		User_Send_MoveInfoToOther(_user, rdata, rdatasize);
+		User_Send_MoveInfoToOther(_user, SEVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
 		break;
 	default:
 		break;
