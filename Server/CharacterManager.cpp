@@ -111,14 +111,17 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 	}
 }
 
-void CharacterManager::CreateCharacter(User * _user, char* _buf)
+bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 {
 	int code;
 	int jobcode;
 	int len;
 	char codebuf[NICKNAMESIZE];
 	char nick[NICKNAMESIZE];
-	bool check = false;
+	char msg2[BUFSIZE];
+	bool check = true;
+
+	memset(msg2, 0, sizeof(msg2));
 
 	// 캐릭터 코드용
 	char uniqcode[30];
@@ -151,47 +154,65 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	printf("uniqcode %s \n", uniqcode);
 
 	//
-	Character origin[MAXCHARACTERORIGIN];
+	//Character origin[MAXCHARACTERORIGIN];
 
-	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
-		GameDataManager::GetInstance()->Character_Origin_Data((i + 1) * 1000, &origin[i]);	// <- 버그
+	//for (int i = 0; i < MAXCHARACTERORIGIN; i++)
+	//	GameDataManager::GetInstance()->Character_Origin_Data((i + 1) * 1000, &origin[i]);	// <- 버그
 
 	int count = 0;
 	DBManager::GetInstance()->Character_Req_CharacterSlotCount(_user->getID(), count);
 	
 	// 다음 슬롯
-	count += 1;
-
-	switch (jobcode)
+	if (count == SLOTMAXCOUNT)
 	{
-	case TANKER:
-		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, jobcode,"Tanker",nick,1, count);
-		break;
-	case WARRIOR:
-		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, jobcode, "Warrior", nick, 1, count);
-		break;
-	case MAGICIAN:
-		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, jobcode, "Magician", nick, 1, count);
-		break;
-	case GUNNER:
-		DBManager::GetInstance()->Character_CharacterSlotAdd
-		(_user->getID(),uniqcode, jobcode, "Gunner", nick, 1, count);
-		break;
+		check == false;
+		sprintf(msg2, "캐릭터 생성 실패 : 슬롯최대수초과\n");
+	}
+	else
+	{
+		count += 1;
+
+		switch (jobcode)
+		{
+		case TANKER:
+			DBManager::GetInstance()->Character_CharacterSlotAdd
+			(_user->getID(), uniqcode, jobcode, "Tanker", nick, 1, count);
+			break;
+		case WARRIOR:
+			DBManager::GetInstance()->Character_CharacterSlotAdd
+			(_user->getID(), uniqcode, jobcode, "Warrior", nick, 1, count);
+			break;
+		case MAGICIAN:
+			DBManager::GetInstance()->Character_CharacterSlotAdd
+			(_user->getID(), uniqcode, jobcode, "Magician", nick, 1, count);
+			break;
+		case GUNNER:
+			DBManager::GetInstance()->Character_CharacterSlotAdd
+			(_user->getID(), uniqcode, jobcode, "Gunner", nick, 1, count);
+			break;
+		default:
+			check = false;
+			sprintf(msg2, "캐릭터 생성 실패 : 직업코드 오류 직업코드 = %d\n", jobcode);
+			break;
+		}
 	}
 
-	char msg2[BUFSIZE];
-	memset(msg2, 0, sizeof(msg2));
-	sprintf(msg2, "캐릭터 생성 : 번호 = %d번 직업코드 = %d 닉네임 = %s 레벨 = 1 코드 = %s",
-		count, jobcode, nick, uniqcode);
-	LogManager::GetInstance()->LogWrite(msg2);
-	//delete[] origin;
+	if (check)
+	{
+		sprintf(msg2, "캐릭터 생성 : 번호 = %d번 직업코드 = %d 닉네임 = %s 레벨 = 1 코드 = %s",
+			count, jobcode, nick, uniqcode);
+		LogManager::GetInstance()->LogWrite(msg2);
+	}
+	else
+	{
+		LogManager::GetInstance()->LogWrite(msg2);
+	}
+	
 
 	// DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
+	return check;
 }
-
+// 게임시작
 void CharacterManager::InitEnterGame(User * _user, char * _buf)
 {
 	PROTOCOL sendprotocol;
@@ -425,12 +446,11 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 
 			_user->pack(sendprotocol, buf, size);
 			result = RT_CHARACTER_SLOTRESULT;
+
+			//뒤처리 받아온 슬롯데이터 삭제
+			for (int i = 0; i < count; i++)
+				delete slotdata[i];
 		}// else문의 끝
-
-		 //뒤처리 받아온 슬롯데이터 삭제
-		for (int i = 0; i < count; i++)
-			delete slotdata[i];
-
 		break;
 	case CLIENT_NEW_CHARACTER_MENU:
 		sendprotocol = SERVER_CHARACTER_MENU;
@@ -487,17 +507,24 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 			check = false;
 			result = RT_CHARACTER_NICKOVERLAP_TRUE;
 			_user->pack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
-			_user->include_wset = true;
+			//_user->include_wset = true;
 		}
 		else
 		{
 			// 중복 없음
 			// 캐릭터 개수 제한 체크 추가
-			check = true;
-			result = RT_CHARACTER_CREATE;
-			CreateCharacter(_user, buf);
+			if (CreateCharacter(_user, buf))
+			{
+				check = true;
+				result = RT_CHARACTER_CREATE;
+			}
+			else
+			{
+				check = false;
+				result = RT_CHARACTER_NICKOVERLAP_TRUE;
+			}
 			_user->pack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
-			_user->include_wset = true;
+			//_user->include_wset = true;
 		}
 		break;
 	case CLIENT_CHARACTER_EXIT:				// 캐릭터 생성 취소
