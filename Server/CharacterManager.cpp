@@ -150,11 +150,11 @@ void CharacterManager::CreateCharacter(User * _user, char* _buf)
 	printf("nick %s \n", nick);
 	printf("uniqcode %s \n", uniqcode);
 
-	////
-	//Character origin[MAXCHARACTERORIGIN];
+	//
+	Character origin[MAXCHARACTERORIGIN];
 
-	//for (int i = 0; i < MAXCHARACTERORIGIN; i++)
-	//	GameDataManager::GetInstance()->Character_Origin_Data((i + 1) * 1000, &origin[i]);	// <- 버그
+	for (int i = 0; i < MAXCHARACTERORIGIN; i++)
+		GameDataManager::GetInstance()->Character_Origin_Data((i + 1) * 1000, &origin[i]);	// <- 버그
 
 	int count = 0;
 	DBManager::GetInstance()->Character_Req_CharacterSlotCount(_user->getID(), count);
@@ -352,44 +352,15 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		}
 
 		// DB에서 슬롯캐릭터 받아오기
-		for (int i = 0; i < count; i++)
+		while (i < count)
 		{
-			SlotData slotdata;
-			memset(&slotdata, 0, sizeof(slotdata));
-
-			if (GetCharacter_Slot(_user, i + 1, &slotdata) == false)
+			slotdata[i] = new SlotData();
+			memset(slotdata[i], 0, sizeof(SlotData));
+			if (GetCharacter_Slot(_user, i + 1, slotdata[i]) == false)
 			{
-				
+				count = i;
+				delete slotdata[i];
 				break;
-			}
-			else
-			{
-				int joblen = strlen(slotdata.jobname);
-				int nicklen = strlen(slotdata.nick);
-
-				memcpy(ptr, &joblen, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
-
-				memcpy(ptr, slotdata.jobname, joblen);
-				ptr += joblen;
-				size += joblen;
-
-				memcpy(ptr, &slotdata.level, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
-
-				memcpy(ptr, &nicklen, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
-
-				memcpy(ptr, slotdata.nick, nicklen);
-				ptr += nicklen;
-				size += nicklen;
-
-				memcpy(ptr, slotdata.code, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
 			}
 
 			++i;
@@ -424,12 +395,42 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 
 			for (int i = 0; i < count; i++)
 			{
-				
+				int joblen = strlen(slotdata[i]->jobname);
+				int nicklen = strlen(slotdata[i]->nick);
+
+				memcpy(ptr, &joblen, sizeof(int));
+				ptr += sizeof(int);
+				size += sizeof(int);
+
+				memcpy(ptr, slotdata[i]->jobname, joblen);
+				ptr += joblen;
+				size += joblen;
+
+				memcpy(ptr, &slotdata[i]->level, sizeof(int));
+				ptr += sizeof(int);
+				size += sizeof(int);
+
+				memcpy(ptr, &nicklen, sizeof(int));
+				ptr += sizeof(int);
+				size += sizeof(int);
+
+				memcpy(ptr, slotdata[i]->nick, nicklen);
+				ptr += nicklen;
+				size += nicklen;
+
+				memcpy(ptr, &slotdata[i]->code, sizeof(int));
+				ptr += sizeof(int);
+				size += sizeof(int);
 			}
 
 			_user->pack(sendprotocol, buf, size);
 			result = RT_CHARACTER_SLOTRESULT;
 		}// else문의 끝
+
+		 //뒤처리 받아온 슬롯데이터 삭제
+		for (int i = 0; i < count; i++)
+			delete slotdata[i];
+
 		break;
 	case CLIENT_NEW_CHARACTER_MENU:
 		sendprotocol = SERVER_CHARACTER_MENU;
