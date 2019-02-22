@@ -190,16 +190,6 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 		datasize += sizeof(Vector3);
 		ptr += sizeof(Vector3);
 
-		// 방향 x
-		memcpy(ptr, &dirx, sizeof(float));
-		datasize += sizeof(float);
-		ptr += sizeof(float);
-
-		// 방향 y
-		memcpy(ptr, &diry, sizeof(float));
-		datasize += sizeof(float);
-		ptr += sizeof(float);
-
 		_user->GetCurCharacter()->SetPosition(curRot);
 	}
 	else	 // 정상이동
@@ -215,7 +205,7 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	int rdatasize = 0;
 
 	// 다른유저에게 줄 정보 데이터
-	User_Pack_MoveInfoToOther(_user, relesedata, rdatasize, dirx, diry);
+	User_Pack_MoveInfoToOther(_user, relesedata, rdatasize);
 
 	// 외부에 복사
 	memcpy(_releasedata, relesedata, rdatasize);
@@ -305,7 +295,7 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 	int rdatasize = 0;
 
 	// 다른유저에게 줄 정보 데이터
-	User_Pack_MoveInfoToOther(_user, relesedata, rdatasize, dirx, diry);
+	User_Pack_MoveInfoToOther(_user, relesedata, rdatasize);
 
 	// 외부에 복사
 	memcpy(_releasedata, relesedata, rdatasize);
@@ -315,7 +305,7 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 }
 
 // 다른유저에게 줄 유저정보 데이터 패킹
-void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _datasize, float _dirx, float _diry)
+void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _datasize)
 {
 	int datasize = 0;
 	int len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
@@ -344,20 +334,10 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	datasize += sizeof(Vector3);
 	ptr += sizeof(Vector3);
 
-	// 방향 x
-	memcpy(ptr, &_dirx, sizeof(float));
-	datasize += sizeof(float);
-	ptr += sizeof(float);
-
-	// 방향 y
-	memcpy(ptr, &_diry, sizeof(float));
-	datasize += sizeof(float);
-	ptr += sizeof(float);
-
 	// 메세지
 	memset(msg, 0, sizeof(msg));
 	sprintf(msg, "다른 유저전송 데이터 :: 위치: %f %f %f 회전: %f %f %f 방향: %f %f", curcharacter->GetPosition().x, curcharacter->GetPosition().y,
-		curcharacter->GetPosition().z, curcharacter->GetRotation().x, curcharacter->GetRotation().y, curcharacter->GetRotation().z, _dirx, _diry);
+		curcharacter->GetPosition().z, curcharacter->GetRotation().x, curcharacter->GetRotation().y, curcharacter->GetRotation().z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
