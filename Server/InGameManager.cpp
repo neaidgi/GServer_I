@@ -84,7 +84,7 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 				size += sizeof(int);
 
 				// ÄÚµå
-				memcpy(ptr, character_temp->GetCharacter_Code(), nicksize);
+				memcpy(ptr, character_temp->GetCharacter_Code(), codesize);
 				ptr += codesize;
 				size += codesize;
 

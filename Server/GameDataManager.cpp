@@ -116,21 +116,21 @@ void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 
 }
 // 직업에따라 설계도 가져옴
-void GameDataManager::Character_Origin_Data(int _jobcode, Character* _job)
+void GameDataManager::Character_Origin_Data(int _jobcode, const Character*& _job)
 {
 	switch (_jobcode)
 	{
 	case TANKER:
-		characterdata->GetTanker(_job);
+		_job = characterdata->GetTanker();
 		break;
 	case WARRIOR:
-		characterdata->GetWarrior(_job);
+		_job = characterdata->GetWarrior();
 		break;
 	case MAGICIAN:
-		characterdata->GetMagician(_job);
+		_job = characterdata->GetMagician();
 		break;
 	case GUNNER:
-		characterdata->GetGunner(_job);
+		_job = characterdata->GetGunner();
 		break;
 	}
 }

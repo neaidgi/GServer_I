@@ -153,11 +153,8 @@ bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 	printf("nick %s \n", nick);
 	printf("uniqcode %s \n", uniqcode);
 
-	//
-	//Character origin[MAXCHARACTERORIGIN];
-
-	//for (int i = 0; i < MAXCHARACTERORIGIN; i++)
-	//	GameDataManager::GetInstance()->Character_Origin_Data((i + 1) * 1000, &origin[i]);	// <- 버그
+	// 설계도
+	//const Character * origin = nullptr;
 
 	int count = 0;
 	DBManager::GetInstance()->Character_Req_CharacterSlotCount(_user->getID(), count);
@@ -220,6 +217,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	char* ptr = data;
 	int index = 0;
 	int size = 0;
+	int len = 0;
 	bool enter = true;
 	Vector3 pos;
 	Vector3 spawnpos[CHARACTER_SPAWNPOS_MAXCOUNT];
@@ -259,13 +257,24 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	// 
 	char* ptr_temp = ptr;
 
+	// 캐릭터 코드 사이즈
+	len = strlen(player->GetCharacter_Code());
+	memcpy(ptr_temp, &len, sizeof(int));
+	ptr_temp += sizeof(int);
+	size += sizeof(int);
+
+	// 캐릭터 코드
+	memcpy(ptr_temp, player->GetCharacter_Code(), len);
+	ptr_temp += len;
+	size += len;
+
 	// 캐릭터 직업코드
 	int code = player->GetCharacter_JobCode();
 	memcpy(ptr_temp, &code, sizeof(int));
 	ptr_temp += sizeof(int);
 	size += sizeof(int);
 	// 닉네임 사이즈
-	int len = strlen(player->GetCharacter_Name());
+	len = strlen(player->GetCharacter_Name());
 	memcpy(ptr_temp, &len, sizeof(int));
 	ptr_temp += sizeof(int);
 	size += sizeof(int);
@@ -324,18 +333,30 @@ void CharacterManager::Character_Slot_Send(User * _user)
 // 게임 시작시 실제 캐릭터 조립
 Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, int _index)
 {
-	Character temp;
-	GameDataManager::GetInstance()->Character_Origin_Data(_slotdata->jobcode, &temp);
-
 	Character* player = new Character();
+
+	// 설계도
+	const Character* origin = nullptr;
+
+	// 직업코드에 따라서 설계도 요청
+	GameDataManager::GetInstance()->Character_Origin_Data(_slotdata->jobcode, origin);
 
 	//
 	//	실제 스테이터스 셋팅 
 	//  player
-
-	*player = temp;
-
+	player->SetCharacter_JobCode(origin->GetCharacter_JobCode());
+	player->SetCharacter_JobName(origin->GetCharacter_JobName());
+	player->SetCharacter_STR(origin->GetCharacter_STR());
+	player->SetCharacter_DEX(origin->GetCharacter_DEX());
+	player->SetCharacter_INT(origin->GetCharacter_INT());
+	player->SetCharacter_Health(origin->GetCharacter_Health());
+	player->SetCharacter_Mana(origin->GetCharacter_Mana());
+	player->SetCharacter_AttackPoint(origin->GetCharacter_AttackPoint());
+	player->SetCharacter_DefensePoint(origin->GetCharacter_DefensePoint());
+	player->SetCharacter_Speed(origin->GetCharacter_Speed());
+	player->SetCharacter_Level(_slotdata->level);
 	player->SetCharacter_Name(_slotdata->nick);
+	player->SetCharacter_Code(_slotdata->code);
 
 	return player;
 }
