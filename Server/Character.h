@@ -30,30 +30,30 @@ private:
 	int	character_growint;			// ¼ºÀå Áö
 
 public:
-	const char* GetCharacter_Name() { return character_name; }
-	const char* GetCharacter_JobName() { return character_jobname; }
-	int GetCharacter_JobCode() { return character_jobcode; }
-	const char* GetCharacter_Code() { return character_code; }
-	int GetCharacter_Level() { return character_level; }
-	int GetCharacter_STR() { return character_str; }
-	int GetCharacter_DEX() { return character_dex; }
-	int GetCharacter_INT() { return character_int; }
-	int GetCharacter_Health() { return character_health; }
-	int GetCharacter_Mana() { return character_mana; }
-	int GetCharacter_AttackPoint() { return character_attackpoint; }
-	int GetCharacter_DefensePoint() { return character_defensepoint; }
-	int GetCharacter_Speed() { return character_speed; }
-	int GetCharacter_GrowHealth() { return character_growhealth; }
-	int GetCharacter_GrowMana() { return character_growmana; }
-	int GetCharacter_GrowSTR() { return character_growstr; }
-	int GetCharacter_GrowDEX() { return character_growdex; }
-	int GetCharacter_GrowINT() { return character_growint; }
+	const char* GetCharacter_Name() const { return character_name; }
+	const char* GetCharacter_JobName() const { return character_jobname; }
+	int GetCharacter_JobCode()const { return character_jobcode; }
+	const char* GetCharacter_Code() const { return character_code; }
+	int GetCharacter_Level() const { return character_level; }
+	int GetCharacter_STR() const { return character_str; }
+	int GetCharacter_DEX() const { return character_dex; }
+	int GetCharacter_INT() const { return character_int; }
+	int GetCharacter_Health() const { return character_health; }
+	int GetCharacter_Mana() const { return character_mana; }
+	int GetCharacter_AttackPoint()const { return character_attackpoint; }
+	int GetCharacter_DefensePoint()const { return character_defensepoint; }
+	int GetCharacter_Speed()const { return character_speed; }
+	int GetCharacter_GrowHealth()const { return character_growhealth; }
+	int GetCharacter_GrowMana()const { return character_growmana; }
+	int GetCharacter_GrowSTR()const { return character_growstr; }
+	int GetCharacter_GrowDEX()const { return character_growdex; }
+	int GetCharacter_GrowINT()const { return character_growint; }
 
 	const Vector3 GetPosition() { return Position; }
 	const Vector3 GetRotation() { return Rotation; }
 	const Vector3 GetScale() { return Scale; }
 
-	void SetCharacter_Name(char* _character_name)
+	void SetCharacter_Name(const char* _character_name)
 	{
 		int len = strlen(_character_name);
 		char* name = new char[len + 1];
@@ -61,7 +61,7 @@ public:
 		strcpy_s(name, len + 1, _character_name);
 		character_name = name;
 	}
-	void SetCharacter_JobName(char* _character_jobname)
+	void SetCharacter_JobName(const char* _character_jobname)
 	{
 		int len = strlen(_character_jobname);
 		char* jname = new char[len + 1];
@@ -75,7 +75,7 @@ public:
 		int len = strlen(_character_code);
 		char* code = new char[len + 1];
 		memset(code, 0, len + 1);
-		strcpy_s(code, len, _character_code);
+		strcpy_s(code, len + 1, _character_code);
 		character_code = code;
 	}
 	void SetCharacter_Level(int _character_level) { character_level = _character_level; }

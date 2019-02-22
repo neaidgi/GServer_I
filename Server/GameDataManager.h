@@ -30,7 +30,11 @@ public:
 	void EndManager();
 
 	void Character_SpawnPos_Vector(Vector3 * _pos);
-	void Character_Origin_Data(int _jobcode, Character* _job);
+	//const Character* GetTanker() { return characterdata->GetTanker(); }
+	//const Character* GetWarrior() { return characterdata->GetWarrior(); }
+	//const Character* GetMagician() { return characterdata->GetMagician(); }
+	//const Character* GetGunner() { return characterdata->GetGunner(); }
+	void GameDataManager::Character_Origin_Data(int _jobcode, const Character*& _job);
 };
 
 #endif
