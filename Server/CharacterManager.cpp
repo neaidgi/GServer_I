@@ -126,7 +126,7 @@ bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 	// 캐릭터 코드용
 	char uniqcode[30];
 	memset(uniqcode, 0, sizeof(uniqcode));
-	char* ptr = uniqcode;
+	char* codedata = uniqcode;
 
 	//
 	memcpy(&len, _buf, sizeof(int));
@@ -134,21 +134,30 @@ bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 
 	memcpy(nick, _buf, len);
 	_buf += len;
-	
+
 	memcpy(&jobcode, _buf, sizeof(int));
 	_buf += sizeof(int);
 
 	// 고유코드 만들기 (유저아이디[20] + 캐릭터닉네임[6] + 직업코드[4])
 	itoa(jobcode, codebuf, 10);
 
-	memcpy(ptr, _user->getID(), strlen(_user->getID()));
-	ptr += strlen(_user->getID());
+	memcpy(codedata, _user->getID(), strlen(_user->getID()));
+	codedata += strlen(_user->getID());
 
-	memcpy(ptr, nick, 6);
-	ptr += 6;
+	// 캐릭터 닉네임길이가 6보다 작으면 길이만큼해서 코드만들기
+	if (len >= NICKNAME_CODESIZE)
+	{
+		memcpy(codedata, nick, NICKNAME_CODESIZE);
+		codedata += NICKNAME_CODESIZE;
+	}
+	else
+	{
+		memcpy(codedata, nick, len - 1);
+		codedata += len - 1;
+	}
 
-	memcpy(ptr, codebuf, strlen(codebuf));
-	ptr += strlen(codebuf);
+	memcpy(codedata, codebuf, JOBCODE_SIZE);
+	codedata += JOBCODE_SIZE;
 
 	printf("nick %s \n", nick);
 	printf("uniqcode %s \n", uniqcode);
