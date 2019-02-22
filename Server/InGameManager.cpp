@@ -137,7 +137,6 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	Vector3 curPos;
 	Vector3 curRot;
 	float dirx, diry;
-	float delay_time = 0;
 	bool lesult;
 	int datasize = 0;
 	int len = 0;
@@ -154,13 +153,11 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	memcpy(&curRot, ptr, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 
-	memcpy(&delay_time, ptr, sizeof(float));
-	ptr += sizeof(float);
 	//
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "이동 완료 데이터 :: 위치: %f %f %f 회전: %f %f %f 딜레이타임: %f", curPos.x, curPos.y,
-		curPos.z, curRot.x, curRot.y, curRot.z, delay_time);
+	sprintf(msg, "이동 완료 데이터 :: 위치: %f %f %f 회전: %f %f %f ", curPos.x, curPos.y,
+		curPos.z, curRot.x, curRot.y, curRot.z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 버퍼 클리어
