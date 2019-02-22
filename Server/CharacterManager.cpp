@@ -229,6 +229,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	int len = 0;
 	bool enter = true;
 	Vector3 pos;
+	Vector3 rot;
 	Vector3 spawnpos[CHARACTER_SPAWNPOS_MAXCOUNT];
 
 	memcpy(&index, _buf, sizeof(int));
@@ -260,6 +261,13 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	player->SetCharacter_Code(slotdata->code);
 	_user->SetCurCharacter(player);
 	_user->GetCurCharacter()->SetPosition(pos);
+
+	// 플레이어에 회전값 추가
+	rot.x = 0;
+	rot.y = 0;
+	rot.z = 0;
+
+	_user->GetCurCharacter()->SetRotation(rot);
 
 	// 
 	// 현재 접속한 캐릭터 패킹
@@ -293,6 +301,10 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	size += len;
 	// 위치
 	memcpy(ptr_temp, &player->GetPosition(), sizeof(Vector3));
+	ptr_temp += sizeof(Vector3);
+	size += sizeof(Vector3);
+	// 회전
+	memcpy(ptr_temp, &player->GetRotation(), sizeof(Vector3));
 	ptr_temp += sizeof(Vector3);
 	size += sizeof(Vector3);
 
