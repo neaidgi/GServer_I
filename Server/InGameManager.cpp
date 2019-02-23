@@ -156,7 +156,10 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	//
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "이동 완료 데이터 :: 위치: %f %f %f 회전: %f %f %f ", curPos.x, curPos.y,
+	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
+		curPos.z, curRot.x, curRot.y, curRot.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
 		curPos.z, curRot.x, curRot.y, curRot.z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
@@ -236,7 +239,10 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "이동 시작 데이터 :: 위치: %f %f %f 회전: %f %f %f", curPos.x, curPos.y,
+	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
+		curPos.z, curRot.x, curRot.y, curRot.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
 		curPos.z, curRot.x, curRot.y, curRot.z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
@@ -333,7 +339,7 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "다른 유저전송 데이터 :: 위치: %f %f %f 회전: %f %f %f 방향: %f %f", curcharacter->GetPosition().x, curcharacter->GetPosition().y,
+	sprintf(msg, "다른 유저전송 데이터 :: 위치: [%f] [%f] [%f] 회전: [%f] [%f] [%f]", curcharacter->GetPosition().x, curcharacter->GetPosition().y,
 		curcharacter->GetPosition().z, curcharacter->GetRotation().x, curcharacter->GetRotation().y, curcharacter->GetRotation().z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
@@ -395,18 +401,11 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_Send_MoveInfoToOther(_user, SEVER_INGAME_MOVE_ORDER,rdata, rdatasize);
 		break;
 	case CLIENT_INGAME_MOVE_REPORT:
-		if (User_Pack_Move(_user, buf, datasize, rdata, rdatasize))
-		{
-
-		}
-		else
-		{
-
-		}
+		User_Pack_Move(_user, buf, datasize, rdata, rdatasize);
+		User_Send_MoveInfoToOther(_user, SEVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
 		sendprotocol = SEVER_INGAME_MOVE_RESULT;
 		_user->pack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
-		User_Send_MoveInfoToOther(_user, SEVER_INGAME_MOVE_OTHERPLAYERINFO,rdata, rdatasize);
 		break;
 	case CLIENT_INGAME_MOVE_END:
 		if (User_Pack_Move(_user, buf, datasize, rdata, rdatasize))
