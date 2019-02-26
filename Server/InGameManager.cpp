@@ -151,6 +151,11 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	ptr += len;
 	size += len;
 
+	// 직업 코드
+	memcpy(ptr, &_user->GetCurCharacter()->GetCharacter_JobCode(), sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
 	// 닉네임 사이즈
 	len = strlen(_user->GetCurCharacter()->GetCharacter_Name());
 	memcpy(ptr, &len, sizeof(int));
