@@ -150,6 +150,7 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	size += sizeof(int);
 
 	sprintf(msg, "접속한 유저 데이터 :: 코드사이즈: %d ", len);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 코드
 	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), len);
@@ -157,6 +158,7 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	size += len;
 
 	sprintf(msg, "코드: [%s] ", _user->GetCurCharacter()->GetCharacter_Code());
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 직업 
 	int jobcode = _user->GetCurCharacter()->GetCharacter_JobCode();
@@ -165,6 +167,7 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	size += sizeof(int);
 
 	sprintf(msg, "직업코드: [%d] ", jobcode);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 닉네임 사이즈
 	len = strlen(_user->GetCurCharacter()->GetCharacter_Name());
@@ -173,6 +176,7 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	size += sizeof(int);
 
 	sprintf(msg, "닉네임사이즈: [%d] ", len);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 닉네임
 	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Name(), len);
@@ -180,6 +184,7 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	size += len;
 
 	sprintf(msg, "닉네임: [%s]\n", _user->GetCurCharacter()->GetCharacter_Name());
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 위치
 	memcpy(ptr, &_user->GetCurCharacter()->GetPosition(), sizeof(Vector3));
@@ -187,6 +192,7 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	size += sizeof(Vector3);
 
 	sprintf(msg, "위치: [%f] [%f] [%f] ", _user->GetCurCharacter()->GetPosition().x, _user->GetCurCharacter()->GetPosition().y, _user->GetCurCharacter()->GetPosition().z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 회전
 	memcpy(ptr, &_user->GetCurCharacter()->GetRotation(), sizeof(Vector3));
@@ -194,11 +200,9 @@ void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _dat
 	size += sizeof(Vector3);
 
 	sprintf(msg, "회전: [%f] [%f] [%f] ", _user->GetCurCharacter()->GetRotation().x, _user->GetCurCharacter()->GetRotation().y, _user->GetCurCharacter()->GetRotation().z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = size;
-
-	// 메세지
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 }
 
 // 이동 완료 요청
