@@ -33,8 +33,11 @@ void IocpModel::IocpProcess()
 				LogManager::GetInstance()->SetTime();
 				LogManager::GetInstance()->LogWrite("IocpModel::IocpProcess : ERROR : GetQueuedCompletionStatus() failed ");
 				
-				user->stop();
-				UserManager::GetInstance()->removeUser(user);
+				if (user != nullptr)
+				{
+					user->stop();
+					UserManager::GetInstance()->removeUser(user);
+				}
 			}
 			continue;
 		}
