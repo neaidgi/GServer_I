@@ -460,8 +460,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	{
 	case CLIENT_INGAME_OTHERPLAYERLIST:
 		User_Pack_OtherUserPosData(_user);
-		User_Send_MoveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_CONNECT, buf, datasize);
 		User_Pack_PlayerPosData(_user, buf, datasize);
+		User_Send_MoveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_CONNECT, buf, datasize);
 		result = RT_INGAME_OTHERPLAYER_LIST;
 		break;
 	case CLIENT_INGAME_MOVE_START:
