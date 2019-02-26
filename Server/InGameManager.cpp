@@ -339,7 +339,7 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "다른 유저전송 데이터 :: 위치: [%f] [%f] [%f] 회전: [%f] [%f] [%f]", curcharacter->GetPosition().x, curcharacter->GetPosition().y,
+	sprintf(msg, "다른 유저전송 데이터 :: 코드 : [%s] 위치: [%f] [%f] [%f] 회전: [%f] [%f] [%f]", curcharacter->GetCharacter_Code(), curcharacter->GetPosition().x, curcharacter->GetPosition().y,
 		curcharacter->GetPosition().z, curcharacter->GetRotation().x, curcharacter->GetRotation().y, curcharacter->GetRotation().z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
@@ -352,6 +352,7 @@ void InGameManager::User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char * _
 	char* ptr = _data;
 
 	User* user;
+	UserManager::GetInstance()->startSearch();
 	while (UserManager::GetInstance()->searchData(user))
 	{
 		if (user->isIngame() && user->getSocket() != _user->getSocket())
