@@ -126,8 +126,53 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 	memcpy(data, &usercount, sizeof(int));
 	size += sizeof(int);
 
-	sendprotocol = SEVER_INGAME_OTHERPLAYERLIST_RESULT;
+	sendprotocol = SERVER_INGAME_OTHERPLAYERLIST_RESULT;
 	_user->pack(sendprotocol, data, size);
+}
+
+// 접속한 유저 정보 패킹
+void InGameManager::User_Pack_PlayerPosData(User * _user, char* _data, int& _datasize)
+{
+	PROTOCOL sendprotocol;
+	char* ptr = _data;
+	int size = 0;
+	int len = 0;
+
+	memset(ptr, 0, BUFSIZE);
+
+	// 코드 사이즈
+	len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
+	memcpy(ptr, &len, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	// 코드
+	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), len);
+	ptr += len;
+	size += len;
+
+	// 닉네임 사이즈
+	len = strlen(_user->GetCurCharacter()->GetCharacter_Name());
+	memcpy(ptr, &len, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	// 닉네임
+	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Name(), len);
+	ptr += len;
+	size += len;
+
+	// 위치
+	memcpy(ptr, &_user->GetCurCharacter()->GetPosition(), sizeof(Vector3));
+	ptr += sizeof(Vector3);
+	size += sizeof(Vector3);
+
+	// 회전
+	memcpy(ptr, &_user->GetCurCharacter()->GetRotation(), sizeof(Vector3));
+	ptr += sizeof(Vector3);
+	size += sizeof(Vector3);
+
+	_datasize = size;
 }
 
 // 이동 완료 요청
@@ -384,6 +429,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	{
 	case CLIENT_INGAME_OTHERPLAYERLIST:
 		User_Pack_OtherUserPosData(_user);
+		User_Send_MoveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_CONNECT, buf, datasize);
+		User_Pack_PlayerPosData(_user, buf, datasize);
 		result = RT_INGAME_OTHERPLAYER_LIST;
 		break;
 	case CLIENT_INGAME_MOVE_START:
@@ -395,15 +442,15 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		{
 
 		}
-		sendprotocol = SEVER_INGAME_MOVE_RESULT;
+		sendprotocol = SERVER_INGAME_MOVE_RESULT;
 		_user->pack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
-		User_Send_MoveInfoToOther(_user, SEVER_INGAME_MOVE_ORDER,rdata, rdatasize);
+		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_ORDER,rdata, rdatasize);
 		break;
 	case CLIENT_INGAME_MOVE_REPORT:
 		User_Pack_Move(_user, buf, datasize, rdata, rdatasize);
-		User_Send_MoveInfoToOther(_user, SEVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
-		sendprotocol = SEVER_INGAME_MOVE_RESULT;
+		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
+		sendprotocol = SERVER_INGAME_MOVE_RESULT;
 		_user->pack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
 		break;
@@ -416,10 +463,10 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		{
 
 		}
-		sendprotocol = SEVER_INGAME_MOVE_RESULT;
+		sendprotocol = SERVER_INGAME_MOVE_RESULT;
 		_user->pack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
-		User_Send_MoveInfoToOther(_user, SEVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
+		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
 		break;
 	default:
 		break;

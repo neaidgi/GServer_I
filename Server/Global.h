@@ -63,11 +63,12 @@ enum PROTOCOL {
 	CLIENT_INGAME_MOVE_START,				// 클라 이동 시작					[프로토콜]
 	CLIENT_INGAME_MOVE_REPORT,				// 클라 이동중 보고					[프로토콜]
 	CLIENT_INGAME_MOVE_END,					// 클라 이동 끝					[프로토콜]
-	SEVER_INGAME_MOVE_ORDER,				// 서버 이동 명령				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
-	SEVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
-	SEVER_INGAME_MOVE_OTHERPLAYERINFO,		// 서버 다른플레이어 이동정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
-	SEVER_INGAME_OTHERPLAYERLIST_RESULT,	// 서버 플레이어 리스트 			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
-	
+	SERVER_INGAME_MOVE_ORDER,				// 서버 이동 명령				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
+	SERVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
+	SERVER_INGAME_MOVE_OTHERPLAYERINFO,		// 서버 다른플레이어 이동정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
+	SERVER_INGAME_OTHERPLAYERLIST_RESULT,	// 서버 플레이어 리스트			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
+	SERVER_INGAME_OTHERPLAYER_CONNECT,		// 서버 플레이어 접속 정보
+
 	// 채팅 프로토콜
 	CLIENT_REQ_CHAT_LIST,					// 현재 로그인한 회원리스트 요청 			 프로토콜만
 	SERVER_CHAT_LIST_RESULT,				// 현재 로그인한 회원리스트 요청 결과 		[인원 수] [닉네임 사이즈] [닉네임]...
