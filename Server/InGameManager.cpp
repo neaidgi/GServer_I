@@ -210,7 +210,6 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 {
 	Vector3 prePos;
 	Vector3 curPos;
-	Vector3 curRot;
 	float dirx, diry;
 	bool lesult;
 	int datasize = 0;
@@ -225,17 +224,10 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	memcpy(&curPos, ptr, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 
-	memcpy(&curRot, ptr, sizeof(Vector3));
-	ptr += sizeof(Vector3);
-
-	//
 	// 메세지
 	memset(msg, 0, sizeof(msg));
 	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
 		curPos.z);
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curRot.x, curRot.y, 
-		curRot.z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 버퍼 클리어
@@ -259,17 +251,9 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 		memcpy(ptr, &prePos, sizeof(Vector3));
 		datasize += sizeof(Vector3);
 		ptr += sizeof(Vector3);
-
-		// 회전
-		memcpy(ptr, &curRot, sizeof(Vector3));
-		datasize += sizeof(Vector3);
-		ptr += sizeof(Vector3);
-
-		_user->GetCurCharacter()->SetRotation(curRot);
 	}
 	else	 // 정상이동
 	{
-		_user->GetCurCharacter()->SetRotation(curRot);
 		_user->GetCurCharacter()->SetPosition(curPos);
 	}
 

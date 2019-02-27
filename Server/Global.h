@@ -63,9 +63,11 @@ enum PROTOCOL {
 	CLIENT_INGAME_MOVE_START,				// 클라 이동 시작					[프로토콜]
 	CLIENT_INGAME_MOVE_REPORT,				// 클라 이동중 보고					[프로토콜]
 	CLIENT_INGAME_MOVE_END,					// 클라 이동 끝					[프로토콜]
+	CLIENT_INGAME_MOVE_ROTATION,			// 클라 회전
 	SERVER_INGAME_MOVE_ORDER,				// 서버 이동 명령				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
 	SERVER_INGAME_MOVE_RESULT,				// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
 	SERVER_INGAME_MOVE_OTHERPLAYERINFO,		// 서버 다른플레이어 이동정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
+	SERVER_INGAME_MOVE_ROTATION,			// 클라 회전
 	SERVER_INGAME_OTHERPLAYERLIST_RESULT,	// 서버 플레이어 리스트			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
 	SERVER_INGAME_OTHERPLAYER_CONNECT,		// 서버 플레이어 접속 정보
 
