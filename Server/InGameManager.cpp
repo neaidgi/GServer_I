@@ -301,9 +301,6 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
 		curPos.z, curRot.x, curRot.y, curRot.z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
-		curPos.z, curRot.x, curRot.y, curRot.z);
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 초기화
 	ptr = _buf;
@@ -395,6 +392,14 @@ void InGameManager::User_Pack_Rotation(User * _user, char * _data, int & _datasi
 	datasize += sizeof(Vector3);
 
 	_datasize = datasize;
+
+	// 메세지
+	char msg[BUFSIZE];
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "회전 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curRot.x, curRot.y,
+		curRot.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
 }
 
 // 다른유저에게 줄 유저정보 데이터 패킹
@@ -473,12 +478,11 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	// 수정했음
 	switch (protocol)
 	{
-	case CLIENT_INGAME_OTHERPLAYERLIST:
+	case CLIENT_INGAME_OTHERPLAYERLIST:		// 유저리스트
 		User_Pack_OtherUserPosData(_user);
 		User_Pack_PlayerPosData(_user, buf, datasize);
 		User_Send_MoveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_CONNECT, buf, datasize);
 		result = RT_INGAME_OTHERPLAYER_LIST;
-		_user->SetCallback(false);
 		break;
 	case CLIENT_INGAME_MOVE_START:
 		if (User_Pack_MoveStart(_user, buf, datasize, rdata, rdatasize))
