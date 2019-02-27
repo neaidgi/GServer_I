@@ -381,6 +381,37 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 
 	return lesult;
 }
+// 유저 회전 패킹
+void InGameManager::User_Pack_Rotation(User * _user, char * _data, int & _datasize)
+{
+	Vector3 curRot;
+	char * ptr = _data;
+	int datasize = 0;
+	int len = 0;
+
+	memcpy(&curRot, ptr, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+
+	_user->GetCurCharacter()->SetRotation(curRot);
+
+	memset(_data, 0, BUFSIZE);
+	ptr = _data;
+
+	len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
+	memcpy(ptr, &len, sizeof(int));
+	ptr += sizeof(int);
+	datasize += sizeof(int);
+
+	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), len);
+	ptr += len;
+	datasize += len;
+
+	memcpy(ptr, &curRot, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+	datasize += sizeof(Vector3);
+
+	_datasize = datasize;
+}
 
 // 다른유저에게 줄 유저정보 데이터 패킹
 void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _datasize)
@@ -421,7 +452,7 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	_datasize = datasize;
 }
 
-// 유저위치 다른유저에게 전송해줌
+// 다른유저에게 전송해줌
 void InGameManager::User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char * _data, int & _datasize)
 {
 	char* ptr = _data;
@@ -463,6 +494,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_Pack_PlayerPosData(_user, buf, datasize);
 		User_Send_MoveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_CONNECT, buf, datasize);
 		result = RT_INGAME_OTHERPLAYER_LIST;
+		_user->SetCallback(false);
 		break;
 	case CLIENT_INGAME_MOVE_START:
 		if (User_Pack_MoveStart(_user, buf, datasize, rdata, rdatasize))
@@ -498,6 +530,12 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		_user->pack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
 		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
+		break;
+	case CLIENT_INGAME_MOVE_ROTATION:
+		User_Pack_Rotation(_user, buf, datasize);
+		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_ROTATION, buf, datasize);
+		_user->SetCallback(false);
+		result = RT_INGAME_MOVE;
 		break;
 	default:
 		break;
