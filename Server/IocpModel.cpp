@@ -33,7 +33,7 @@ void IocpModel::IocpProcess()
 				LogManager::GetInstance()->SetTime();
 				LogManager::GetInstance()->LogWrite("IocpModel::IocpProcess : ERROR : GetQueuedCompletionStatus() failed ");
 				
-				if (user != nullptr)
+				if (UserManager::GetInstance()->isUser(user))
 				{
 					user->stop();
 					UserManager::GetInstance()->removeUser(user);
@@ -53,8 +53,11 @@ void IocpModel::IocpProcess()
 		case IOTYPE_ACCEPT:
 			if (acceptProcess(user) == false)
 			{
-				user->stop();
-				UserManager::GetInstance()->removeUser(user);
+				if (UserManager::GetInstance()->isUser(user))
+				{
+					user->stop();
+					UserManager::GetInstance()->removeUser(user);
+				}
 			}			
 			break;
 		case IOTYPE_RECV:
@@ -62,8 +65,11 @@ void IocpModel::IocpProcess()
 			{
 				if (user->IOCP_RecvMsg() == false)
 				{
-					user->stop();
-					UserManager::GetInstance()->removeUser(user);
+					if (UserManager::GetInstance()->isUser(user))
+					{
+						user->stop();
+						UserManager::GetInstance()->removeUser(user);
+					}
 					break;
 				}
 				continue;
@@ -76,8 +82,11 @@ void IocpModel::IocpProcess()
 				{
 					if (user->IOCP_SendMsg() == false)
 					{
-						user->stop();
-						UserManager::GetInstance()->removeUser(user);
+						if (UserManager::GetInstance()->isUser(user))
+						{
+							user->stop();
+							UserManager::GetInstance()->removeUser(user);
+						}
 						break;
 					}
 				}
@@ -86,8 +95,11 @@ void IocpModel::IocpProcess()
 					user->SetCallback(true);
 					if (user->IOCP_RecvMsg() == false)
 					{
-						user->stop();
-						UserManager::GetInstance()->removeUser(user);
+						if (UserManager::GetInstance()->isUser(user))
+						{
+							user->stop();
+							UserManager::GetInstance()->removeUser(user);
+						}
 						break;
 					}
 				}
@@ -101,8 +113,11 @@ void IocpModel::IocpProcess()
 				// send : false를 return하면 소켓 종료. 다보내면 
 				if (user->IOCP_SendMsg() == false)
 				{
-					user->stop();
-					UserManager::GetInstance()->removeUser(user);
+					if (UserManager::GetInstance()->isUser(user))
+					{
+						user->stop();
+						UserManager::GetInstance()->removeUser(user);
+					}
 					break;
 				}
 				continue;
@@ -112,8 +127,11 @@ void IocpModel::IocpProcess()
 			{
 				if (user->IOCP_RecvMsg() == false)
 				{
-					user->stop();
-					UserManager::GetInstance()->removeUser(user);
+					if (UserManager::GetInstance()->isUser(user))
+					{
+						user->stop();
+						UserManager::GetInstance()->removeUser(user);
+					}
 					break;
 				}
 			}
@@ -125,8 +143,11 @@ void IocpModel::IocpProcess()
 				// send : false를 return하면 소켓 종료. 다보내면 
 				if (user->IOCP_SendMsg() == false)
 				{
-					user->stop();
-					UserManager::GetInstance()->removeUser(user);
+					if (UserManager::GetInstance()->isUser(user))
+					{
+						user->stop();
+						UserManager::GetInstance()->removeUser(user);
+					}
 					break;
 				}
 				continue;

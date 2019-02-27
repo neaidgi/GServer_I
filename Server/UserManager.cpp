@@ -105,6 +105,21 @@ User* UserManager::getUser(char* _id)
 	return target;
 }
 
+bool UserManager::isUser(User * _user)
+{
+	User* target = nullptr;
+
+	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
+	{
+		target = (*i);
+		if (target == _user)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void UserManager::startSearch()
 {
 	// 리스트 시작부 세팅

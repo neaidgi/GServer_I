@@ -72,8 +72,11 @@ bool GameManager::recvProcess(User* _user)
 
 	if (_user->getState()->Read(_user) == false)
 	{
-		_user->stop();
-		UserManager::GetInstance()->removeUser(_user);
+		if (UserManager::GetInstance()->isUser(_user))
+		{
+			_user->stop();
+			UserManager::GetInstance()->removeUser(_user);
+		}
 		return false;
 	}
 	return true;
@@ -88,8 +91,11 @@ bool GameManager::sendProcess(User* _user)
 
 	if (_user->getState()->Write(_user) == false)
 	{
-		_user->stop();
-		UserManager::GetInstance()->removeUser(_user);
+		if (UserManager::GetInstance()->isUser(_user))
+		{
+			_user->stop();
+			UserManager::GetInstance()->removeUser(_user);
+		}
 		return false;
 	}
 
