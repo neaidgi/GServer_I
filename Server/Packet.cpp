@@ -8,8 +8,6 @@ Packet::Packet()
 	sentSize = 0;
 	recvSize = 0;
 	recvedSize = 0;
-
-
 }
 
 // TCPClient 생성자에 인수 넣어줌
@@ -127,11 +125,25 @@ bool Packet::IOCP_SendMsg()
 	retval = WSASend(sock, &sendwsabuf, 1, &sendbytes, 0, &sendEx.overlapped, NULL);
 	if (retval == SOCKET_ERROR)
 	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
+		int errorcode = WSAGetLastError();
+		LPVOID lpMsgBuf;
+
+		if (errorcode != WSA_IO_PENDING)
 		{
 			LogManager::GetInstance()->SetTime();
 			LogManager::GetInstance()->LogWrite("Packet::IOCP_SendMsg : ERROR : WSASend() result = SOCKET_ERROR");
-			ErrorManager::GetInstance()->err_display("Packet second_WSAsend()");
+			char err[BUFSIZE];
+			memset(err, 0, sizeof(err));
+			FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_FROM_SYSTEM,
+				NULL, errorcode,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				(LPTSTR)&lpMsgBuf, 0, NULL);
+			sprintf(err, "Packet second_WSAsend() ERROR CODE : %d MSG : %s", errorcode, lpMsgBuf);
+			printf("%s", err);
+			//ErrorManager::GetInstance()->err_display(err);
+
 			return false;
 		}
 	}
@@ -183,7 +195,7 @@ bool Packet::IOCP_OneSided_SendMsg()
 		{
 			LogManager::GetInstance()->SetTime();
 			LogManager::GetInstance()->LogWrite("Packet::IOCP_SendMsg : ERROR : WSASend() result = SOCKET_ERROR");
-			ErrorManager::GetInstance()->err_display("Packet second_WSAsend()");
+			ErrorManager::GetInstance()->err_display("Packet OneSided_WSAsend()");
 			return false;
 		}
 	}
