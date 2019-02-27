@@ -177,6 +177,9 @@
     <ClCompile Include="CharacterVerification.cpp">
       <Filter>소스 파일\InGame</Filter>
     </ClCompile>
+    <ClCompile Include="CriticalSectionManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Packet.h">
@@ -280,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="CharacterVerification.h">
       <Filter>헤더 파일\Ingame</Filter>
+    </ClInclude>
+    <ClInclude Include="CriticalSectionManager.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

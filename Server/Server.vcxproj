@@ -140,6 +140,7 @@
     <ClCompile Include="CharacterState.cpp" />
     <ClCompile Include="CharacterVerification.cpp" />
     <ClCompile Include="CloseState.cpp" />
+    <ClCompile Include="CriticalSectionManager.cpp" />
     <ClCompile Include="DBManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -175,6 +176,7 @@
     <ClInclude Include="CharacterVerification.h" />
     <ClInclude Include="CharacterState.h" />
     <ClInclude Include="CloseState.h" />
+    <ClInclude Include="CriticalSectionManager.h" />
     <ClInclude Include="DBManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
