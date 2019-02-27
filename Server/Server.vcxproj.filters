@@ -82,6 +82,12 @@
     <Filter Include="헤더 파일\NetworkData">
       <UniqueIdentifier>{dbc61827-9a28-40b0-beca-394b3a756dc2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\CriticalSection">
+      <UniqueIdentifier>{1bf93469-cc08-4426-b1a3-410e8322d3e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\CriticalSection">
+      <UniqueIdentifier>{ca19d3bd-012b-4252-af69-5c1bf7a8bfb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -178,7 +184,7 @@
       <Filter>소스 파일\InGame</Filter>
     </ClCompile>
     <ClCompile Include="CriticalSectionManager.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\CriticalSection</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -285,7 +291,7 @@
       <Filter>헤더 파일\Ingame</Filter>
     </ClInclude>
     <ClInclude Include="CriticalSectionManager.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\CriticalSection</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
