@@ -141,7 +141,7 @@ void IocpModel::IocpProcess()
 			if (user->IOCP_isSendSuccess(cbTransferred) == false)
 			{
 				// send : false를 return하면 소켓 종료. 다보내면 
-				if (user->IOCP_SendMsg() == false)
+				if (user->IOCP_OneSided_SendMsg() == false)
 				{
 					if (UserManager::GetInstance()->isUser(user))
 					{
