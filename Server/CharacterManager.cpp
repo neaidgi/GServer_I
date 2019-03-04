@@ -310,8 +310,6 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 	_user->pack(sendprotocol, data, size);
-
-	_user->SetEnterGame();
 }
 
 void CharacterManager::CreateInstance()

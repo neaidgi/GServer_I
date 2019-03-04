@@ -65,7 +65,11 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 
 	User* user_temp;
 	Character* character_temp;
+
+	CriticalSectionManager::GetInstance()->Enter();
+	
 	UserManager::GetInstance()->startSearch();
+
 	while (1)
 	{
 		// 유저 검색
@@ -117,6 +121,8 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 			break;
 		}
 	}
+
+	CriticalSectionManager::GetInstance()->Leave();
 
 	char msg[BUFSIZE];
 	memset(msg, 0, sizeof(msg));
@@ -378,15 +384,16 @@ void InGameManager::User_Pack_Rotation(User * _user, char * _data, int & _datasi
 	memset(_data, 0, BUFSIZE);
 	ptr = _data;
 
+	// 코드 사이즈
 	len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
 	memcpy(ptr, &len, sizeof(int));
 	ptr += sizeof(int);
 	datasize += sizeof(int);
-
+	// 코드
 	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), len);
 	ptr += len;
 	datasize += len;
-
+	// 회전값
 	memcpy(ptr, &curRot, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 	datasize += sizeof(Vector3);
@@ -444,18 +451,21 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 // 다른유저에게 전송해줌
 void InGameManager::User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char * _data, int & _datasize)
 {
-	char* ptr = _data;
-
 	User* user;
+
+	CriticalSectionManager::GetInstance()->Enter();
+
 	UserManager::GetInstance()->startSearch();
 	while (UserManager::GetInstance()->searchData(user))
 	{
 		if (user->isIngame() && user->getSocket() != _user->getSocket())
 		{
-			user->pack(_p, ptr, _datasize);
+			user->ospack(_p, _data, _datasize);
 			user->IOCP_OneSided_SendMsg();
 		}
 	}
+
+	CriticalSectionManager::GetInstance()->Leave();
 }
 
 RESULT InGameManager::InGame_Init_Packet(User * _user)

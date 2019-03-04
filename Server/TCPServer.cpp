@@ -83,7 +83,7 @@ SOCKET TCPServer::acceptClient()
 	LogManager::GetInstance()->SetTime();
 	LogManager::GetInstance()->LogWrite(temp);
 
-	printf("[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
+	printf("[TCP 서버] 클라이언트 접속: Socket=%d IP 주소=%s, 포트 번호=%d\n", socket,
 		inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
 	return socket;

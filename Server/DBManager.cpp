@@ -700,7 +700,7 @@ bool DBManager::Character_Req_CharacterPos(char* _code, Vector3& _pos)
 
 		if (sql_row == nullptr)
 		{
-			fprintf(stderr, "Mysql 해당캐릭터 없음 : %s \n", mysql_error(mysql));
+			fprintf(stderr, "Mysql 해당캐릭터 위치 없음 : %s \n", mysql_error(mysql));
 			return false;
 		}
 
