@@ -201,9 +201,7 @@ RESULT LoginManager::loginProcess(User * _user)
 		result = RT_JOIN;
 		break;
 	case CLIENT_REQ_EXIT_JOIN:
-		
 		_user->Quepack(SERVER_EXIT_JOIN, 0, 0);
-
 		result = RT_EXIT_JOIN;
 	}
 	return result;
