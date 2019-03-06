@@ -65,7 +65,11 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 
 	User* user_temp;
 	Character* character_temp;
+
+	CriticalSectionManager::GetInstance()->Enter();
+	
 	UserManager::GetInstance()->startSearch();
+
 	while (1)
 	{
 		// 유저 검색
@@ -127,7 +131,8 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 	size += sizeof(int);
 
 	sendprotocol = SERVER_INGAME_OTHERPLAYERLIST_RESULT;
-	_user->pack(sendprotocol, data, size);
+	_user->Quepack(sendprotocol, data, size);
+	CriticalSectionManager::GetInstance()->Leave();
 }
 
 // 접속한 유저 정보 패킹
@@ -220,7 +225,7 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	// 받은 데이터 복사
 	prePos = _user->GetCurCharacter()->GetPosition();
 
-	// 위치 회전 시간 복사
+	// 위치 복사
 	memcpy(&curPos, ptr, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 
@@ -378,15 +383,16 @@ void InGameManager::User_Pack_Rotation(User * _user, char * _data, int & _datasi
 	memset(_data, 0, BUFSIZE);
 	ptr = _data;
 
+	// 코드 사이즈
 	len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
 	memcpy(ptr, &len, sizeof(int));
 	ptr += sizeof(int);
 	datasize += sizeof(int);
-
+	// 코드
 	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), len);
 	ptr += len;
 	datasize += len;
-
+	// 회전값
 	memcpy(ptr, &curRot, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 	datasize += sizeof(Vector3);
@@ -428,14 +434,14 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	ptr += sizeof(Vector3);
 
 	// 회전
-	memcpy(ptr, &curcharacter->GetRotation(), sizeof(Vector3));
-	datasize += sizeof(Vector3);
-	ptr += sizeof(Vector3);
+	//memcpy(ptr, &curcharacter->GetRotation(), sizeof(Vector3));
+	//datasize += sizeof(Vector3);
+	//ptr += sizeof(Vector3);
 
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "다른 유저전송 데이터 :: 코드 : [%s] 위치: [%f] [%f] [%f] 회전: [%f] [%f] [%f]", curcharacter->GetCharacter_Code(), curcharacter->GetPosition().x, curcharacter->GetPosition().y,
-		curcharacter->GetPosition().z, curcharacter->GetRotation().x, curcharacter->GetRotation().y, curcharacter->GetRotation().z);
+	sprintf(msg, "User_Pack_MoveInfoToOther :: 코드 : [%s] 위치: [%f] [%f] [%f]", curcharacter->GetCharacter_Code(), curcharacter->GetPosition().x, curcharacter->GetPosition().y,
+		curcharacter->GetPosition().z);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
@@ -444,18 +450,34 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 // 다른유저에게 전송해줌
 void InGameManager::User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char * _data, int & _datasize)
 {
-	char* ptr = _data;
-
 	User* user;
+
+	CriticalSectionManager::GetInstance()->Enter();
+
 	UserManager::GetInstance()->startSearch();
 	while (UserManager::GetInstance()->searchData(user))
 	{
 		if (user->isIngame() && user->getSocket() != _user->getSocket())
 		{
-			user->pack(_p, ptr, _datasize);
-			user->IOCP_OneSided_SendMsg();
+			user->Quepack(_p, _data, _datasize);
+			if (user->isSending() == false)
+			{
+				if (user->TakeOutSendPacket())
+				{
+					user->IOCP_SendMsg();
+				}
+			}
+
+			// 메세지
+			char msg[BUFSIZE];
+			memset(msg, 0, sizeof(msg));
+			sprintf(msg, "User_Send_MoveInfoToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(),user->getSocket(),user->getID(),
+				_p, _datasize, user->GetSendQueueSize());
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 	}
+
+	CriticalSectionManager::GetInstance()->Leave();
 }
 
 RESULT InGameManager::InGame_Init_Packet(User * _user)
@@ -485,7 +507,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		result = RT_INGAME_OTHERPLAYER_LIST;
 		break;
 	case CLIENT_INGAME_MOVE_START:
-		if (User_Pack_MoveStart(_user, buf, datasize, rdata, rdatasize))
+		/*if (User_Pack_MoveStart(_user, buf, datasize, rdata, rdatasize))
 		{
 
 		}
@@ -494,30 +516,30 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 
 		}
 		sendprotocol = SERVER_INGAME_MOVE_RESULT;
-		_user->pack(sendprotocol, buf, datasize);
+		_user->Quepack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
-		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_ORDER,rdata, rdatasize);
+		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_ORDER,rdata, rdatasize);*/
 		break;
 	case CLIENT_INGAME_MOVE_REPORT:
 		User_Pack_Move(_user, buf, datasize, rdata, rdatasize);
 		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
 		sendprotocol = SERVER_INGAME_MOVE_RESULT;
-		_user->pack(sendprotocol, buf, datasize);
+		_user->Quepack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
 		break;
 	case CLIENT_INGAME_MOVE_END:
-		if (User_Pack_Move(_user, buf, datasize, rdata, rdatasize))
-		{
+		//if (User_Pack_Move(_user, buf, datasize, rdata, rdatasize))
+		//{
 
-		}
-		else
-		{
+		//}
+		//else
+		//{
 
-		}
-		sendprotocol = SERVER_INGAME_MOVE_RESULT;
-		_user->pack(sendprotocol, buf, datasize);
-		result = RT_INGAME_MOVE;
-		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
+		//}
+		//sendprotocol = SERVER_INGAME_MOVE_RESULT;
+		//_user->Quepack(sendprotocol, buf, datasize);
+		//result = RT_INGAME_MOVE;
+		//User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
 		break;
 	case CLIENT_INGAME_MOVE_ROTATION:
 		User_Pack_Rotation(_user, buf, datasize);

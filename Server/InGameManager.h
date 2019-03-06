@@ -7,6 +7,7 @@
 #include "MsgManager.h"
 #include "UserManager.h"
 #include "CharacterVerification.h"
+#include "CriticalSectionManager.h"
 
 class InGameManager
 {

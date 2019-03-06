@@ -24,6 +24,11 @@ void IocpModel::IocpProcess()
 		
 		if (retval == 0 || cbTransferred == 0)
 		{
+			if (UserManager::GetInstance()->isUser(user) == false)
+			{
+				continue;
+			}
+
 			if (retval == 0)
 			{
 				DWORD temp1, temp2;
@@ -32,7 +37,7 @@ void IocpModel::IocpProcess()
 				
 				LogManager::GetInstance()->SetTime();
 				LogManager::GetInstance()->LogWrite("IocpModel::IocpProcess : ERROR : GetQueuedCompletionStatus() failed ");
-				
+			
 				if (UserManager::GetInstance()->isUser(user))
 				{
 					user->stop();
@@ -42,7 +47,7 @@ void IocpModel::IocpProcess()
 			continue;
 		}
 		
-		if (user == nullptr)
+		if (UserManager::GetInstance()->isUser(user) == false)
 		{
 			continue;
 		}
@@ -70,29 +75,26 @@ void IocpModel::IocpProcess()
 						user->stop();
 						UserManager::GetInstance()->removeUser(user);
 					}
-					break;
 				}
 				continue;
 			}
-
-			if (recvProcess(user))
+			else
 			{
-				// Send가 필요한지 확인
-				if (user->GetCallback())
+				if (recvProcess(user))
 				{
-					if (user->IOCP_SendMsg() == false)
+					// Send가 필요한지 확인
+					if (user->TakeOutSendPacket())
 					{
-						if (UserManager::GetInstance()->isUser(user))
+						if (user->IOCP_SendMsg() == false)
 						{
-							user->stop();
-							UserManager::GetInstance()->removeUser(user);
+							if (UserManager::GetInstance()->isUser(user))
+							{
+								user->stop();
+								UserManager::GetInstance()->removeUser(user);
+							}
 						}
-						break;
 					}
-				}
-				else
-				{
-					user->SetCallback(true);
+
 					if (user->IOCP_RecvMsg() == false)
 					{
 						if (UserManager::GetInstance()->isUser(user))
@@ -100,14 +102,11 @@ void IocpModel::IocpProcess()
 							user->stop();
 							UserManager::GetInstance()->removeUser(user);
 						}
-						break;
 					}
 				}
 			}
 			break;
 		case IOTYPE_SEND:
-
-			// 다 보냈는지 확인
 			if (user->IOCP_isSendSuccess(cbTransferred) == false)
 			{
 				// send : false를 return하면 소켓 종료. 다보내면 
@@ -118,39 +117,26 @@ void IocpModel::IocpProcess()
 						user->stop();
 						UserManager::GetInstance()->removeUser(user);
 					}
-					break;
 				}
 				continue;
 			}
-
-			if (sendProcess(user))
+			else
 			{
-				if (user->IOCP_RecvMsg() == false)
+				if (sendProcess(user))
 				{
-					if (UserManager::GetInstance()->isUser(user))
+					if (user->TakeOutSendPacket())
 					{
-						user->stop();
-						UserManager::GetInstance()->removeUser(user);
+						// send : false를 return하면 소켓 종료. 다보내면 
+						if (user->IOCP_SendMsg() == false)
+						{
+							if (UserManager::GetInstance()->isUser(user))
+							{
+								user->stop();
+								UserManager::GetInstance()->removeUser(user);
+							}
+						}
 					}
-					break;
 				}
-			}
-			break;
-		case IOTYPE_ONESIDED_SEND:
-			// 다 보냈는지 확인
-			if (user->IOCP_isSendSuccess(cbTransferred) == false)
-			{
-				// send : false를 return하면 소켓 종료. 다보내면 
-				if (user->IOCP_OneSided_SendMsg() == false)
-				{
-					if (UserManager::GetInstance()->isUser(user))
-					{
-						user->stop();
-						UserManager::GetInstance()->removeUser(user);
-					}
-					break;
-				}
-				continue;
 			}
 			break;
 		}

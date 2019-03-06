@@ -11,6 +11,7 @@
 #include "CharacterManager.h"
 #include "GameDataManager.h"
 #include "MsgManager.h"
+#include "CriticalSectionManager.h"
 
 class MainManager
 {

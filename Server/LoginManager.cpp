@@ -81,7 +81,7 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 	}
 	sprintf(msg, "%s : %s", id, check ? "중복" : "중복아님");
 	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
-	user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
+	user->Quepack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
 }
 
 void LoginManager::reqJoin(User* user, char* _buf)
@@ -109,7 +109,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	if (strcmp(id, user->getID()))
 	{
 		result = false;
-		user->pack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
+		user->Quepack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
 		return;
 	}
 
@@ -124,7 +124,8 @@ void LoginManager::reqJoin(User* user, char* _buf)
 		user->setPW(info->pw);
 	}
 
-	user->pack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
+	//userList[userCount++] = info;
+	user->Quepack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
 
 	sprintf(tempbuf, "%s [회원가입].", user->getID());
 	LogManager::GetInstance()->LogWrite(tempbuf);
@@ -164,8 +165,7 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	}
 
 	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
-	user->include_wset = true;
-	user->pack(SERVER_LOGIN_SUCCESS, &result, sizeof(bool));
+	user->Quepack(SERVER_LOGIN_SUCCESS, &result, sizeof(bool));
 	
 	return result;
 }
@@ -194,7 +194,7 @@ RESULT LoginManager::loginProcess(User * _user)
 		break;
 	case CLIENT_REQ_EXIT_JOIN:
 		
-		_user->pack(SERVER_EXIT_JOIN, 0, 0);
+		_user->Quepack(SERVER_EXIT_JOIN, 0, 0);
 
 		result = RT_EXIT_JOIN;
 	}
@@ -231,7 +231,7 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 		break;
 	case CLIENT_JOIN_MENU_CHOICE:
 		sendprotocol = SERVER_JOIN;
-		_user->pack(sendprotocol, buf, 0);
+		_user->Quepack(sendprotocol, buf, 0);
 		result = RT_JOINMENU;
 		break;
 	default:
