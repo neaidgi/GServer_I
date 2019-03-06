@@ -11,7 +11,7 @@
 // 문자열 데이터 [strlen(문자열)+1 4Byte][문자열]
 enum PROTOCOL {
 	EXIT = -1,
-	CLIENT_LOGOUT_MENU_CHOICE = 0,			// 로그아웃 메뉴 선택			[프로토콜][int]
+	CLIENT_JOIN_MENU_CHOICE = 0,			// 회원가입 메뉴 선택			[프로토콜][int]
 	CLIENT_LOGIN_MENU_CHOICE,				// 로그인 메뉴 선택				[프로토콜][int]
 	CLIENT_REQ_EXIT_JOIN,					// 회원가입 취소 선택			[프로토콜]
 	CLIENT_REQ_ID_OVERLAP_CHECK,			// 회원가입 ID중복체크 요청		[프로토콜][int][char *]

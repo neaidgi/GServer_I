@@ -3,24 +3,6 @@
 
 #include "User.h"
 
-const struct
-{
-	enum {
-		LOGIN = 1,
-		JOIN = 2,
-		EXIT
-	};
-} LogoutMenu = {};
-const struct
-{
-	enum {
-		TENDER = 1,
-		LEAVE,
-		LOGOUT,
-		EXIT
-	};
-} LoginMenu = {};
-
 struct UserInfo
 {
 	char id[IDSIZE];
@@ -53,12 +35,10 @@ public:
 	bool InitializeManager();
 	void EndManager();
 
-	// INIR상태에서 매뉴 선택(로그인,회원가입,나가기)
+	// INIR상태에서 매뉴 선택(로그인,회원가입 매뉴선택,나가기)
 	RESULT logoutMenuChoice(User* user);
-	// 
+	// 회원가입상태에 따른 선택(중복확인,회원가입)
 	RESULT loginProcess(User* user);
-	// 로그인상태에서 매뉴 선택()
-	RESULT loginMenuChoice(User* user);
 };
 
 #endif

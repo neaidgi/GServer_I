@@ -127,12 +127,6 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	//userList[userCount++] = info;
 	user->Quepack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
 
-	//if (result)
-	//{
-	//	// 캐릭터 슬롯에 아이디추가
-	//	resultslot = DBManager::GetInstance()->Login_JoinCharacterSlot(info->id);
-	//}
-
 	sprintf(tempbuf, "%s [회원가입].", user->getID());
 	LogManager::GetInstance()->LogWrite(tempbuf);
 	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
@@ -153,8 +147,6 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	memcpy(&len, _buf, sizeof(int));
 	_buf += sizeof(int);
 	memcpy(pw, _buf, len);
-
-	//const UserInfo* info = getUser(id);
 
 	bool result;
 
@@ -235,94 +227,14 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 		}
 		result = RT_LOGIN;
 		break;
-	case CLIENT_LOGOUT_MENU_CHOICE:
-		
-		memcpy(&choice, buf, sizeof(int));
-		
-		if (choice == 2)
-		{
-			sendprotocol = SERVER_JOIN;
-			_user->Quepack(sendprotocol, buf, 0);
-			result = RT_JOINMENU;
-		}
-		else
-		{
-			result = RT_LOGINMENU;
-		}
+	case CLIENT_JOIN_MENU_CHOICE:
+		sendprotocol = SERVER_JOIN;
+		_user->Quepack(sendprotocol, buf, 0);
+		result = RT_JOINMENU;
 		break;
 	default:
 		break;
 	}
 
-	return result;
-}
-
-RESULT LoginManager::loginMenuChoice(User* _user)
-{
-	PROTOCOL protocol;
-	char buf[BUFSIZE];
-
-	_user->unPack(&protocol, &buf);
-	int choice;
-	memcpy(&choice, buf, sizeof(int));
-
-	char tempbuf[IDSIZE + 10];	//문자열만들어줄것
-
-	RESULT result;
-	PROTOCOL sendprotocol;
-	switch (choice)
-	{
-	/*case LoginMenu.TENDER:
-		sendprotocol = SERVER_TENDER;
-		_user->pack(sendprotocol, buf, 0);
-		_user->include_wset = true;
-		result = RT_TENDER;
-		break;*/
-	case LoginMenu.LEAVE:
-		{
-			bool result;
-
-			char id[IDSIZE];
-
-			strcpy(id, _user->getID());
-			result = DBManager::GetInstance()->Login_Req_Leave(id);
-
-			_user->setID("");
-			_user->setPW("");
-		
-			if (result)
-			{
-				sprintf(tempbuf, "[회원탈퇴 성공]");
-			}
-			else
-			{
-				sprintf(tempbuf, "[회원탈퇴 실패]");
-			}
-
-			MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
-		}
-		sendprotocol = SERVER_LEAVE;
-		_user->setLogout();
-
-		_user->Quepack(sendprotocol, buf, 0);
-		result = RT_MEMBER_LEAVE;
-		break;
-	case LoginMenu.LOGOUT:
-		sprintf(tempbuf, "%s [로그아웃].", _user->getID());
-		MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
-		LogManager::GetInstance()->LogWrite(tempbuf);
-
-		sendprotocol = SERVER_LOGOUT;
-		_user->setLogout();
-
-		_user->Quepack(sendprotocol, buf, 0);
-		result = RT_LOGOUT;
-		break;
-	case LoginMenu.EXIT:
-		sprintf(tempbuf, "%s [종료].", _user->getID());
-		LogManager::GetInstance()->LogWrite((char*)_user->getID());
-		sendprotocol = EXIT;
-		result = RT_USER_DISCONNECT;
-	}
 	return result;
 }
