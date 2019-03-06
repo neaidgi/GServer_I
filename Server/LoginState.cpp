@@ -47,25 +47,6 @@ bool LoginState::Read(User* _user)
 			state = JOIN_EXIT_SEND;
 		}
 		break;
-	case LoginState::LOGIN_RECV:
-		result = loginmanager->loginMenuChoice(_user);
-		if (result == RT_TENDER)
-		{
-			state = TENDER_SEND;
-		}
-		else if (result == RT_MEMBER_LEAVE)
-		{
-			state = LEAVE_SEND;
-		}
-		else if (result == RT_LOGOUT)
-		{
-			state = LOGOUT_SEND;
-		}
-		else if (result == RT_USER_DISCONNECT)
-		{
-			return false;
-		}
-		break;
 	default:
 		break;
 	}
@@ -95,16 +76,6 @@ bool LoginState::Write(User* _user)
 		break;
 	case LoginState::LOGINFAIL_RESULT_SEND:
 		state = INIT_RECV;
-		break;
-	case LoginState::TENDER_SEND:
-		state = LOGIN_RECV;		// Àü ´Ü°è
-		//_user->SetState(_user->getTenderState());
-		break;
-	case LoginState::LEAVE_SEND:
-		state = INIT_RECV;
-		break;
-	case LoginState::LOGOUT_SEND:
-		state = INIT_RECV;	
 		break;
 	default:
 		break;
