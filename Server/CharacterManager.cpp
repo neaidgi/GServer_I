@@ -309,7 +309,7 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 	size += sizeof(Vector3);
 
 	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
-	_user->pack(sendprotocol, data, size);
+	_user->Quepack(sendprotocol, data, size);
 }
 
 void CharacterManager::CreateInstance()
@@ -435,7 +435,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 			// 프로토콜 데이터 패킹
 			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
 			memcpy(buf, &is_slot, sizeof(bool));
-			_user->pack(sendprotocol, buf, sizeof(bool));
+			_user->Quepack(sendprotocol, buf, sizeof(bool));
 			result = RT_CHARACTER_SLOTRESULT;
 		}
 		else
@@ -484,7 +484,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 				size += sizeof(int);
 			}
 
-			_user->pack(sendprotocol, buf, size);
+			_user->Quepack(sendprotocol, buf, size);
 			result = RT_CHARACTER_SLOTRESULT;
 
 			//뒤처리 받아온 슬롯데이터 삭제
@@ -494,7 +494,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		break;
 	case CLIENT_NEW_CHARACTER_MENU:
 		sendprotocol = SERVER_CHARACTER_MENU;
-		_user->pack(sendprotocol, buf, 0);
+		_user->Quepack(sendprotocol, buf, 0);
 		result = RT_CHARACTER_ENTERCREATE;
 		break;
 	case CLIENT_CHARACTER_ENTER:
@@ -513,7 +513,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 			MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 실패");
 			check = false;
 		}
-		_user->pack(SERVER_CHARACTER_DELETE_RESULT, &check, sizeof(bool));
+		_user->Quepack(SERVER_CHARACTER_DELETE_RESULT, &check, sizeof(bool));
 
 		result = RT_CHARACTER_DELETE;
 		break;
@@ -546,7 +546,7 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 			// 중복 있음
 			check = false;
 			result = RT_CHARACTER_NICKOVERLAP_TRUE;
-			_user->pack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
+			_user->Quepack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
 			//_user->include_wset = true;
 		}
 		else
@@ -563,12 +563,12 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 				check = false;
 				result = RT_CHARACTER_NICKOVERLAP_TRUE;
 			}
-			_user->pack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
+			_user->Quepack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
 			//_user->include_wset = true;
 		}
 		break;
 	case CLIENT_CHARACTER_EXIT:				// 캐릭터 생성 취소
-		_user->pack(SERVER_CHARACTER_EXIT_RESULT, buf, 0);
+		_user->Quepack(SERVER_CHARACTER_EXIT_RESULT, buf, 0);
 		result = RT_CHARACTER_EXIT;
 		break;
 	default:

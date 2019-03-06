@@ -81,7 +81,7 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 	}
 	sprintf(msg, "%s : %s", id, check ? "중복" : "중복아님");
 	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
-	user->pack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
+	user->Quepack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
 }
 
 void LoginManager::reqJoin(User* user, char* _buf)
@@ -109,7 +109,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	if (strcmp(id, user->getID()))
 	{
 		result = false;
-		user->pack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
+		user->Quepack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
 		return;
 	}
 
@@ -125,7 +125,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	}
 
 	//userList[userCount++] = info;
-	user->pack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
+	user->Quepack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
 
 	//if (result)
 	//{
@@ -173,8 +173,7 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	}
 
 	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
-	user->include_wset = true;
-	user->pack(SERVER_LOGIN_SUCCESS, &result, sizeof(bool));
+	user->Quepack(SERVER_LOGIN_SUCCESS, &result, sizeof(bool));
 	
 	return result;
 }
@@ -203,7 +202,7 @@ RESULT LoginManager::loginProcess(User * _user)
 		break;
 	case CLIENT_REQ_EXIT_JOIN:
 		
-		_user->pack(SERVER_EXIT_JOIN, 0, 0);
+		_user->Quepack(SERVER_EXIT_JOIN, 0, 0);
 
 		result = RT_EXIT_JOIN;
 	}
@@ -245,8 +244,7 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 		if (choice == 2)
 		{
 			sendprotocol = SERVER_JOIN;
-			_user->pack(sendprotocol, buf, 0);
-			_user->include_wset = true;
+			_user->Quepack(sendprotocol, buf, 0);
 			result = RT_JOINMENU;
 		}
 		else
@@ -308,8 +306,7 @@ RESULT LoginManager::loginMenuChoice(User* _user)
 		sendprotocol = SERVER_LEAVE;
 		_user->setLogout();
 
-		_user->pack(sendprotocol, buf, 0);
-		_user->include_wset = true;
+		_user->Quepack(sendprotocol, buf, 0);
 		result = RT_MEMBER_LEAVE;
 		break;
 	case LoginMenu.LOGOUT:
@@ -320,8 +317,7 @@ RESULT LoginManager::loginMenuChoice(User* _user)
 		sendprotocol = SERVER_LOGOUT;
 		_user->setLogout();
 
-		_user->pack(sendprotocol, buf, 0);
-		_user->include_wset = true;
+		_user->Quepack(sendprotocol, buf, 0);
 		result = RT_LOGOUT;
 		break;
 	case LoginMenu.EXIT:

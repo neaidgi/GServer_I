@@ -1,5 +1,6 @@
 #include "Packet.h"
-
+#include "MsgManager.h"
+#include "CriticalSectionManager.h"
 
 // 생성자
 Packet::Packet()
@@ -8,6 +9,7 @@ Packet::Packet()
 	sentSize = 0;
 	recvSize = 0;
 	recvedSize = 0;
+	sending = false;
 }
 
 // TCPClient 생성자에 인수 넣어줌
@@ -17,6 +19,7 @@ Packet::Packet(SOCKET _socket, SOCKADDR_IN _addr): TCPClient(_socket, _addr)
 	sentSize = 0;
 	recvSize = 0;
 	recvedSize = 0;
+	sending = false;
 
 	ZeroMemory(&sendEx.overlapped, sizeof(sendEx.overlapped));
 	ZeroMemory(&recvEx.overlapped, sizeof(recvEx.overlapped));
@@ -110,7 +113,6 @@ bool Packet::recvMsg()
 }
 
 
-
 bool Packet::IOCP_SendMsg()
 {
 	int retval;
@@ -178,33 +180,52 @@ bool Packet::IOCP_RecvMsg()
 	return true;
 }
 
-bool Packet::IOCP_OneSided_SendMsg()
+
+void Packet::ClearSendQueue()
 {
-	int retval;
-	DWORD sendbytes;
-	DWORD flags;
-
-	ZeroMemory(&os_sendEx.overlapped, sizeof(os_sendEx.overlapped));
-
-	sendwsabuf.buf = sendBuf + sentSize;
-	sendwsabuf.len = sendSize - sentSize;
-	retval = WSASend(sock, &sendwsabuf, 1, &sendbytes, 0, &os_sendEx.overlapped, NULL);
-	if (retval == SOCKET_ERROR)
+	CriticalSectionManager::GetInstance()->Enter();
+	while (sendQueue.empty() == false)
 	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
-		{
-			LogManager::GetInstance()->SetTime();
-			LogManager::GetInstance()->LogWrite("Packet::IOCP_SendMsg : ERROR : WSASend() result = SOCKET_ERROR");
-			ErrorManager::GetInstance()->err_display("Packet OneSided_WSAsend()");
-			return false;
-		}
+		SendPacket* temp = sendQueue.front();
+		delete temp;
+		sendQueue.pop();
 	}
-	return true;
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+// send 큐에서 패킷 꺼내오기
+bool Packet::TakeOutSendPacket()
+{
+	CriticalSectionManager::GetInstance()->Enter();
+	char msg[BUFSIZE];
+	sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	if (isSendQueue() && isSending() == false)
+	{
+		SendPacket* sendpacket = sendQueue.front();
+		memcpy(sendBuf, sendpacket->sendBuf, sendpacket->sendSize);
+		sendSize = sendpacket->sendSize;
+
+		delete sendpacket;
+		sendQueue.pop();
+		sending = true;
+		CriticalSectionManager::GetInstance()->Leave();
+		char msg[BUFSIZE];
+		sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		return true;
+	}
+	else
+	{
+		CriticalSectionManager::GetInstance()->Leave();
+		return false;
+	}
 }
 
 // Data 패킹
 void Packet::pack(PROTOCOL p, void * data, int size)
 {
+	CriticalSectionManager::GetInstance()->Enter();
 	memset(sendBuf, 0, sizeof(sendBuf));
 
 	char* ptr = sendBuf;
@@ -223,6 +244,37 @@ void Packet::pack(PROTOCOL p, void * data, int size)
 
 	// 암호화
 	EncryptManager::GetInstance()->encoding(sendBuf + sizeof(PROTOCOL), sendSize);
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+
+void Packet::Quepack(PROTOCOL p, void * data, int size)
+{
+	CriticalSectionManager::GetInstance()->Enter();
+
+	SendPacket* temp = new SendPacket();
+
+	char* ptr = temp->sendBuf;
+
+	temp->sendSize = sizeof(PROTOCOL) + size;
+
+	memcpy(ptr, &temp->sendSize, sizeof(int));
+	ptr += sizeof(int);
+
+	memcpy(ptr, &p, sizeof(PROTOCOL));
+	ptr += sizeof(PROTOCOL);
+
+	memcpy(ptr, data, size);
+
+	temp->sendSize += sizeof(size);		// 보낼 사이즈
+	
+	// 암호화
+	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(PROTOCOL), temp->sendSize);
+	// 큐에 넣기
+
+	sendQueue.push(temp);
+
+	CriticalSectionManager::GetInstance()->Leave();
 }
 
 void Packet::bitpack(PROTOCOL p, void * data, int size)
@@ -250,6 +302,8 @@ void Packet::bitpack(PROTOCOL p, void * data, int size)
 // Data 언패킹
 void Packet::unPack(PROTOCOL * p, void * data)
 {
+	CriticalSectionManager::GetInstance()->Enter();
+
 	char* ptr = recvBuf;
 	PROTOCOL protocol;
 
@@ -261,22 +315,51 @@ void Packet::unPack(PROTOCOL * p, void * data)
 	memcpy(data, ptr, recvSize - sizeof(PROTOCOL));
 	*p = protocol;
 
-	recvSize = 0;						// 초기화
-	recvedSize = 0;						// 초기화
+	IOCP_InitializeBuffer();
+
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+bool Packet::isSendQueue()
+{
+	CriticalSectionManager::GetInstance()->Enter();
+	if (sendQueue.empty() == false)
+	{
+		CriticalSectionManager::GetInstance()->Leave();
+		return true;
+	}
+	CriticalSectionManager::GetInstance()->Leave();
+	return false;
+}
+
+bool Packet::isSendQueueSending()
+{
+	CriticalSectionManager::GetInstance()->Enter();
+	if (sendQueue.empty() == false)
+	{
+		CriticalSectionManager::GetInstance()->Leave();
+		return true;
+
+	}
+	CriticalSectionManager::GetInstance()->Leave();
+	return false;
 }
 
 // sendSize만큼 보냈는지
 bool Packet::isSendSuccess()
 {
+	//CriticalSectionManager::GetInstance()->Enter();
 	if (sendSize == sentSize)
 		return true;
 	else
 		return false;
+	//CriticalSectionManager::GetInstance()->Leave();
 }
 
 // recvSize만큼 받았는지
 bool Packet::isRecvSuccess()
 {
+	//CriticalSectionManager::GetInstance()->Enter();
 	if (recvSize == 0)
 	{
 		if (recvedSize == 0)
@@ -291,18 +374,22 @@ bool Packet::isRecvSuccess()
 		else
 			return false;
 	}
+	//CriticalSectionManager::GetInstance()->Leave();
 }
 
 bool Packet::IOCP_isSendSuccess(int _sentbyte)
 {
+	CriticalSectionManager::GetInstance()->Enter();
 	sentSize += _sentbyte;
 	if (sentSize == sendSize)
 	{
 		sentSize = 0;
 		sendSize = 0;
-
+		sending = false;
+		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 	}
+	CriticalSectionManager::GetInstance()->Leave();
 	return false;
 }
 
@@ -362,4 +449,12 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 		return false;
 	}
 	
+}
+
+void Packet::IOCP_InitializeBuffer()
+{
+	CriticalSectionManager::GetInstance()->Enter();
+	memcpy(recvBuf, recvBuf + recvSize, recvedSize);
+	recvSize = 0;
+	CriticalSectionManager::GetInstance()->Leave();
 }
