@@ -5,7 +5,6 @@
 #include "EnryptManager.h"
 #include "ErrorManager.h"
 #include "LogManager.h"
-#include <queue>
 
 struct SendPacket
 {

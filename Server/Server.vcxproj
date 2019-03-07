@@ -170,6 +170,7 @@
     <ClCompile Include="UserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChannelSystem.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="CharacterData.h" />
     <ClInclude Include="CharacterManager.h" />

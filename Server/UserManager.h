@@ -2,7 +2,6 @@
 #define USER_MANAGER_H
 
 #include "User.h"
-#include <list>
 
 class UserManager
 {

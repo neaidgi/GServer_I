@@ -293,5 +293,8 @@
     <ClInclude Include="CriticalSectionManager.h">
       <Filter>헤더 파일\CriticalSection</Filter>
     </ClInclude>
+    <ClInclude Include="ChannelSystem.h">
+      <Filter>헤더 파일\Ingame</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

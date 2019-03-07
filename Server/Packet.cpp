@@ -247,7 +247,7 @@ void Packet::pack(PROTOCOL p, void * data, int size)
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
-
+// Data 패킹 Send 큐사용
 void Packet::Quepack(PROTOCOL p, void * data, int size)
 {
 	CriticalSectionManager::GetInstance()->Enter();
