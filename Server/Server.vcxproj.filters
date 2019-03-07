@@ -189,6 +189,9 @@
     <ClCompile Include="PartySystem.cpp">
       <Filter>소스 파일\InGame</Filter>
     </ClCompile>
+    <ClCompile Include="ChannelSystem.cpp">
+      <Filter>소스 파일\InGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Packet.h">

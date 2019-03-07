@@ -8,6 +8,7 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 	ZeroMemory(id, IDSIZE);
 	ZeroMemory(pw, IDSIZE);
 	money = 100000;
+	channelnum = -1;
 
 	state = nullptr;
 	memset(characterslot, 0, sizeof(characterslot));

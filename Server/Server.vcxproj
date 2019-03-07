@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChannelSystem.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="CharacterData.cpp" />
     <ClCompile Include="CharacterManager.cpp" />

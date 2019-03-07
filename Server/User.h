@@ -39,6 +39,7 @@ private:
 	char id[IDSIZE];
 	char pw[IDSIZE];
 	int money;
+	int channelnum;
 	bool login;
 	bool ingame;
 	UserState* state;
@@ -63,6 +64,8 @@ public:
 	Character* GetCurCharacter() { return current_character; }
 	bool SetSlot(SlotData* _slotdata);
 	//const SlotData* GetSlot(int _index) { return characterslot[_index - 1]; }		// 슬롯데이터 접근지정자
+	const int GetChannelNum() { return channelnum; }
+	void SetChannelNum(int _channelnum) { channelnum = _channelnum; }
 	const int GetSlotCount() { return slotcount; }
 	void SetSlotCount(int _count) { slotcount = _count; }
 	void ResetSlot() { for (int i = 0; i < slotcount; i++) delete characterslot[i]; memset(characterslot, 0, sizeof(characterslot)); }
