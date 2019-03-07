@@ -47,8 +47,6 @@ void UserManager::EndManager()
 
 }
 
-
-
 User* UserManager::addUser(SOCKET _sock)
 {
 	User* newUser = nullptr;
