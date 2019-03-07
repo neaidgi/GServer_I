@@ -5,6 +5,8 @@
 #include <WinSock2.h>
 #include <stdio.h>
 #include <math.h>
+#include <queue>
+#include <list>
 #include "Vector3.h"
 
 // 패킷 : [전체크기 4Byte][프로토콜 4Byte][데이터]
