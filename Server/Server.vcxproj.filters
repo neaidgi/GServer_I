@@ -186,6 +186,9 @@
     <ClCompile Include="CriticalSectionManager.cpp">
       <Filter>소스 파일\CriticalSection</Filter>
     </ClCompile>
+    <ClCompile Include="PartySystem.cpp">
+      <Filter>소스 파일\InGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Packet.h">
@@ -292,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="CriticalSectionManager.h">
       <Filter>헤더 파일\CriticalSection</Filter>
+    </ClInclude>
+    <ClInclude Include="PartySystem.h">
+      <Filter>헤더 파일\Ingame</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

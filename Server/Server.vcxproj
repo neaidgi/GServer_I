@@ -161,6 +161,7 @@
     <ClCompile Include="MsgManager.cpp" />
     <ClCompile Include="NetworkDataManager.cpp" />
     <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="PartySystem.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="SpawnData.cpp" />
     <ClCompile Include="TCPClient.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="MsgManager.h" />
     <ClInclude Include="NetworkDataManager.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="PartySystem.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="SpawnData.h" />
     <ClInclude Include="TCPClient.h" />
