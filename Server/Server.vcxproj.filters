@@ -88,6 +88,12 @@
     <Filter Include="소스 파일\CriticalSection">
       <UniqueIdentifier>{ca19d3bd-012b-4252-af69-5c1bf7a8bfb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\UUID">
+      <UniqueIdentifier>{c873a9fc-11d9-4a04-bc13-4d8caa0ab68a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\UUID">
+      <UniqueIdentifier>{1bae8cc9-9520-428f-a222-da46eac13179}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -191,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="ChannelSystem.cpp">
       <Filter>소스 파일\InGame</Filter>
+    </ClCompile>
+    <ClCompile Include="UUIDManager.cpp">
+      <Filter>소스 파일\UUID</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="PartySystem.h">
       <Filter>헤더 파일\Ingame</Filter>
+    </ClInclude>
+    <ClInclude Include="UUIDManager.h">
+      <Filter>헤더 파일\UUID</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #include "IocpModel.h"
 #include "GameManager.h"
 #include "InGameManager.h"
+#include "UUIDManager.h"
 
 MainManager* MainManager::Instance = nullptr;
 
@@ -34,6 +35,7 @@ void MainManager::CreateInstance()
 		GameDataManager::CreateInstance();
 		EncryptManager::CreateInstance(ENCRYPT_KEY);
 		InGameManager::CreateInstance();
+		UUIDManager::CreateInstance();
 	}
 }
 MainManager* MainManager::GetInstance()
@@ -47,6 +49,7 @@ void MainManager::DestroyInstance()
 		delete Instance;
 		Instance = nullptr;
 
+		UUIDManager::DestroyInstance();
 		InGameManager::DestroyInstance();
 		GameDataManager::DestroyInstance();
 		UserManager::DestroyInstance();
@@ -152,6 +155,8 @@ bool MainManager::MangerInitialize()
 
 	CriticalSectionManager::GetInstance()->InitializeManager();
 
+	UUIDManager::GetInstance()->InitializeManager();
+
 	MsgManager::GetInstance()->DisplayMsg("메인","데이터베이스 초기화중");
 	// DB 연동
 	if (DBManager::GetInstance()->InitializeDB() == false)
@@ -208,6 +213,7 @@ void MainManager::EndManager()
 	DBManager::GetInstance()->EndManager();
 	CriticalSectionManager::GetInstance()->EndManager();
 	MsgManager::GetInstance()->EndManager();
+	UUIDManager::GetInstance()->EndManager();
 
 	// 윈속 종료
 	WSACleanup();	// 소켓 DLL 메모리 해제
