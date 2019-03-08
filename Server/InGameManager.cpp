@@ -4,7 +4,8 @@ InGameManager* InGameManager::Instance = nullptr;
 
 InGameManager::InGameManager()
 {
-	verification = new CharacterVerification();
+	verification = nullptr;
+	channelsystem = nullptr;
 }
 
 InGameManager::~InGameManager()
@@ -32,18 +33,21 @@ void InGameManager::DestroyInstance()
 	}
 }
 
-
 bool InGameManager::MangerInitialize()
 {
-	//verification->Initalize();
+	// 인증, 채널시스템 초기화
+	verification = new CharacterVerification();
+	channelsystem = new ChannelSystem();
+
+	channelsystem->InitializeChannel();
 	return true;
 }
 
 // 서버 종료
 void InGameManager::EndManager()
 {
+	delete channelsystem;
 }
-
 // 접속한 유저리스트 보냄
 void InGameManager::User_Pack_OtherUserPosData(User * _user)
 {
@@ -445,6 +449,38 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
+}
+// 채널 들어가기
+bool InGameManager::User_Enter_Channel(User * _user)
+{
+	if (channelsystem->ChannelEnter(_user))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+// 채널 나가기
+void InGameManager::User_Leave_Channel(User * _user)
+{
+	channelsystem->ChannelLeave(_user);
+}
+// 던전 채널 나가기
+void InGameManager::User_LeaveInDun_Channel(User * _user)
+{
+	//channelsystem->DungeonLeave()
+	
+	// 마을 채널 들어가기
+	
+}
+void InGameManager::User_EnterInDun_Channel(User * _user)
+{
+	// 파티 검색
+
+	// 파티 채널추가
+
 }
 
 // 다른유저에게 전송해줌

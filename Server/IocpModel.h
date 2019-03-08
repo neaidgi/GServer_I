@@ -4,6 +4,7 @@
 #include "UserManager.h"
 #include "ThreadManager.h"
 #include "LogManager.h"
+#include "InGameManager.h"
 
 //using namespace std;
 

@@ -139,3 +139,40 @@ void ChannelSystem::InitializeChannel()
 {
 	channel_list = new ChannelList();
 }
+// 채널 입장 (빈곳 자동 탐색)
+bool ChannelSystem::ChannelEnter(User* _user)
+{
+	if (channel_list->ChannelEnter(_user))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+// 마을 채널 나가기
+void ChannelSystem::ChannelLeave(User * _user)
+{
+	channel_list->ChannelLeave(_user);
+}
+void ChannelSystem::DungeonEnter(PartyRoom* _partyroom)
+{
+	channel_list->DungeonEnter(_partyroom);
+}
+// 던전 채널 나가기
+bool ChannelSystem::DungeonLeave(int _partyroomnum)
+{
+	channel_list->StartSearchInDunUser();
+	PartyRoom* party = nullptr;
+	while (channel_list->SearchInDunUser(party))
+	{
+		if (party->partyroom_num == _partyroomnum)
+		{
+			channel_list->DungeonLeave(party);
+			return true;
+		}
+	}
+
+	return false;
+}

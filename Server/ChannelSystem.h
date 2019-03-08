@@ -42,6 +42,10 @@ public:
 	}
 
 	void InitializeChannel();
+	bool ChannelEnter(User* _user);
+	void ChannelLeave(User* _user);
+	void DungeonEnter(PartyRoom* _partyroom);
+	bool DungeonLeave(int _partyroomnum);
 };
 #endif
 

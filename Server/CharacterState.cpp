@@ -26,6 +26,10 @@ bool CharacterState::Read(User * _user)
 		{
 			state = CHARACTER_DELETE_SEND;
 		}
+		else if (result == RT_CHARACTER_ENTERGAMEFAIL)
+		{
+			state = CHARACTER_ENTERFAIL_SEND;
+		}
 		break;
 	case CharacterState::CHARACTER_REQ_RECV:
 		result = charactermanager->Character_Management_Process(_user);
@@ -61,6 +65,9 @@ bool CharacterState::Write(User * _user)
 	case CharacterState::CHARACTER_ENTER_SEND:
 		state = CHARACTER_MENU_RECV;
 		_user->SetState(_user->getInGameState());
+		break;
+	case CharacterState::CHARACTER_ENTERFAIL_SEND:
+		state = CHARACTER_MENU_RECV;
 		break;
 	case CharacterState::CHARACTER_REQ_OVLAP_NICK_SEND:
 		state = CHARACTER_REQ_RECV;

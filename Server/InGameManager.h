@@ -8,6 +8,7 @@
 #include "UserManager.h"
 #include "CharacterVerification.h"
 #include "CriticalSectionManager.h"
+#include "ChannelSystem.h"
 
 class InGameManager
 {
@@ -18,6 +19,7 @@ private:
 	~InGameManager();
 
 	CharacterVerification* verification;
+	ChannelSystem*	channelsystem;
 
 	// **Pack 함수**
 	void User_Pack_OtherUserPosData(User * _user);											 // 다른 유저 위치정보 요청
@@ -27,7 +29,7 @@ private:
 	void User_Pack_Rotation(User*_user, char* _data, int& _datasize);
 	// 이동 정보 다른유저에게 줄 정보
 	void User_Pack_MoveInfoToOther(User* _user, char* _data, int& _datasize);				  
-	
+
 	// **Send 함수**
 	void User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);		  // 다른 유저 이동정보 전송
 public:
@@ -39,6 +41,11 @@ public:
 	void EndManager();
 
 	RESULT	InGame_Init_Packet(User* _user);		// 인게임 요청 처리		 
+	bool User_Enter_Channel(User* _user);
+	void User_Leave_Channel(User* _user);
+
+	void User_LeaveInDun_Channel(User* _user);
+	void User_EnterInDun_Channel(User* _user);
 };
 
 #endif

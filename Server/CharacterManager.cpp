@@ -219,7 +219,7 @@ bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 	return check;
 }
 // 게임시작
-void CharacterManager::InitEnterGame(User * _user, char * _buf)
+bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 {
 	PROTOCOL sendprotocol;
 	char data[BUFSIZE];
@@ -234,82 +234,100 @@ void CharacterManager::InitEnterGame(User * _user, char * _buf)
 
 	memcpy(&index, _buf, sizeof(int));
 
-	SlotData* slotdata = new SlotData();
-	memset(slotdata, 0, sizeof(SlotData));
-	GetCharacter_Slot(_user, index, slotdata);
-	//DBManager::GetInstance()->Character_Req_CharacterSlot
-	//(_user->getID(), index, slotdata.origincode, slotdata.jobname, slotdata.nick, slotdata.level, slotdata.code);
+	enter = InGameManager::GetInstance()->User_Enter_Channel(_user);
 
-	if (DBManager::GetInstance()->Character_Req_CharacterPos(slotdata->code, pos))
+	if (enter)
 	{
-		memcpy(ptr, &enter, sizeof(bool));
-		ptr += sizeof(bool);
-		size = sizeof(bool);
+		SlotData* slotdata = new SlotData();
+		memset(slotdata, 0, sizeof(SlotData));
+		GetCharacter_Slot(_user, index, slotdata);
+		//DBManager::GetInstance()->Character_Req_CharacterSlot
+		//(_user->getID(), index, slotdata.origincode, slotdata.jobname, slotdata.nick, slotdata.level, slotdata.code);
+
+		if (DBManager::GetInstance()->Character_Req_CharacterPos(slotdata->code, pos))
+		{
+			memcpy(ptr, &enter, sizeof(bool));
+			ptr += sizeof(bool);
+			size = sizeof(bool);
+		}
+		else
+		{
+			// 캐릭터 위치 정보 없을 경우 스폰위치로
+			GameDataManager::GetInstance()->Character_SpawnPos_Vector(spawnpos);
+			pos = spawnpos[0];
+
+			memcpy(ptr, &enter, sizeof(bool));
+			ptr += sizeof(bool);
+			size = sizeof(bool);
+		}
+
+		Character* player = CharacterSelect(_user, slotdata, index);
+		player->SetCharacter_Code(slotdata->code);
+		_user->SetCurCharacter(player);
+		_user->GetCurCharacter()->SetPosition(pos);
+
+		// 플레이어에 회전값 추가
+		rot.x = 0;
+		rot.y = 0;
+		rot.z = 0;
+
+		_user->GetCurCharacter()->SetRotation(rot);
+
+		// 
+		// 현재 접속한 캐릭터 패킹
+		// 
+		char* ptr_temp = ptr;
+
+		// 캐릭터 코드 사이즈
+		len = strlen(player->GetCharacter_Code());
+		memcpy(ptr_temp, &len, sizeof(int));
+		ptr_temp += sizeof(int);
+		size += sizeof(int);
+
+		// 캐릭터 코드
+		memcpy(ptr_temp, player->GetCharacter_Code(), len);
+		ptr_temp += len;
+		size += len;
+
+		// 캐릭터 직업코드
+		int code = player->GetCharacter_JobCode();
+		memcpy(ptr_temp, &code, sizeof(int));
+		ptr_temp += sizeof(int);
+		size += sizeof(int);
+		// 닉네임 사이즈
+		len = strlen(player->GetCharacter_Name());
+		memcpy(ptr_temp, &len, sizeof(int));
+		ptr_temp += sizeof(int);
+		size += sizeof(int);
+		// 닉네임
+		memcpy(ptr_temp, player->GetCharacter_Name(), len);
+		ptr_temp += len;
+		size += len;
+		// 위치
+		memcpy(ptr_temp, &player->GetPosition(), sizeof(Vector3));
+		ptr_temp += sizeof(Vector3);
+		size += sizeof(Vector3);
+		// 회전
+		memcpy(ptr_temp, &player->GetRotation(), sizeof(Vector3));
+		ptr_temp += sizeof(Vector3);
+		size += sizeof(Vector3);
+
+		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
+		_user->Quepack(sendprotocol, data, size);
 	}
 	else
 	{
-		// 캐릭터 위치 정보 없을 경우 스폰위치로
-		GameDataManager::GetInstance()->Character_SpawnPos_Vector(spawnpos);
-		pos = spawnpos[0];
-
 		memcpy(ptr, &enter, sizeof(bool));
 		ptr += sizeof(bool);
 		size = sizeof(bool);
+
+		// 채널 꽉참
+
+		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
+		_user->Quepack(sendprotocol, data, size);
 	}
 
-	Character* player = CharacterSelect(_user, slotdata, index);
-	player->SetCharacter_Code(slotdata->code);
-	_user->SetCurCharacter(player);
-	_user->GetCurCharacter()->SetPosition(pos);
-
-	// 플레이어에 회전값 추가
-	rot.x = 0;
-	rot.y = 0;
-	rot.z = 0;
-
-	_user->GetCurCharacter()->SetRotation(rot);
-
-	// 
-	// 현재 접속한 캐릭터 패킹
-	// 
-	char* ptr_temp = ptr;
-
-	// 캐릭터 코드 사이즈
-	len = strlen(player->GetCharacter_Code());
-	memcpy(ptr_temp, &len, sizeof(int));
-	ptr_temp += sizeof(int);
-	size += sizeof(int);
-
-	// 캐릭터 코드
-	memcpy(ptr_temp, player->GetCharacter_Code(), len);
-	ptr_temp += len;
-	size += len;
-
-	// 캐릭터 직업코드
-	int code = player->GetCharacter_JobCode();
-	memcpy(ptr_temp, &code, sizeof(int));
-	ptr_temp += sizeof(int);
-	size += sizeof(int);
-	// 닉네임 사이즈
-	len = strlen(player->GetCharacter_Name());
-	memcpy(ptr_temp, &len, sizeof(int));
-	ptr_temp += sizeof(int);
-	size += sizeof(int);
-	// 닉네임
-	memcpy(ptr_temp, player->GetCharacter_Name(), len);
-	ptr_temp += len;
-	size += len;
-	// 위치
-	memcpy(ptr_temp, &player->GetPosition(), sizeof(Vector3));
-	ptr_temp += sizeof(Vector3);
-	size += sizeof(Vector3);
-	// 회전
-	memcpy(ptr_temp, &player->GetRotation(), sizeof(Vector3));
-	ptr_temp += sizeof(Vector3);
-	size += sizeof(Vector3);
-
-	sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
-	_user->Quepack(sendprotocol, data, size);
+	return enter;
 }
 
 void CharacterManager::CreateInstance()
@@ -498,9 +516,15 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 		result = RT_CHARACTER_ENTERCREATE;
 		break;
 	case CLIENT_CHARACTER_ENTER:
-		InitEnterGame(_user, buf);
-		_user->SetEnterGame();
-		result = RT_CHARACTER_ENTERGAME;
+		if (InitEnterGame(_user, buf))
+		{
+			_user->SetEnterGame();
+			result = RT_CHARACTER_ENTERGAME;
+		}
+		else
+		{
+			result = RT_CHARACTER_ENTERGAME;
+		}
 		break;
 	case CLIENT_CHARACTER_DELETE:
 		if (DeleateCharacter(_user, buf))
