@@ -211,7 +211,7 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 
 	PROTOCOL sendprotocol;
 
-	RESULT result;
+	RESULT result = RT_DEFAULT;
 
 	// 수정했음
 	switch (protocol)

@@ -170,6 +170,7 @@
     <ClCompile Include="ThreadManager.cpp" />
     <ClCompile Include="User.cpp" />
     <ClCompile Include="UserManager.cpp" />
+    <ClCompile Include="UUIDManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChannelSystem.h" />
@@ -210,6 +211,7 @@
     <ClInclude Include="User.h" />
     <ClInclude Include="UserManager.h" />
     <ClInclude Include="UserState.h" />
+    <ClInclude Include="UUIDManager.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

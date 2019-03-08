@@ -138,32 +138,11 @@ bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 	memcpy(&jobcode, _buf, sizeof(int));
 	_buf += sizeof(int);
 
-	// 고유코드 만들기 (유저아이디[20] + 캐릭터닉네임[6] + 직업코드[4])
-	itoa(jobcode, codebuf, 10);
-
-	memcpy(codedata, _user->getID(), strlen(_user->getID()));
-	codedata += strlen(_user->getID());
-
-	// 캐릭터 닉네임길이가 6보다 작으면 길이만큼해서 코드만들기
-	if (len >= NICKNAME_CODESIZE)
-	{
-		memcpy(codedata, nick, NICKNAME_CODESIZE);
-		codedata += NICKNAME_CODESIZE;
-	}
-	else
-	{
-		memcpy(codedata, nick, len - 1);
-		codedata += len - 1;
-	}
-
-	memcpy(codedata, codebuf, JOBCODE_SIZE);
-	codedata += JOBCODE_SIZE;
-
-	printf("nick %s \n", nick);
-	printf("uniqcode %s \n", uniqcode);
-
 	// 설계도
-	//const Character * origin = nullptr;
+	const Character * origin = nullptr;
+
+	// 케릭터 고유코드 생성
+	UUIDManager::GetInstance()->UUID_CharacterUniqCode(_user, codedata, jobcode, len, nick);
 
 	int count = 0;
 	DBManager::GetInstance()->Character_Req_CharacterSlotCount(_user->getID(), count);

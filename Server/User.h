@@ -42,6 +42,7 @@ private:
 	int channelnum;
 	bool login;
 	bool ingame;
+	int partyroomnum;
 	UserState* state;
 
 	LoginState* loginstate;
@@ -83,10 +84,13 @@ public:
 	void setLogout() { login = false; }
 	void SetEnterGame() { ingame = true; }
 	void SetLeaveGame() { ingame = false; }
+	void SetPartyIn(int _partyroomnum) { partyroomnum = _partyroomnum; }
+	int SetPartyOut() { return partyroomnum; }
 	void SetCallback(bool _callback) { is_callback = _callback; }
 	bool GetCallback() { return is_callback; }
 	bool isLogin() { return login ? true : false; }
 	bool isIngame() { return ingame ? true : false; }
+	bool isParty() { return partyroomnum == -1 ? true : false; }
 
 	void InitState();
 };

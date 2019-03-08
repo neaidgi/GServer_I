@@ -7,6 +7,7 @@
 #include "GameDataManager.h"
 #include "MsgManager.h"
 #include "InGameManager.h"
+#include "UUIDManager.h"
 
 class CharacterManager 
 {
