@@ -2,6 +2,7 @@
 #define USER_MANAGER_H
 
 #include "User.h"
+#include "CriticalSectionManager.h"
 
 class UserManager
 {

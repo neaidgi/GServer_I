@@ -67,10 +67,14 @@ User* UserManager::addUser(SOCKET _sock)
 
 void UserManager::removeUser(User* _user)
 {
+	CriticalSectionManager::GetInstance()->Enter();
+
 	// 유저 찾아서 삭제
 	ConnectUserlist.remove(_user);
 	delete _user;
 	_user = nullptr;
+
+	CriticalSectionManager::GetInstance()->Leave();
 }
 
 User* UserManager::getUser(SOCKET _sock)
