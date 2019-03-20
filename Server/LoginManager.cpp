@@ -179,7 +179,7 @@ RESULT LoginManager::loginProcess(User * _user)
 	bool check;
 	_user->unPack(&protocol, &buf);
 
-	RESULT result;
+	RESULT result = RT_DEFAULT;
 	switch (protocol)
 	{
 	case CLIENT_REQ_ID_OVERLAP_CHECK:

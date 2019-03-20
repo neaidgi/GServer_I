@@ -10,19 +10,22 @@
 
 #define SLOTMAXCOUNT 3 
 
-struct SlotData {
+struct SlotData 
+{
 	int jobcode;
 	char* jobname;
 	char* nick;
 	int level;
 	char* code;
 
-	SlotData() {
+	SlotData() 
+	{
 		code = nullptr;
 		jobname = nullptr;
 		nick = nullptr;
 	}
-	~SlotData() {
+	~SlotData() 
+	{
 		if (jobname != nullptr)
 			delete[] jobname;
 		if (nick != nullptr)
@@ -38,7 +41,6 @@ class User : public Packet
 private:
 	char id[IDSIZE];
 	char pw[IDSIZE];
-	int money;
 	int channelnum;
 	bool login;
 	bool ingame;
@@ -52,6 +54,7 @@ private:
 	SlotData* characterslot[SLOTMAXCOUNT];
 	Character* current_character;
 	int slotcount;
+	bool is_partyleader;
 	bool is_slotload;
 	bool is_callback;
 public:
@@ -64,12 +67,13 @@ public:
 	void SetCurCharacter(Character* _player);
 	Character* GetCurCharacter() { return current_character; }
 	bool SetSlot(SlotData* _slotdata);
-	//const SlotData* GetSlot(int _index) { return characterslot[_index - 1]; }		// 슬롯데이터 접근지정자
 	const int GetChannelNum() { return channelnum; }
 	void SetChannelNum(int _channelnum) { channelnum = _channelnum; }
 	const int GetSlotCount() { return slotcount; }
 	void SetSlotCount(int _count) { slotcount = _count; }
 	void ResetSlot() { for (int i = 0; i < slotcount; i++) delete characterslot[i]; memset(characterslot, 0, sizeof(characterslot)); }
+	void ResetCurCharacter() { delete current_character; current_character = nullptr; }
+	void ResetUserInfo();
 	bool DeleteCharacter(int _index);
 	bool isSlotLoaded() { return is_slotload; }
 	void SlotLoadComplete() { is_slotload = true; }
@@ -78,14 +82,12 @@ public:
 	const char* getID();
 	void setPW(char *pw);
 	const char* getPW();
-	bool checkmoney(int money);
-	void setmoney(int money);
 	void setLogin() { login = true; }
 	void setLogout() { login = false; }
 	void SetEnterGame() { ingame = true; }
 	void SetLeaveGame() { ingame = false; }
-	void SetPartyIn(int _partyroomnum) { partyroomnum = _partyroomnum; }
-	int SetPartyOut() { return partyroomnum; }
+	void SetPartyNum(int _partyroomnum) { partyroomnum = _partyroomnum; }
+	int GetPartyNum() { return partyroomnum; }
 	void SetCallback(bool _callback) { is_callback = _callback; }
 	bool GetCallback() { return is_callback; }
 	bool isLogin() { return login ? true : false; }

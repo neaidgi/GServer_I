@@ -70,16 +70,25 @@ bool GameManager::recvProcess(User* _user)
 		return false;
 	}
 
-	if (_user->getState()->Read(_user) == false)
+	while (1)
 	{
-		if (UserManager::GetInstance()->isUser(_user))
+		if (_user->getState()->Read(_user) == false)
 		{
-			_user->stop();
-			UserManager::GetInstance()->removeUser(_user);
+			if (UserManager::GetInstance()->isUser(_user))
+			{
+				_user->stop();
+				UserManager::GetInstance()->removeUser(_user);
+			}
+			return false;
 		}
-		return false;
+		
+		if (_user->IOCP_isRecvSuccess() == false)
+		{
+			break;
+		}
 	}
 	return true;
+
 }
 
 bool GameManager::sendProcess(User* _user)

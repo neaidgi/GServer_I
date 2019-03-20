@@ -10,6 +10,38 @@ bool InGameState::Read(User * _user)
 	{
 	case INGAME_INIT_RECV:
 		result = ingamemanager->InGame_Init_Packet(_user);
+		if (result == RT_INGAME_OTHERPLAYER_LIST)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_MOVE)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_CHANNEL_INFO)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_CHANNEL_CHANGE)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_MENU_CHARACTER)
+		{
+			state = INGAME_INIT_RECV;
+			// 유저 상태 변경(캐릭터선택화면)
+			_user->SetState(_user->getCharacterState());
+		}
+		else if (result == RT_INGAME_MENU_LOGOUT)
+		{
+			state = INGAME_INIT_RECV;
+			// 유저 상태 변경(타이틀)
+			_user->SetState(_user->getLoginState());
+		}
+		else if (result == RT_INGAME_MENU_EXIT)
+		{
+
+		}
 		break;
 	default:
 		break;

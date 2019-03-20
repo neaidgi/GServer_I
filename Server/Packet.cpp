@@ -13,7 +13,7 @@ Packet::Packet()
 }
 
 // TCPClient 생성자에 인수 넣어줌
-Packet::Packet(SOCKET _socket, SOCKADDR_IN _addr): TCPClient(_socket, _addr)
+Packet::Packet(SOCKET _socket, SOCKADDR_IN _addr) : TCPClient(_socket, _addr)
 {
 	sendSize = 0;
 	sentSize = 0;
@@ -267,7 +267,7 @@ void Packet::Quepack(PROTOCOL p, void * data, int size)
 	memcpy(ptr, data, size);
 
 	temp->sendSize += sizeof(size);		// 보낼 사이즈
-	
+
 	// 암호화
 	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(PROTOCOL), temp->sendSize);
 	// 큐에 넣기
@@ -395,6 +395,7 @@ bool Packet::IOCP_isSendSuccess(int _sentbyte)
 
 bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 {
+	CriticalSectionManager::GetInstance()->Enter();
 	if (recvSize < sizeof(int))
 	{
 		recvedSize += _recvedSize;
@@ -410,15 +411,21 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 			if (recvedSize >= recvSize)
 			{
 				recvedSize -= recvSize;
+
+				char msg[BUFSIZE];
+				sprintf(msg, "IOCP_isRecvSuccess: sock : [%d] recvedSize : [%d]", sock, recvedSize);
+				MsgManager::GetInstance()->DisplayMsg("[recvedSize] INFO ", msg);
+				CriticalSectionManager::GetInstance()->Leave();
 				return true;
 			}
 			else
 			{
 				if (!IOCP_RecvMsg())
 				{
+					CriticalSectionManager::GetInstance()->Leave();
 					return false;
 				}
-
+				CriticalSectionManager::GetInstance()->Leave();
 				return false;
 			}
 		}
@@ -426,6 +433,7 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 		{
 			if (!IOCP_RecvMsg())
 			{
+				CriticalSectionManager::GetInstance()->Leave();
 				return false;
 			}
 		}
@@ -436,19 +444,72 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 	if (recvedSize >= recvSize)
 	{
 		recvedSize -= recvSize;
-
+		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 	}
 	else
 	{
 		if (!IOCP_RecvMsg())
 		{
+			CriticalSectionManager::GetInstance()->Leave();
 			return false;
 		}
-
+		CriticalSectionManager::GetInstance()->Leave();
 		return false;
 	}
+}
+
+bool Packet::IOCP_isRecvSuccess()
+{
+	CriticalSectionManager::GetInstance()->Enter();
 	
+	if (recvSize < sizeof(int)) // recvSize를 받아야한다면
+	{
+		// 받은크기가 받아야할 크기 보다 크면
+		if (recvedSize >= sizeof(int))
+		{
+			// 받아야할 크기 저장
+			memcpy(&recvSize, recvBuf, sizeof(int));
+			// 받은크기에서 받아야할크기(sizeof(int)) 빼기
+			recvedSize = recvedSize - sizeof(int);
+
+			memcpy(&recvBuf, recvBuf + sizeof(int), recvedSize);
+
+			if (recvedSize >= recvSize)
+			{
+				recvedSize -= recvSize;
+
+				CriticalSectionManager::GetInstance()->Leave();
+
+				return true;
+			}
+			else // 받아야할 크기보다 받은크기가 작을때
+			{
+				CriticalSectionManager::GetInstance()->Leave();
+				return false;
+			}
+		}
+		else // 받은 크기가 받아야할 크기 보다 작으면
+		{
+			CriticalSectionManager::GetInstance()->Leave();
+			return false;
+		}
+	}
+
+	// 크기는 알고있을때
+	if (recvedSize >= recvSize)
+	{
+		memcpy(&recvBuf, recvBuf, recvedSize);
+
+		recvedSize -= recvSize;
+		CriticalSectionManager::GetInstance()->Leave();
+		return true;
+	}
+	else
+	{
+		CriticalSectionManager::GetInstance()->Leave();
+		return false;
+	}
 }
 
 void Packet::IOCP_InitializeBuffer()

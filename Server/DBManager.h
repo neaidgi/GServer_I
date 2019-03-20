@@ -42,6 +42,7 @@ public:
 	bool Charactor_CharacterPosAdd(int _code);
 	bool Character_Req_SlotCount(const char* _id, int _slotnum, int& _index);		// 삭제한 유저캐릭터 슬롯 뒤에 슬롯이 몇개있는지
 	bool Character_Slot_Pull(const char* _id, int _afterslot, int _beforeslot);		// 슬롯 당기기
+	bool Character_Save(const char* _id, Character* _character);										// 유저 캐릭터 저장하기
 
 	bool Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count);
 };

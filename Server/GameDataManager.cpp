@@ -112,7 +112,7 @@ bool GameDataManager::Init_Character_Data()
 // 플레이어 스폰위치 배열
 void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 {
-	memcpy(_pos, spawndata->Character_Spawn_PosData(), sizeof(Vector3));
+	memcpy(_pos, spawndata->Character_Spawn_PosData(), sizeof(Vector3)*6);
 
 }
 // 직업에따라 설계도 가져옴

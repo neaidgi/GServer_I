@@ -18,19 +18,6 @@ struct SendPacket
 	}
 };
 
-//struct RecvPacket
-//{
-//	char recvBuf[BUFSIZE];
-//	int recvsize;
-//
-//	RecvPacket()
-//	{
-//		recvsize = 0;
-//		memset(recvBuf, 0, sizeof(recvBuf));
-//	}
-//};
-
-
 class Packet : public TCPClient
 {
 private:
@@ -81,6 +68,7 @@ public:
 
 	bool IOCP_isSendSuccess(int _sentbyte);
 	bool IOCP_isRecvSuccess(int _sentbyte);
+	bool IOCP_isRecvSuccess();
 	void IOCP_InitializeBuffer();
 };
 

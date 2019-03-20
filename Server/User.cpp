@@ -3,11 +3,10 @@
 
 
 // 생성자
-User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
+User::User(SOCKET _sock, SOCKADDR_IN _addr) : Packet(_sock, _addr)
 {
 	ZeroMemory(id, IDSIZE);
 	ZeroMemory(pw, IDSIZE);
-	money = 100000;
 	channelnum = -1;
 
 	state = nullptr;
@@ -16,7 +15,8 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr): Packet(_sock, _addr)
 	is_slotload = false;
 	ingame = false;
 	login = false;
-	partyroomnum = 0;
+	partyroomnum = -1;
+	is_partyleader = false;
 	is_callback = true;
 }
 
@@ -69,6 +69,25 @@ bool User::SetSlot(SlotData* _slotdata)
 	return true;
 }
 
+// 유저 정보 초기화
+void User::ResetUserInfo()
+{
+	ZeroMemory(id, IDSIZE);
+	ZeroMemory(pw, IDSIZE);
+	channelnum = -1;
+
+	memset(characterslot, 0, sizeof(characterslot));
+	slotcount = 0;
+	is_slotload = false;
+	login = false;
+	partyroomnum = -1;
+	is_partyleader = false;
+	is_callback = true;
+
+	SetLeaveGame();
+	ResetCurCharacter();
+}
+
 // 슬롯 캐릭터 1개 삭제 // 몇 번째인지 _index 받아서 삭제 후 땡기기
 bool User::DeleteCharacter(int _index)
 {
@@ -83,7 +102,7 @@ bool User::DeleteCharacter(int _index)
 	else
 	{
 		delete characterslot[_index];
-		for (int i = _index; slotcount-1 > i; i++)
+		for (int i = _index; slotcount - 1 > i; i++)
 		{
 			characterslot[i] = characterslot[i + 1];
 		}
@@ -97,7 +116,6 @@ void User::SetState(UserState * _state)
 {
 	state = _state;
 }
-
 
 void User::setID(char * id)
 {
@@ -117,16 +135,6 @@ void User::setPW(char * pw)
 const char * User::getPW()
 {
 	return pw;
-}
-
-bool User::checkmoney(int money)
-{
-	return true;
-}
-
-void User::setmoney(int money)
-{
-
 }
 
 void User::InitState()

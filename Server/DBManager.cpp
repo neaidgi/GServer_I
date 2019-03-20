@@ -466,7 +466,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 	*/
 
 	// 쿼리 입력 // code, jobname, nick, level
-		sprintf(query,"%s FROM UserCharacterInfo WHERE id = '%s' AND character_slotnum = %d",base_query, _id, _index);
+	sprintf(query, "%s FROM UserCharacterInfo WHERE id = '%s' AND character_slotnum = %d", base_query, _id, _index);
 
 	/*
 	*	끝
@@ -491,7 +491,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 		// DB 데이터 아웃풋 저장
 		// 캐릭터 코드
 		memcpy(_code, sql_row[0], strlen(sql_row[0]));
-		
+
 		// 직업코드
 		_jobcode = atoi(sql_row[2]);
 
@@ -682,7 +682,7 @@ bool DBManager::Character_Req_CharacterPos(char* _code, Vector3& _pos)
 	*/
 
 	// 쿼리 입력 
-	sprintf(query,"%s %d", base_query, _code);
+	sprintf(query, "%s %d", base_query, _code);
 
 	/*
 	*	끝
@@ -766,7 +766,7 @@ bool DBManager::Charactor_CharacterPosAdd(int _code)
 }
 
 // 삭제한 유저캐릭터 슬롯 뒤에 슬롯이 몇개있는지
-bool DBManager::Character_Req_SlotCount(const char * _id, int _slotnum,int& _index)
+bool DBManager::Character_Req_SlotCount(const char * _id, int _slotnum, int& _index)
 {
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
@@ -860,6 +860,38 @@ bool DBManager::Character_Slot_Pull(const char * _id, int _afterslot, int _befor
 	}
 }
 
+bool DBManager::Character_Save(const char* _id, Character* _character)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "  UPDATE usercharacterinfo  SET character_level =  ";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+	sprintf(query, "%s  %d WHERE id= '%s' AND character_code = '%s' ", base_query, _character->GetCharacter_Level(), _id, _character->GetCharacter_Code());
+	/*
+	*	끝
+	*/
+
+	state = mysql_query(mysql, query);
+
+	if (state == 0)
+	{
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Save error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
 // 캐릭터 스폰위치 요청
 bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 {
@@ -878,7 +910,7 @@ bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 
 	// 쿼리 날리기
 	state = mysql_query(mysql, base_query);
-	MsgManager::GetInstance()->DisplayMsg("DB","플레이어 스폰 위치 요청 중");
+	MsgManager::GetInstance()->DisplayMsg("DB", "플레이어 스폰 위치 요청 중");
 	// 성공
 	if (state == 0)
 	{
@@ -898,8 +930,10 @@ bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 			_pos[i].x = atof(sql_row[1]);
 			_pos[i].y = atof(sql_row[2]);
 			_pos[i].z = atof(sql_row[3]);
+
+			i++;
 		}
-		
+
 		_count = mysql_num_rows(sql_result);
 
 		return true;

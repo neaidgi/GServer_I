@@ -88,6 +88,7 @@ bool CharacterManager::GetCharacter_SlotCount(User * _user, int & _count)
 	}
 }
 
+// 캐릭터 닉네임 중복체크
 bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 {
 	int len;
@@ -111,6 +112,7 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 	}
 }
 
+// 캐릭터 생성
 bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 {
 	int code;
@@ -197,6 +199,7 @@ bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 	// DBManager::GetInstance()->Charactor_CharacterPosAdd(code);
 	return check;
 }
+
 // 게임시작
 bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 {
@@ -206,6 +209,7 @@ bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 	int index = 0;
 	int size = 0;
 	int len = 0;
+	int spawnposcount = 0;
 	bool enter = true;
 	Vector3 pos;
 	Vector3 rot;
@@ -231,10 +235,14 @@ bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 		}
 		else
 		{
+			// 난수생성
+			srand((unsigned int)time(NULL));
+			spawnposcount = rand() % (CHARACTER_SPAWNPOS_MAXCOUNT);
+
 			// 캐릭터 위치 정보 없을 경우 스폰위치로
 			GameDataManager::GetInstance()->Character_SpawnPos_Vector(spawnpos);
-			pos = spawnpos[0];
-
+			pos = spawnpos[spawnposcount];
+			
 			memcpy(ptr, &enter, sizeof(bool));
 			ptr += sizeof(bool);
 			size = sizeof(bool);
@@ -255,6 +263,9 @@ bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 		// 
 		// 현재 접속한 캐릭터 패킹
 		// 
+
+		int channelnum = _user->GetChannelNum();
+
 		char* ptr_temp = ptr;
 
 		// 캐릭터 코드 사이즈
@@ -290,9 +301,15 @@ bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 		memcpy(ptr_temp, &player->GetRotation(), sizeof(Vector3));
 		ptr_temp += sizeof(Vector3);
 		size += sizeof(Vector3);
+		// 채널 번호
+		memcpy(ptr_temp, &channelnum, sizeof(int));
+		ptr_temp += sizeof(int);
+		size += sizeof(int);
 
 		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 		_user->Quepack(sendprotocol, data, size);
+
+		delete slotdata;
 	}
 	else
 	{
@@ -305,7 +322,6 @@ bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 		_user->Quepack(sendprotocol, data, size);
 	}
-
 	return enter;
 }
 
@@ -377,6 +393,7 @@ Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, 
 	return player;
 }
 
+// 캐릭터 초기화면
 RESULT CharacterManager::Character_Init_Choice(User * _user)
 {
 	PROTOCOL protocol;
@@ -391,7 +408,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 
 	PROTOCOL sendprotocol;
 
-	RESULT result;
+	RESULT result = RT_DEFAULT;
 	SlotData* slotdata[3];
 	memset(slotdata, 0, sizeof(slotdata));
 	int count = 0;
@@ -527,6 +544,7 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 	return result;
 }
 
+// 캐릭터 생성창
 RESULT CharacterManager::Character_Management_Process(User * _user)
 {
 	PROTOCOL protocol;
@@ -539,7 +557,7 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 
 	PROTOCOL sendprotocol;
 
-	RESULT result;
+	RESULT result = RT_DEFAULT;
 
 	switch (protocol)
 	{
@@ -581,33 +599,7 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 	return result;
 }
 
-// 캐릭터 정보 다른 플레이어에게 전송
-//void CharacterManager::CharacterInfo_toOther(User * _user, char * _data, int _datasize)
-//{
-//	char* ptr = _data;
-//	int size = _datasize;
-//	const char* name = _user->GetCurCharacter()->GetCharacter_Name();
-//	int namesize = strlen(name);
-//
-//	ptr += size;
-//	memcpy(ptr, &namesize, sizeof(int));
-//	ptr += sizeof(int);
-//	size += sizeof(int);
-//
-//	memcpy(ptr, name, namesize);
-//	size += namesize;
-//
-//	User* user;
-//	while (UserManager::GetInstance()->searchData(user))
-//	{
-//		if (user->isIngame() && user != _user)
-//		{
-//			user->pack(SEVER_INGAME_OTHERPLAYER_INFO, _data, _datasize);
-//			user->IOCP_OneSided_SendMsg();
-//		}
-//	}
-//}
-
+// 캐릭터 삭제
 bool CharacterManager::DeleateCharacter(User * _user, char * _buf)
 {
 	PROTOCOL sendprotocol;
@@ -654,6 +646,7 @@ bool CharacterManager::DeleateCharacter(User * _user, char * _buf)
 
 }
 
+// 캐릭터 슬롯이 뒤에 몇개있는지 확인용
 bool CharacterManager::Character_SlotCount_Calculation(User* _user,int _index, int& _slotcount)
 {
 	int slot_count = 0;
@@ -672,6 +665,7 @@ bool CharacterManager::Character_SlotCount_Calculation(User* _user,int _index, i
 	
 }
 
+// 캐릭터 슬롯 당기기(삭제된슬롯번호,당겨야할)
 bool CharacterManager::Character_SlotPull(User * _user, int _index, int _slotcount)
 {
 	int slotnum = _index;
@@ -689,31 +683,8 @@ bool CharacterManager::Character_SlotPull(User * _user, int _index, int _slotcou
 	return true;
 }
 
-//RESULT CharacterManager::Character_EnterGame_Process(User * _user)
-//{
-//	PROTOCOL protocol;
-//	char buf[BUFSIZE];
-//	char* ptr = buf;
-//	bool check;
-//	int datasize = 0;
-//
-//	_user->unPack(&protocol, &buf);
-//
-//	RESULT result;
-//	PROTOCOL sendprotocol;
-//
-//	// 수정했음
-//	switch (protocol)
-//	{
-//	case CLIENT_INGAME_MOVE:
-//		CharacterMove(_user, buf, datasize);
-//		sendprotocol = SEVER_INGAME_MOVE_RESULT;
-//		_user->pack(sendprotocol, buf, datasize);
-//		result = RT_INGAME_MOVE;
-//		CharacterInfo_toOther(_user, buf, datasize);
-//	default:
-//		break;
-//	}
-//
-//	return result;
-//}
+// 캐릭터 저장
+bool CharacterManager::Character_Save(User * _user)
+{
+	return false;
+}

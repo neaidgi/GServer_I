@@ -7,6 +7,7 @@
 #include <math.h>
 #include <queue>
 #include <list>
+#include <ctime>
 #include "Vector3.h"
 
 // 패킷 : [전체크기 4Byte][프로토콜 4Byte][데이터]
@@ -73,6 +74,35 @@ enum PROTOCOL {
 	SERVER_INGAME_OTHERPLAYERLIST_RESULT,	// 서버 플레이어 리스트			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
 	SERVER_INGAME_OTHERPLAYER_CONNECT,		// 서버 플레이어 접속 정보
 
+	CLIENT_INGAME_MENU_REQ_CHARACTER,		// 클라 캐릭터 선택화면으로 요청
+	CLIENT_INGAME_MENU_REQ_LOGOUT,			// 클라 로그아웃
+	CLIENT_INGAME_MENU_EXIT,				// 클라 게임종료
+	SERVER_INGAME_MENU_RESULT_CHARACTER,	// 서버 캐릭터 선택화면 결과
+	SERVER_INGAME_MENU_RESULT_LOGOUT,		// 서버 로그아웃 결과
+	SERVER_INGAME_OTHERPLAYER_LEAVE,		// 서버 다른 유저가 인게임에서 나갈때
+
+	CLIENT_INGAME_CHANNEL_INFO,				// 클라 채널 정보 요청
+	CLIENT_INGAME_CHANNEL_CHANGE,			// 클라 채널 이동 요청
+	SERVER_INGAME_CHANNLE_INFO_RESULT,		// 서버 채널 정보 결과
+	SERVER_INGAME_CHANNLE_CHANGE_RESULT,	// 서버 채널 이동 요청 결과
+	SERVER_INGAME_CHANNLE_USER_CHANGE,		// 서버 채널 이동 요청시 그 유저 이동했다고 통보
+
+	CLIENT_INGAME_PARTY_ROOM_CREATE,		// 클라 파티방 생성 요청
+	CLIENT_INGAME_PARTY_ROOM_INFO,			// 클라 파티방 정보 요청
+	CLIENT_INGAME_PARTY_ROOM_JOIN,			// 클라 파티 참여 요청
+	CLIENT_INGAME_PARTY_ROOM_INVITE,		// 클라 파티 초대 요청
+	CLIENT_INGAME_PARTY_USER_KICK,			// 클라 파티원 강퇴 요청
+	CLIENT_INGAME_PARTY_USER_LEAVE,			// 클라 파티 탈퇴 요청
+	SERVER_INGAME_PARTY_ROOM_CREATE_RESULT,	// 서버 파티방 생성 결과
+	SERVER_INGAME_PARTY_ROOM_INFO_RESULT,	// 서버 파티방 정보
+	SERVER_INGAME_PARTY_ROOM_JOIN_RESULT,	// 서버 파티 참여 결과
+	SERVER_INGAME_PARTY_ROOM_INVITE,		// 서버 파티 초대(특정유저에게)
+	SERVER_INGAME_PARTY_ROOM_INVITE_RESULT,	// 서버 파티 초대 결과
+	SERVER_INGAME_PARTY_USER_KICK,			// 서버 파티 강퇴
+	SERVER_INGAME_PARTY_USER_KICK_RESULT,	// 서버 파티 강퇴결과
+	SERVER_INGAME_PARTY_USER_LEAVE_RESULT,	// 서버 파티 탈퇴결과
+	SERVER_INGAME_PARTY_USER_INFO,			// 서버 파티원정보(파티원숫자,닉네임,HP,MP)
+
 	// 채팅 프로토콜
 	CLIENT_REQ_CHAT_LIST,					// 현재 로그인한 회원리스트 요청 			 프로토콜만
 	SERVER_CHAT_LIST_RESULT,				// 현재 로그인한 회원리스트 요청 결과 		[인원 수] [닉네임 사이즈] [닉네임]...
@@ -138,14 +168,19 @@ enum RESULT {
 
 	RT_INGAME_MOVE = 300,				// 이동
 	RT_INGAME_OTHERPLAYER_INFO,			// 다른 플레이어 정보
-	RT_INGAME_OTHERPLAYER_LIST			// 다른 플레이어 리스트
+	RT_INGAME_OTHERPLAYER_LIST,			// 다른 플레이어 리스트
+	RT_INGAME_CHANNEL_INFO,				// 채널 정보
+	RT_INGAME_CHANNEL_CHANGE,			// 채널 이동
+	RT_INGAME_MENU_CHARACTER,			// 캐릭터 선택화면
+	RT_INGAME_MENU_LOGOUT,				// 로그아웃
+	RT_INGAME_MENU_EXIT					// 종료
 };
 
 // 직업코드
 enum CHARACTER_JOB
 {
-	TANKER = 1000, 
-	WARRIOR = 2000, 
+	TANKER = 1000,
+	WARRIOR = 2000,
 	MAGICIAN = 3000,
 	GUNNER = 4000
 };
@@ -170,7 +205,7 @@ struct WSAOVERLAPPEDEx {
 #define NICKNAMESIZE 20
 #define CHARACTERCODESIZE 30
 #define PRODUCT_NAMESIZE 50
-#define CHARACTER_SPAWNPOS_MAXCOUNT 10
+#define CHARACTER_SPAWNPOS_MAXCOUNT 6
 #define ENCRYPT_KEY 951324896
 
 #define MAXCHARACTERORIGIN 4

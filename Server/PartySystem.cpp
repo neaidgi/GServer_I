@@ -59,7 +59,7 @@ PartyRoom * PartySystem::PartyRoomSearch(int _partyroomnum)
 	for (save = PartyRoomList.begin(); save != PartyRoomList.end(); save++)
 	{
 		target = (*save);
-		if (target->partyroom_num == _partyroomnum)
+		if (target->GetPartyRoomNum() == _partyroomnum)
 		{
 			return target;
 		}

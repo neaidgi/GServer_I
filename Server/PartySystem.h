@@ -25,29 +25,34 @@ struct PartyUser
 
 	~PartyUser()
 	{
-
+		user = nullptr;
 	}
 };
 
 // 파티방
-struct PartyRoom
+class PartyRoom
 {
+private:
 	char partyroom_num;			// 파티 번호
 	int partyroom_usernum;		// 파티 유저 몇명있는지
 
 	std::list<PartyUser*> partyuser;
 	std::list<PartyUser*>::iterator save;
 
+public:
+
 	PartyRoom()
 	{
 		partyroom_num = 0;
 		partyroom_usernum = 0;
 	}
+
 	PartyRoom(int _partyroomnum)
 	{
 		partyroom_num = _partyroomnum;
 		partyroom_usernum = 0;
 	}
+
 	~PartyRoom()
 	{
 		PartyUser* target = nullptr;
@@ -57,6 +62,12 @@ struct PartyRoom
 			target = (*save);
 			delete target;
 		}
+	}
+
+	// 파티방 번호가 무엇인가
+	int GetPartyRoomNum()
+	{
+		return partyroom_num;
 	}
 
 	// 유저 추가
@@ -180,7 +191,6 @@ public:
 	// 파티추방
 	// 파티원들에게 정보보내기(코드, 체력, 마나)
 	PartyRoom* PartyRoomSearch(int _partyroomnum);// 파티방 검색(int _partyroomnum)
-
 };
 
 
