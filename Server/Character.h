@@ -18,8 +18,8 @@ private:
 	int	character_str;				// 힘
 	int	character_dex;				// 민
 	int	character_int;				// 지
-	int	character_health;			// 체력
-	int	character_mana;				// 마나
+	float	character_health;			// 체력
+	float	character_mana;				// 마나
 	int	character_attackpoint;		// 공격력
 	int	character_defensepoint;		// 방어력
 	int	character_speed;			// 이속
@@ -38,8 +38,8 @@ public:
 	int GetCharacter_STR() const { return character_str; }
 	int GetCharacter_DEX() const { return character_dex; }
 	int GetCharacter_INT() const { return character_int; }
-	int GetCharacter_Health() const { return character_health; }
-	int GetCharacter_Mana() const { return character_mana; }
+	float GetCharacter_Health() const { return character_health; }
+	float GetCharacter_Mana() const { return character_mana; }
 	int GetCharacter_AttackPoint()const { return character_attackpoint; }
 	int GetCharacter_DefensePoint()const { return character_defensepoint; }
 	int GetCharacter_Speed()const { return character_speed; }
@@ -82,8 +82,8 @@ public:
 	void SetCharacter_STR(int _character_str) { character_str = _character_str; }
 	void SetCharacter_DEX(int _character_dex) { character_dex = _character_dex; }
 	void SetCharacter_INT(int _character_int) { character_int = _character_int; }
-	void SetCharacter_Health(int _character_health) { character_health = _character_health; }
-	void SetCharacter_Mana(int _character_mana) { character_mana = _character_mana; }
+	void SetCharacter_Health(float _character_health) { character_health = _character_health; }
+	void SetCharacter_Mana(float _character_mana) { character_mana = _character_mana; }
 	void SetCharacter_AttackPoint(int _character_attackpoint) { character_attackpoint = _character_attackpoint; }
 	void SetCharacter_DefensePoint(int _character_defensepoint) { character_defensepoint = _character_defensepoint; }
 	void SetCharacter_Speed(int _character_speed) { character_speed = _character_speed; }

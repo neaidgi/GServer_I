@@ -4,7 +4,7 @@ UUIDManager* UUIDManager::Instance = nullptr;
 
 UUIDManager::UUIDManager()
 {
-
+	
 }
 
 UUIDManager::~UUIDManager()
@@ -57,9 +57,9 @@ bool UUIDManager::isPartyRoomNum(int _partyroomnum)
 	return false;
 }
 
+// 캐릭터 코드
 void UUIDManager::UUID_CharacterUniqCode(User* _user,char * _codebuf,int _jobcode,int _len,char* _nick)
 {
-
 	char jobcodedata[NICKNAMESIZE];
 
 	memset(jobcodedata, 0, sizeof(NICKNAMESIZE));
@@ -94,13 +94,24 @@ void UUIDManager::UUID_CharacterUniqCode(User* _user,char * _codebuf,int _jobcod
 
 int UUIDManager::UUID_PartyRoomNum()
 {
+	CriticalSectionManager::GetInstance()->Enter();
 	int num = 0;
 
-	num = (*partyroomnum.end());
+	// 비어있으면
+	if (partyroomnum.empty() == true)
+	{
+		partyroomnum.push_back(num);
+
+		CriticalSectionManager::GetInstance()->Leave();
+		return num;
+	}
+
+	num = partyroomnum.back();
 
 	num++;
 
 	partyroomnum.push_back(num);
 
+	CriticalSectionManager::GetInstance()->Leave();
 	return num;
 }

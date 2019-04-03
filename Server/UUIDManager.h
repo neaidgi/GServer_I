@@ -2,6 +2,7 @@
 #define UUID_MANAGER_H
 
 #include "User.h"
+#include "CriticalSectionManager.h"
 #include <list>
 
 class UUIDManager
@@ -12,10 +13,11 @@ private:
 	UUIDManager();
 	~UUIDManager();
 
+	int partyroomnum_default;
+
 	// 파티번호
 	std::list<int> partyroomnum;
 	std::list<int>::iterator save;
-
 
 	// 파티번호있는지
 	bool isPartyRoomNum(int _partyroomnum);

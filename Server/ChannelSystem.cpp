@@ -185,6 +185,8 @@ bool ChannelList::DungeonEnter(PartyRoom* _partyroom)
 		}
 	}
 
+	_partyroom->DungeonEnter_PartyRoom();
+
 	InDunChannel.push_back(_partyroom);
 	return true;
 }
@@ -198,6 +200,8 @@ bool ChannelList::DungeonLeave(PartyRoom * _partyroom)
 	{
 		if (save == _partyroom)
 		{
+			_partyroom->DungeonLeave_PartyRoom();
+
 			InDunChannel.remove(_partyroom);
 			return true;
 		}

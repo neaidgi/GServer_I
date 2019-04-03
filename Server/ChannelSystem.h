@@ -53,10 +53,11 @@ public:
 	void StartSearchTownUser(int _channelnum);				// 리스트
 	bool SearchTownUser(int _channelnum, User*& _user);		// 리스트
 
-	bool ChannelEnter(User* _user);
-	bool ChannelEnter(User* _user,int _channelnum);
-	void ChannelLeave(User* _user);
-	bool ChannelLeave(User* _user, int _channelnum);
+	bool ChannelEnter(User* _user);							// 채널입장(빈곳)
+	bool ChannelEnter(User* _user,int _channelnum);			// 채널입장(특정한채널)
+	void ChannelLeave(User* _user);							// 채널떠나기
+	bool ChannelLeave(User* _user, int _channelnum);		// 특정채널떠나기
+
 	void DungeonEnter(PartyRoom* _partyroom);
 	bool DungeonLeave(int _partyroomnum);
 

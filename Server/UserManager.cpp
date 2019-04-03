@@ -84,9 +84,12 @@ User* UserManager::getUser(SOCKET _sock)
 	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
 	{
 		target = (*i);
-		if (target->getSocket() == _sock)
+		if (target != nullptr)
 		{
-			break;
+			if (target->getSocket() == _sock && target != nullptr)
+			{
+				break;
+			}
 		}
 	}
 	return target;
@@ -99,9 +102,65 @@ User* UserManager::getUser(char* _id)
 	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
 	{
 		target = (*i);
-		if (target->getID() == _id)
+		if (target != nullptr)
 		{
-			break;
+			if (target->getID() == _id)
+			{
+				break;
+			}
+		}
+	}
+	return target;
+}
+
+User * UserManager::getUserCode(char * _code)
+{
+	User* target = nullptr;
+
+	char msg[BUFSIZE];
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+
+	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
+	{
+		target = (*i);
+
+		if (target != nullptr)
+		{
+			if (strcmp(target->GetCurCharacter()->GetCharacter_Code(), _code) == false && target->isIngame())
+			{
+				sprintf(msg, "getUserCode :: 유저 ID : [%s] 캐릭터 코드 : [%s] ", target->getID(), target->GetCurCharacter()->GetCharacter_Code());
+				MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+				break;
+			}
+		}
+
+	}
+	return target;
+}
+
+User * UserManager::getUserCode(const char * _code)
+{
+	User* target = nullptr;
+
+	char msg[BUFSIZE];
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+
+	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
+	{
+		target = (*i);
+
+		if (target != nullptr)
+		{
+			if (strcmp(target->GetCurCharacter()->GetCharacter_Code(), _code) == false && target->isIngame())
+			{
+				sprintf(msg, "getUserCode :: 유저 ID : [%s] 캐릭터 코드 : [%s] ", target->getID(), target->GetCurCharacter()->GetCharacter_Code());
+				MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+				break;
+			}
 		}
 	}
 	return target;
@@ -114,10 +173,12 @@ bool UserManager::isUser(User * _user)
 	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
 	{
 		target = (*i);
+
 		if (target == _user)
 		{
 			return true;
 		}
+
 	}
 	return false;
 }

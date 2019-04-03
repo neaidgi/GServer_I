@@ -5,7 +5,7 @@
 // 생성자
 User::User(SOCKET _sock, SOCKADDR_IN _addr) : Packet(_sock, _addr)
 {
-	ZeroMemory(id, IDSIZE);
+	ZeroMemory(m_id, IDSIZE);
 	ZeroMemory(pw, IDSIZE);
 	channelnum = -1;
 
@@ -18,6 +18,7 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr) : Packet(_sock, _addr)
 	partyroomnum = -1;
 	is_partyleader = false;
 	is_callback = true;
+	is_dungeon = false;
 }
 
 User::~User()
@@ -72,7 +73,7 @@ bool User::SetSlot(SlotData* _slotdata)
 // 유저 정보 초기화
 void User::ResetUserInfo()
 {
-	ZeroMemory(id, IDSIZE);
+	ZeroMemory(m_id, IDSIZE);
 	ZeroMemory(pw, IDSIZE);
 	channelnum = -1;
 
@@ -85,7 +86,9 @@ void User::ResetUserInfo()
 	is_callback = true;
 
 	SetLeaveGame();
+	SetLeaveDungeon();
 	ResetCurCharacter();
+	ResetPartyInfo();
 }
 
 // 슬롯 캐릭터 1개 삭제 // 몇 번째인지 _index 받아서 삭제 후 땡기기
@@ -119,12 +122,12 @@ void User::SetState(UserState * _state)
 
 void User::setID(char * id)
 {
-	memcpy(this->id, id, sizeof(this->id));
+	memcpy(this->m_id, id, sizeof(this->m_id));
 }
 
 const char * User::getID()
 {
-	return id;
+	return m_id;
 }
 
 void User::setPW(char * pw)

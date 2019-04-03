@@ -40,7 +40,28 @@ bool InGameState::Read(User * _user)
 		}
 		else if (result == RT_INGAME_MENU_EXIT)
 		{
-
+			// 아직 구현안함
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_PARTY_INVITE)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_PARTY_INVITE_RESULT)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_PARTY_LEADER_DELEGATE_RESULT)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_DUNGEON_ENTER_RESULT)
+		{
+			state = INGAME_INIT_RECV;
+		}
+		else if (result == RT_INGAME_DUNGEON_LEAVE_RESULT)
+		{
+			state = INGAME_INIT_RECV;
 		}
 		break;
 	default:

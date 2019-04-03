@@ -6,11 +6,14 @@ InGameManager::InGameManager()
 {
 	verification = nullptr;
 	channelsystem = nullptr;
+	m_partysystem = nullptr;
 }
 
 InGameManager::~InGameManager()
 {
 	delete verification;
+	delete channelsystem;
+	delete m_partysystem;
 }
 
 void InGameManager::CreateInstance()
@@ -40,8 +43,10 @@ bool InGameManager::MangerInitialize()
 	// 인증, 채널시스템 초기화
 	verification = new CharacterVerification();
 	channelsystem = new ChannelSystem();
+	m_partysystem = new PartySystem();
 
 	channelsystem->InitializeChannel();
+	m_partysystem->InitializePartySystem();
 	return true;
 }
 
@@ -128,9 +133,7 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 		{
 			break;
 		}
-
 	}
-
 
 	char msg[BUFSIZE];
 	memset(msg, 0, sizeof(msg));
@@ -543,9 +546,484 @@ bool InGameManager::User_Pack_ChannelChangeResult(User * _user, char* _buf, int 
 	return result;
 }
 
+// 현재 접속한 채널몇번이지 패킹
+void InGameManager::User_Pack_Current_ChannelInfo(User * _user, char * _buf, int & _datasize)
+{
+	int channelnum = 0;
+	int size = 0;
+	char* ptr = _buf;
+
+	channelnum = _user->GetChannelNum();
+
+	memcpy(ptr, &channelnum, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	_datasize = size;
+}
+
+// 파티 초대 패킷
+void InGameManager::User_Pack_Party_InviteToOther(User * _user, char * _data, int & _datasize)
+{
+	//CriticalSectionManager::GetInstance()->Enter();
+
+	int datasize = 0;
+	int partynum = _user->GetPartyNum();
+	int codelen = strlen(_user->GetCurCharacter()->GetCharacter_Code());
+	int nicklen = strlen(_user->GetCurCharacter()->GetCharacter_Name());
+	char* ptr = _data;
+	char msg[BUFSIZE];
+
+	Character* curcharacter = _user->GetCurCharacter();
+
+	// 코드 사이즈
+	memcpy(ptr, &codelen, sizeof(int));
+	datasize += sizeof(int);
+	ptr += sizeof(int);
+
+	// 코드
+	memcpy(ptr, curcharacter->GetCharacter_Code(), codelen);
+	datasize += codelen;
+	ptr += codelen;
+
+	// 닉네임 사이즈
+	memcpy(ptr, &nicklen, sizeof(int));
+	datasize += sizeof(int);
+	ptr += sizeof(int);
+
+	// 닉네임
+	memcpy(ptr, curcharacter->GetCharacter_Name(), nicklen);
+	datasize += nicklen;
+	ptr += nicklen;
+
+	// 파티 번호
+	memcpy(ptr, &partynum, sizeof(int));
+	datasize += sizeof(int);
+	ptr += sizeof(int);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "User_Pack_Party_Invite_Other :: 파티번호 : [%d] 초대하는 유저 코드 : [%s] 초대하는 유저 닉네임 : [%s] ", _user->GetPartyNum(), curcharacter->GetCharacter_Code(), curcharacter->GetCharacter_Name());
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	_datasize = datasize;
+
+	//CriticalSectionManager::GetInstance()->Leave();
+}
+
+// 파티 초대 결과
+void InGameManager::User_Pack_Party_CharacterInfoToOther(User * _user, char * _data, int & _datasize)
+{
+	char* ptr = _data;
+
+	int datasize = 0;
+	int partynum = _user->GetPartyNum();
+	int partyusercount = 0;
+	int codelen = 0;
+	int nicklen = 0;
+	int character_jobcode;
+	bool leader = false;
+	float character_hp = 0;
+	float character_mp = 0;
+	PartyRoom* partyroom = nullptr;
+
+	char msg[BUFSIZE];
+
+	User* user_temp = nullptr;
+	Character* character_temp;
+
+	// 파티방
+	partyroom = m_partysystem->GetPartyRoomSearch(partynum);
+	partyusercount = m_partysystem->GetPartyRoomUserNum(partynum);
+
+	// 파티 번호
+	memcpy(ptr, &partynum, sizeof(int));
+	ptr += sizeof(int);
+	datasize += sizeof(int);
+
+	// 유저 숫자
+	memcpy(ptr, &partyusercount, sizeof(int));
+	ptr += sizeof(int);
+	datasize += sizeof(int);
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	// 파티방 검색 시작
+	partyroom->StartSearchPartyRoom();
+
+	while (1)
+	{
+		// 유저 검색
+		if (partyroom->SearchPartyRoom(user_temp) == true)
+		{
+			if (user_temp->isIngame() == true && user_temp->isParty() == true)
+			{
+				character_temp = user_temp->GetCurCharacter();
+				character_jobcode = character_temp->GetCharacter_JobCode();
+				nicklen = strlen(character_temp->GetCharacter_Name());
+				codelen = strlen(character_temp->GetCharacter_Code());
+				leader = user_temp->isPartyLeader();
+				character_hp = character_temp->GetCharacter_Health();
+				character_mp = character_temp->GetCharacter_Mana();
+
+				// 코드 사이즈
+				memcpy(ptr, &codelen, sizeof(int));
+				ptr += sizeof(int);
+				datasize += sizeof(int);
+
+				// 코드
+				memcpy(ptr, character_temp->GetCharacter_Code(), codelen);
+				ptr += codelen;
+				datasize += codelen;
+
+				// 직업 코드
+				memcpy(ptr, &character_jobcode, sizeof(int));
+				ptr += sizeof(int);
+				datasize += sizeof(int);
+
+				// 닉네임 사이즈
+				memcpy(ptr, &nicklen, sizeof(int));
+				ptr += sizeof(int);
+				datasize += sizeof(int);
+
+				// 닉네임
+				memcpy(ptr, character_temp->GetCharacter_Name(), nicklen);
+				ptr += nicklen;
+				datasize += nicklen;
+
+				// HP
+				memcpy(ptr, &character_hp, sizeof(float));
+				ptr += sizeof(float);
+				datasize += sizeof(float);
+
+				// MP
+				memcpy(ptr, &character_mp, sizeof(float));
+				ptr += sizeof(float);
+				datasize += sizeof(float);
+
+				// 방장인지
+				memcpy(ptr, &leader, sizeof(bool));
+				ptr += sizeof(bool);
+				datasize += sizeof(bool);
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "User_Pack_Party_InviteResultToOther :: 파티번호 : [%d] 파티인원 [%d]", _user->GetPartyNum(), partyusercount);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	_datasize = datasize;
+
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+// 파티 초대했는데 방에 못들어갔을때
+void InGameManager::User_Pack_Party_InviteResultToOther(User * _user, char * _data, int & _datasize)
+{
+	int datasize = 0;
+	char* ptr = _data;
+	char msg[BUFSIZE];
+	bool result = false;
+
+	// 결과
+	memcpy(ptr, &result, sizeof(bool));
+	datasize += sizeof(bool);
+	ptr += sizeof(bool);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "User_Pack_Party_InviteResultToOther ::  ");
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	_datasize = datasize;
+}
+
+// 파티 강퇴당했다는 정보 패킹(사실 아무것도없다)
+void InGameManager::User_Pack_Party_Kicked(User * _user, char * _data, int & _datasize)
+{
+	int datasize = 0;
+	char* ptr = _data;
+
+	char msg[BUFSIZE];
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "User_Pack_Party_Kicked :: 강퇴한 유저의 닉네임 : [%s] ", _user->GetCurCharacter()->GetCharacter_Name());
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	_datasize = datasize;
+}
+
+// 파티 강퇴 당한 유저 정보 패킹
+void InGameManager::User_Pack_Party_KickInfo(User * _user, char * _data, int & _datasize, char * _code)
+{
+	int datasize = 0;
+	int len = strlen(_code);
+	char* ptr = _data;
+	char msg[BUFSIZE];
+
+	Character* curcharacter = _user->GetCurCharacter();
+
+	// 코드 사이즈
+	memcpy(ptr, &len, sizeof(int));
+	datasize += sizeof(int);
+	ptr += sizeof(int);
+
+	// 코드
+	memcpy(ptr, _code, len);
+	datasize += len;
+	ptr += len;
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "User_Pack_Party_KickInfo :: 강퇴당한 유저의 캐릭터 코드 : [%s] ",_code);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	_datasize = datasize;
+}
+
+void InGameManager::User_Pack_PartyRoom_Leader_Leave(User * _user, char* _data, int& _datasize)
+{
+	int datasize = 0;
+	char* ptr = _data;
+
+	char msg[BUFSIZE];
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "User_Pack_PartyRoom_Leader_Leave :: 파티방이 터졌다 ");
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	_datasize = datasize;
+}
+
+// 파티 리더 바뀐 유저 정보 패킷. 코드,코드
+void InGameManager::User_Pack_PartyRoom_Leader_Delegate(User * _user, char * _data, int & _datasize, char * _code)
+{
+	int datasize = 0;
+	int oldlne = strlen(_user->GetCurCharacter()->GetCharacter_Code());
+	int len = strlen(_code);
+	char* ptr = _data;
+	char msg[BUFSIZE];
+
+	Character* curcharacter = _user->GetCurCharacter();
+
+	// 전 파티 리더 코드 사이즈
+	memcpy(ptr, &oldlne, sizeof(int));
+	datasize += sizeof(int);
+	ptr += sizeof(int);
+
+	// 전 파티 리더 코드
+	memcpy(ptr, _user->GetCurCharacter()->GetCharacter_Code(), oldlne);
+	datasize += oldlne;
+	ptr += oldlne;
+
+	// 현 파티 리더 코드 사이즈
+	memcpy(ptr, &len, sizeof(int));
+	datasize += sizeof(int);
+	ptr += sizeof(int);
+
+	// 현 파티 리더 코드
+	memcpy(ptr, _code, len);
+	datasize += len;
+	ptr += len;
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "User_Pack_PartyRoom_Leader_Delegate :: 새로운 파티 리더 유저의 캐릭터 코드 : [%s] ", _code);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+	_datasize = datasize;
+}
+
+//// 파티 탈퇴한 유저 정보 패킹
+//void InGameManager::User_Pack_Party_LeaveInfo(User * _user, char * _data, int & _datasize)
+//{
+//	int datasize = 0;
+//	int len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
+//	char* ptr = _data;
+//	char msg[BUFSIZE];
+//
+//	Character* curcharacter = _user->GetCurCharacter();
+//
+//	// 코드 사이즈
+//	memcpy(ptr, &len, sizeof(int));
+//	datasize += sizeof(int);
+//	ptr += sizeof(int);
+//
+//	// 코드
+//	memcpy(ptr, curcharacter->GetCharacter_Code(), len);
+//	datasize += len;
+//	ptr += len;
+//
+//	// 메세지
+//	memset(msg, 0, sizeof(msg));
+//	sprintf(msg, "User_Pack_Party_LeaveInfo :: 강퇴당한 유저의 캐릭터 코드 : [%s] ", curcharacter->GetCharacter_Code());
+//	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+//
+//	_datasize = datasize;
+//}
+
+
+// 파티 초대 결과 패킹
+void InGameManager::User_Pack_Party_Invite_Result(User * _user, bool _result, char * _data, int & _datasize)
+{
+	int datasize = 0;
+	char* ptr = _data;
+	char msg[BUFSIZE];
+	bool result = _result;
+
+	// 결과
+	memcpy(ptr, &result, sizeof(bool));
+	datasize += sizeof(bool);
+	ptr += sizeof(bool);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+
+	if (result)
+	{
+		sprintf(msg, "User_Pack_Party_Invite_Result :: 파티 초대 결과 [성공] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+	else
+	{
+		sprintf(msg, "User_Pack_Party_Invite_Result :: 파티 초대 결과 [실패] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+	_datasize = datasize;
+}
+
+// 파티 강퇴 결과 패킹
+void InGameManager::User_Pack_Party_Kick_Result(User * _user, bool _result, char * _code, char * _data, int & _datasize)
+{
+	int datasize = 0;
+
+	char* ptr = _data;
+	char msg[BUFSIZE];
+	int len = strlen(_code);
+	bool result = _result;
+
+	// 결과
+	memcpy(ptr, &result, sizeof(bool));
+	datasize += sizeof(bool);
+	ptr += sizeof(bool);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+
+	if (result)
+	{
+		// 코드 길이
+		memcpy(ptr, &len, sizeof(int));
+		datasize += sizeof(int);
+		ptr += sizeof(int);
+
+		// 코드
+		memcpy(ptr, _code, len);
+		datasize += len;
+		ptr += len;
+
+		sprintf(msg, "User_Pack_Party_Invite_Result :: 파티 초대 결과 [성공] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+	else
+	{
+		sprintf(msg, "User_Pack_Party_Invite_Result :: 파티 초대 결과 [실패] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+
+	_datasize = datasize;
+}
+
+// 파티 탈퇴 결과 패킹
+void InGameManager::User_Pack_Party_Leave_Result(User * _user, bool _result, char * _data, int & _datasize)
+{
+	int datasize = 0;
+
+	char* ptr = _data;
+	char msg[BUFSIZE];
+	bool result = _result;
+
+	// 결과
+	memcpy(ptr, &result, sizeof(bool));
+	datasize += sizeof(bool);
+	ptr += sizeof(bool);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+
+	if (result)
+	{
+		sprintf(msg, "User_Pack_Party_Leave_Result :: 파티 탈퇴 결과 [성공] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+	else
+	{
+		sprintf(msg, "User_Pack_Party_Leave_Result :: 파티 탈퇴 결과 [실패] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+
+	_datasize = datasize;
+}
+
+// 파티 리더 위임 결과 패킹
+void InGameManager::User_Pack_Party_Leader_Delegate_Result(User * _user, bool _result, char * _code, char * _data, int & _datasize)
+{
+	int datasize = 0;
+
+	char* ptr = _data;
+	char msg[BUFSIZE];
+	int len = strlen(_code);
+	bool result = _result;
+
+	// 결과
+	memcpy(ptr, &result, sizeof(bool));
+	datasize += sizeof(bool);
+	ptr += sizeof(bool);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+
+	if (result)
+	{
+		// 코드 길이
+		memcpy(ptr, &len, sizeof(int));
+		datasize += sizeof(int);
+		ptr += sizeof(int);
+
+		// 코드
+		memcpy(ptr, _code, len);
+		datasize += len;
+		ptr += len;
+
+		sprintf(msg, "User_Pack_Party_Leader_Delegate_Result :: 파티 리더 위임 [성공] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+	else
+	{
+		sprintf(msg, "User_Pack_Party_Leader_Delegate_Result :: 파티 리더 위임 [실패] : ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+
+	_datasize = datasize;
+}
+
 // 캐릭터 정보 언팩 - 현재 사용안함
 void InGameManager::User_Unpack_CharacterInfo(User * _user, char * _buf)
 {
+	char* ptr = _buf;
+	char code[CHARACTERCODESIZE];
+	int len = 0;
+
+	memcpy(&len, ptr, sizeof(int));
+	ptr += sizeof(int);
 
 }
 
@@ -557,6 +1035,71 @@ void InGameManager::User_UnPack_ChannelChange(User * _user, char * _buf, int& _c
 	memcpy(&channelnum, _buf, sizeof(int));
 
 	_channelnum = channelnum;
+}
+
+// 초대 요청 언팩 (유저 캐릭터 코드)
+void InGameManager::User_Unpack_PartyRoom_Invite(User * _user, char * _buf, char * _code)
+{
+	char* ptr = _buf;
+	char code[CHARACTERCODESIZE];
+	int len = 0;
+	// 코드 길이
+	memcpy(&len, ptr, sizeof(int));
+	ptr += sizeof(int);
+	// 코드
+	memcpy(_code, ptr, len);
+	ptr += len;
+}
+
+// 초대 요청 결과 언팩
+void InGameManager::User_Unpack_PartyRoom_Invite_Result(User * _user, char * _buf, bool& _result, char * _code, int & _partyroomnum)
+{
+	char* ptr = _buf;
+	int len = 0;
+	bool result = false;
+	int partyroomnum;
+
+	// 결과
+	memcpy(&result, ptr, sizeof(bool));
+	ptr += sizeof(bool);
+	// 코드 길이
+	memcpy(&len, ptr, sizeof(int));
+	ptr += sizeof(int);
+	// 코드
+	memcpy(_code, ptr, len);
+	ptr += len;
+	// 파티 번호
+	memcpy(&partyroomnum, ptr, sizeof(int));
+	ptr += sizeof(int);
+
+	_result = result;
+	_partyroomnum = partyroomnum;
+}
+
+// 파티원 강퇴 요청
+void InGameManager::User_Unpack_PartyRoom_Kick(User * _user, char * _buf, char * _code)
+{
+	char* ptr = _buf;
+	int len = 0;
+	// 코드 길이
+	memcpy(&len, ptr, sizeof(int));
+	ptr += sizeof(int);
+	// 코드
+	memcpy(_code, ptr, len);
+	ptr += len;
+}
+
+// 파티 리더 위임
+void InGameManager::User_Unpack_PartyRoom_Leader_Delegate(User * _user, char * _buf, char * _code)
+{
+	char* ptr = _buf;
+	int len = 0;
+	// 코드 길이
+	memcpy(&len, ptr, sizeof(int));
+	ptr += sizeof(int);
+	// 코드
+	memcpy(_code, ptr, len);
+	ptr += len;
 }
 
 // 다른유저에게 줄 유저정보 데이터 패킹
@@ -616,6 +1159,25 @@ void InGameManager::User_CurCharacter_Save(User * _user)
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
+// 해당유저(코드로검색)가 파티에 속해있는가
+bool InGameManager::User_IsParty(char * _code)
+{
+	User* user = nullptr;
+
+	user = UserManager::GetInstance()->getUserCode(_code);
+	if (user == nullptr)
+	{
+		return false;
+	}
+
+	if (user->isParty() == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 // 채널 들어가기
 bool InGameManager::User_Enter_Channel(User * _user)
 {
@@ -654,36 +1216,144 @@ bool InGameManager::User_Leave_Channel(User * _user, int _channelnum)
 	return channelsystem->ChannelLeave(_user, _channelnum);
 }
 
-// 던전 채널 나가기
-void InGameManager::User_LeaveInDun_Channel(User * _user)
+// 파티방 생성
+bool InGameManager::User_Create_PartyRoom(User * _user)
 {
-	if (channelsystem->DungeonLeave(_user->GetPartyNum()))
-	{
+	return m_partysystem->Party_Create(_user);
+}
 
+// 파티방 삭제
+bool InGameManager::User_Remove_PartyRoom(User * _user)
+{
+	return m_partysystem->Party_Remove(_user);
+}
+
+// 파티방 삭제 코드
+bool InGameManager::User_Remove_PartyRoom(char * _code)
+{
+	User* user = nullptr;
+
+	user = UserManager::GetInstance()->getUser(_code);
+
+	return m_partysystem->Party_Remove(user);
+}
+
+//bool InGameManager::User_Party_Invite(User * _user, char * _code)
+//{
+//	return false;
+//}
+
+// 파티에 유저 추가(참여하는유저코드,파티방번호)
+bool InGameManager::User_Party_AddUser(User* _user, int _partyroomnum)
+{
+	return m_partysystem->Partyroom_add_User(_user, _partyroomnum);
+}
+
+// 해당 유저 파티방 인원수
+int InGameManager::User_PartyRoom_UserNum(User * _user)
+{
+	return m_partysystem->GetPartyRoomUserNum(_user->GetPartyNum());
+}
+
+// 파티방에 혼자인가
+bool InGameManager::User_PartyRoom_Alone(int _partyroomnum)
+{
+	int count = 0;
+	count = m_partysystem->GetPartyRoomUserNum(_partyroomnum);
+	if (count = 1)
+	{
+		return true;
 	}
 	else
 	{
-
+		return false;
 	}
+}
 
-	// 마을 채널 들어가기
-	if (User_Enter_Channel(_user))
-	{
+// 파티 유저 강퇴
+bool InGameManager::User_PartyRoom_User_Kick(User * _user, char * _code)
+{
+	return m_partysystem->Party_Kick_User(_user,_code);
+}
 
-	}
-	else
-	{
+// 파티 유저 탈퇴
+bool InGameManager::User_PartRoom_User_Leave(User * _user)
+{
+	return m_partysystem->Party_User_Leave(_user);;
+}
 
-	}
+// 파티장 위임
+bool InGameManager::User_PartyRoom_Leader_Delegate(User* _user, char* _code)
+{
+	return m_partysystem->Party_Leader_Delegate(_user,_code);
 }
 
 // 던전 채널 들어가기
 void InGameManager::User_EnterInDun_Channel(User * _user)
 {
+	PartyRoom* partyroom = nullptr;
 	// 파티 검색
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
 
 	// 파티 채널추가
+	channelsystem->DungeonEnter(partyroom);
+}
 
+// 던전 채널 나가기
+void InGameManager::User_LeaveInDun_Channel(User * _user)
+{
+	User* user = nullptr;
+	PartyRoom* partyroom = nullptr;
+	char buf[BUFSIZE];
+	char rdata[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	memset(rdata, 0, sizeof(rdata));
+	char* ptr = buf;
+	int channelnum = 0;
+	int datasize = 0;
+	int rdatasize = 0;
+
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	if (channelsystem->DungeonLeave(_user->GetPartyNum()) == false)
+	{
+		// 던전 채널 나가기 실패. 그런 파티가없읍니다.
+		return;
+	}
+
+	partyroom->StartSearchPartyRoom();
+
+	while (partyroom->SearchPartyRoom(user))
+	{
+		// 마을 채널 들어가기(특정채널)
+		if (User_Enter_Channel(user, user->GetChannelNum()) == false)
+		{
+			// 특정채널에 접속못하면 아무채널에나 넣는다
+			if (User_Enter_Channel(_user))
+			{
+				// 채널 입장 성공. 프로토콜은 서버 던전 퇴장
+				User_Pack_Current_ChannelInfo(user, buf, datasize);
+				user->Quepack(SERVER_INGAME_DUNGEON_LEAVE_RESULT, buf, datasize);
+
+				User_Pack_PlayerPosData(_user, rdata, rdatasize);
+				User_Send_MoveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_CONNECT, rdata, rdatasize);
+			}
+			else
+			{
+				// 이부분 아직 구현못함. 만약 아무채널에도 접속을 못한다면 어떻게해야할지
+
+			}
+		}
+		else
+		{
+			//채널 입장 성공. 프로토콜은 서버 던전 퇴장
+			User_Pack_Current_ChannelInfo(user, buf, datasize);
+			user->Quepack(SERVER_INGAME_DUNGEON_LEAVE_RESULT, buf, datasize);
+
+			User_Pack_PlayerPosData(_user, rdata, rdatasize);
+			User_Send_MoveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_CONNECT, rdata, rdatasize);
+		}
+	}
 }
 
 // 다른유저에게 전송해줌
@@ -726,36 +1396,20 @@ void InGameManager::User_Send_LeaveInfoToOther(User * _user, PROTOCOL _p, char *
 
 	CriticalSectionManager::GetInstance()->Enter();
 
-	if (_user->isParty())
+	// 채널에 속해있으면 채널에 속한 유저한테 보낸다
+	if (_user->isChannel())
 	{
-		channelsystem->StartSearchTownUser(_user->GetChannelNum());
-
-		while (channelsystem->SearchTownUser(_user->GetChannelNum(), user))
-		{
-			if (user->isIngame() && user->getSocket() != _user->getSocket())
-			{
-				user->Quepack(_p, _data, _datasize);
-				if (user->isSending() == false)
-				{
-					if (user->TakeOutSendPacket())
-					{
-						user->IOCP_SendMsg();
-					}
-				}
-				// 메세지
-				char msg[BUFSIZE];
-				memset(msg, 0, sizeof(msg));
-				sprintf(msg, "User_Send_LeaveInfoToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-					_p, _datasize, user->GetSendQueueSize());
-				MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-			}
-		}
-
-		User_Leave_Channel(_user);
+		User_Send_Channel_LeaveInfoToOther(_user, _p, _user->GetChannelNum(), _data, _datasize);
 	}
-	else
+
+	// 파티에 속해있으며 파티방장이 아니면 그냥 파티원들한테 보낸다
+	if (_user->isParty() && _user->isPartyLeader() == false)
 	{
-		// 파티속해있는 유저들한테 전송
+		User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_LEAVE_RESULT, _data, _datasize);
+	}// 파티에 속해있으며 파티방장이면 파티방 터트린다.
+	else if (_user->isParty() && _user->isPartyLeader())
+	{
+
 	}
 
 	CriticalSectionManager::GetInstance()->Leave();
@@ -793,16 +1447,137 @@ void InGameManager::User_Send_Channel_LeaveInfoToOther(User * _user, PROTOCOL _p
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
+// 특정 유저(code) 파티 초대 전송
+void InGameManager::User_Send_Party_InviteToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize, char* _code)
+{
+	User* user = nullptr;
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	user = UserManager::GetInstance()->getUserCode(_code);
+
+	if (user->isIngame() && user->getSocket() != _user->getSocket())
+	{
+		user->Quepack(_p, _data, _datasize);
+		if (user->isSending() == false)
+		{
+			if (user->TakeOutSendPacket())
+			{
+				user->IOCP_SendMsg();
+			}
+		}
+		// 메세지
+		char msg[BUFSIZE];
+		memset(msg, 0, sizeof(msg));
+		sprintf(msg, "User_Send_Party_InviteToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+			_p, _datasize, user->GetSendQueueSize());
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	}
+
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+// 파티원에게 전송
+void InGameManager::User_Send_Party_ToOther(User * _user, PROTOCOL _p, char * _data, int & _datasize)
+{
+	User* user = nullptr;
+	PartyRoom* partyroom = nullptr;
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	partyroom->StartSearchPartyRoom();
+
+	while (partyroom->SearchPartyRoom(user))
+	{
+		if (user->isIngame() && user->getSocket() != _user->getSocket())
+		{
+			user->Quepack(_p, _data, _datasize);
+			if (user->isSending() == false)
+			{
+				if (user->TakeOutSendPacket())
+				{
+					user->IOCP_SendMsg();
+				}
+			}
+			// 메세지
+			char msg[BUFSIZE];
+			memset(msg, 0, sizeof(msg));
+			sprintf(msg, "User_Send_Party_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+				_p, _datasize, user->GetSendQueueSize());
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		}
+	}
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+// 던전에 들어갔을대 채널에 속해있는 유저들한테 전송
+void InGameManager::User_Send_Party_Eneter_Dungeon(User * _user, PROTOCOL _p)
+{
+	PartyRoom* partyroom = nullptr;
+	User* user = nullptr;
+	char buf[BUFSIZE];
+	int datasize = 0;
+	memset(buf, 0, sizeof(buf));
+
+	// 유저가 속해있는 파티방을 검색해서 넣는다.
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	// 파티방의 각 유저들 채널에 속해있는 유저들한테 나간다고 알려준다.
+	// 파티 유저 코드 패킹
+	partyroom->StartSearchPartyRoom();
+
+	while (partyroom->SearchPartyRoom(user))
+	{
+		// 유저 코드 패킹
+		User_Pack_Leave_InGame(user, buf, datasize);
+
+		// 파티 유저가 속한 채널에 send
+		User_Send_Channel_LeaveInfoToOther(user, _p, user->GetChannelNum(), buf, datasize);
+	}
+}
+
+// 던전에 나갔을때 채널에 속해있는 유저들한테 전송
+void InGameManager::User_Send_Party_Leave_Dungeon(User * _user, PROTOCOL _p)
+{
+	PartyRoom* partyroom = nullptr;
+	User* user = nullptr;
+	char buf[BUFSIZE];
+	int datasize = 0;
+	memset(buf, 0, sizeof(buf));
+
+	// 유저가 속해있는 파티방을 검색해서 넣는다.
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	// 파티방의 각 유저들 채널에 속해있는 유저들한테 나간다고 알려준다.
+	// 파티 유저 코드 패킹
+	partyroom->StartSearchPartyRoom();
+
+	while (partyroom->SearchPartyRoom(user))
+	{
+		// 유저 코드 패킹
+		User_Pack_Leave_InGame(user, buf, datasize);
+
+		// 파티 유저가 속한 채널에 send
+		User_Send_Channel_LeaveInfoToOther(user, _p, user->GetChannelNum(), buf, datasize);
+	}
+}
+
 
 RESULT InGameManager::InGame_Init_Packet(User * _user)
 {
 	PROTOCOL protocol;
 	char buf[BUFSIZE];
 	char rdata[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	memset(rdata, 0, sizeof(rdata));
+	char charactercode[CHARACTERCODESIZE];
 	char* ptr = buf;
 	bool check;
 	int choice = 0;
 	int oldchannelnum = 0;
+	int partyroomnum = 0;
 	int datasize = 0;
 	int rdatasize = 0;
 
@@ -855,6 +1630,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	case CLIENT_INGAME_MENU_REQ_CHARACTER:	// 캐릭터 선택화면 요청
 		User_Pack_Leave_InGame(_user, buf, datasize);
 		User_Send_LeaveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_LEAVE, buf, datasize);
+		User_Leave_Channel(_user);
 
 		sendprotocol = SERVER_INGAME_MENU_RESULT_CHARACTER;
 		_user->Quepack(sendprotocol, buf, 0);
@@ -863,12 +1639,15 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		// 현재 접속중인 캐릭터 초기화
 		_user->ResetCurCharacter();
 		_user->SetLeaveGame();
+		_user->SetLeaveDungeon();
+		_user->ResetPartyInfo();
 
 		result = RT_INGAME_MENU_CHARACTER;
 		break;
 	case CLIENT_INGAME_MENU_REQ_LOGOUT:		// 로그아웃 요청
 		User_Pack_Leave_InGame(_user, buf, datasize);
 		User_Send_LeaveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_LEAVE, buf, datasize);
+		User_Leave_Channel(_user);
 
 		sendprotocol = SERVER_INGAME_MENU_RESULT_LOGOUT;
 		_user->Quepack(sendprotocol, buf, 0);
@@ -883,9 +1662,238 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		// 아직 안만듬
 		result = RT_INGAME_MENU_EXIT;
 		break;
+	case CLIENT_INGAME_PARTY_ROOM_INVITE:		// 파티 초대 요청
+		memset(charactercode, 0, sizeof(CHARACTERCODESIZE));
+		User_Unpack_PartyRoom_Invite(_user, buf, charactercode);
+
+		if (_user->isParty() == false)
+		{
+			// 파티 초대한 유저가 파티가 없으면 파티방을 만든다.
+			User_Create_PartyRoom(_user);
+		}
+
+		// 파티에 들어가있지않으면
+		if (User_IsParty(charactercode) == false)
+		{
+			User_Pack_Party_InviteToOther(_user, rdata, rdatasize);
+			User_Send_Party_InviteToOther(_user, SERVER_INGAME_PARTY_ROOM_INVITE, rdata, rdatasize, charactercode);
+		}
+		else
+		{
+			// 파티초대 실패 패킹하고 보내준다.
+			User_Pack_Party_Invite_Result(_user, false, buf, datasize);
+			sendprotocol = SERVER_INGAME_PARTY_ROOM_INVITE_RESULT;
+			_user->Quepack(sendprotocol, buf, datasize);
+			// 만들어둔 파티방 삭제
+			User_Remove_PartyRoom(_user);
+		}
+		result = RT_INGAME_PARTY_INVITE;
+		break;
+	case CLIENT_INGAME_PARTY_ROOM_ANSWER_INVITE:		// 클라 파티 초대 응답
+		User_Unpack_PartyRoom_Invite_Result(_user, buf, check, charactercode, partyroomnum);
+		if (check) // 초대 승락
+		{
+			// 파티 유저 추가
+			check = User_Party_AddUser(_user, partyroomnum);
+			if (check)
+			{
+				// 유저 추가 성공
+				User_Pack_Party_CharacterInfoToOther(_user, rdata, rdatasize);
+				User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_ROOM_ADD_USER, rdata, rdatasize);
+				sendprotocol = SERVER_INGAME_PARTY_ROOM_ADD_USER;
+				_user->Quepack(sendprotocol, rdata, rdatasize);
+			}
+			else
+			{
+				// 유저 추가 실패(초대 받는사람한테 실패라고 보낸다)
+				User_Pack_Party_InviteResultToOther(_user, rdata, rdatasize);
+
+				sendprotocol = SERVER_INGAME_PARTY_ROOM_JOIN_RESULT;
+				_user->Quepack(sendprotocol, buf, datasize);
+			}
+		}
+		else // 초대 거절
+		{
+			// 파티 초대 거절 패킹하고 보내준다.
+			User_Pack_Party_Invite_Result(_user, false, rdata, rdatasize);
+			User_Send_Party_InviteToOther(_user, SERVER_INGAME_PARTY_ROOM_INVITE_RESULT, rdata, rdatasize, charactercode);
+
+			// 유저가 혼자라면 삭제한다.
+			if (User_PartyRoom_Alone(partyroomnum))
+			{
+				// 만들어둔 파티방 삭제
+				User_Remove_PartyRoom(charactercode);
+			}
+		}
+		result = RT_INGAME_PARTY_INVITE_RESULT;
+		break;
+	case CLIENT_INGAME_PARTY_USER_KICK:		// 파티 강퇴 요청
+		User_Unpack_PartyRoom_Kick(_user,buf,charactercode);
+		if (_user->isPartyLeader())
+		{
+			// 강퇴 성공
+			if (User_PartyRoom_User_Kick(_user, charactercode))
+			{
+				// 강퇴당한 유저한테 알려주기
+				User_Pack_Party_Kicked(_user, buf, datasize);
+				User_Send_Party_InviteToOther(_user, SERVER_INGAME_PARTY_USER_KICK, buf, datasize, charactercode);
+				
+				// 파티원들 한테는 나갔다라는 코드만 알려주기
+				User_Pack_Party_KickInfo(_user, rdata, rdatasize,charactercode);
+				User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_KICK_INFO, rdata, rdatasize);
+
+				// 파티리더(현재유저)에게는 파티강퇴 실패여부를 알려준다. 그리고 강퇴당한 친구 코드를 넣어준다.
+				User_Pack_Party_Kick_Result(_user, true, charactercode, buf, datasize);
+				sendprotocol = SERVER_INGAME_PARTY_USER_KICK_RESULT;
+				_user->Quepack(sendprotocol, buf, datasize);
+			}
+			else
+			{
+				User_Pack_Party_Kick_Result(_user, false, charactercode, buf, datasize);
+				sendprotocol = SERVER_INGAME_PARTY_USER_KICK_RESULT;
+				_user->Quepack(sendprotocol, buf, datasize);
+			}
+			
+		}
+		result = RT_INGAME_PARTY_USER_KICK_RESULT;
+		break;
+	case CLIENT_INGAME_PARTY_USER_LEAVE:	// 파티 탈퇴 요청
+		if (_user->isPartyLeader())
+		{
+			// 파티원들한테 파티방 터트렸다는 패킷을보냄
+			User_Pack_PartyRoom_Leader_Leave(_user, rdata, rdatasize);
+			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_ROOM_REMOVE_RESULT, rdata, rdatasize);
+
+			// 파티없앤다
+			check = User_Remove_PartyRoom(_user);
+
+			// 현재유저(파티리더였던유저)에게 파티 탈퇴결과를 보낸다
+			User_Pack_Party_Leave_Result(_user, check, buf, datasize);
+			sendprotocol = SERVER_INGAME_PARTY_USER_LEAVE_RESULT;
+			_user->Quepack(sendprotocol, buf, datasize);
+		}
+		else
+		{
+			// 파티원들한테 파티원 한명 탈퇴했다고 알려준다.
+			User_Pack_Leave_InGame(_user, rdata, rdatasize);
+			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_LEAVE_INFO, rdata, rdatasize);
+
+			// 파티에서 한명 지운다.
+			check = User_PartRoom_User_Leave(_user);
+
+			// 현재유저(파티원이였던유저)에게 파티 탈퇴결과를 보낸다
+			User_Pack_Party_Leave_Result(_user, check, buf, datasize);
+			sendprotocol = SERVER_INGAME_PARTY_USER_LEAVE_RESULT;
+			_user->Quepack(sendprotocol, buf, datasize);
+
+		}
+		result = RT_INGAME_PARTY_USER_LEAVE_RESULT;
+		break;
+	case CLIENT_INGAME_PARTY_LEADER_DELEGATE:		// 파티장 위임
+		User_Unpack_PartyRoom_Leader_Delegate(_user, buf, charactercode);
+		
+		// 파티장 위임
+		if (User_PartyRoom_Leader_Delegate(_user, charactercode))
+		{
+			// 파티장 위임 성공시 파티리더 바뀐정보를 파티원들한테 보낸다
+			User_Pack_PartyRoom_Leader_Delegate(_user, rdata, rdatasize, charactercode);
+			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_LEADER_DELEGATE, rdata, rdatasize);
+			// 현재 유저에게 파티장 위임 결과를 보낸다.(코드+성공실패)
+			User_Pack_Party_Leader_Delegate_Result(_user, true, charactercode, buf, datasize);
+			_user->Quepack(SERVER_INGAME_PARTY_LEADER_DELEGATE_RESULT, buf, datasize);
+		}
+		else
+		{
+			// 현재 유저에게 파티장 위임 결과를 보낸다.(코드+성공실패)
+			User_Pack_Party_Leader_Delegate_Result(_user, false, charactercode, buf, datasize);
+			_user->Quepack(SERVER_INGAME_PARTY_LEADER_DELEGATE_RESULT, buf, datasize);
+		}
+		result = RT_INGAME_PARTY_LEADER_DELEGATE_RESULT;
+		break;
+	case CLIENT_INGAME_DUNGEON_ENTER:		// 던전 입장 요청
+		User_EnterInDun_Channel(_user);
+		User_Send_Party_Eneter_Dungeon(_user, SERVER_INGAME_OTHERPLAYER_LEAVE);
+
+		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
+		_user->Quepack(SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
+
+		result = RT_INGAME_DUNGEON_ENTER_RESULT;
+		break;
+	case CLIENT_INGAME_DUNGEON_LEAVE:	// 던전 퇴장 요청
+	
+		User_LeaveInDun_Channel(_user);
+
+		result = RT_INGAME_DUNGEON_LEAVE_RESULT;
+		break;
 	default:
 		break;
 	}
 
 	return result;
+}
+
+// 인게임 상태에서 강종했을때 뒷처리
+bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
+{
+	char buf[BUFSIZE];
+	char* ptr = buf;
+	int datasize = 0;
+	bool check = false;
+
+	// 메세지
+	char msg[BUFSIZE];
+	memset(msg, 0, sizeof(msg));
+
+
+	  // 파티에 속해있고 던전에 들어와있으면
+	if (_user->isParty() == true && _user->isDungeon() == true)
+	{
+		// 아직 미구현했지요
+
+
+		sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있는 상태에 종료");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+		return true;
+	} // 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있으면
+	else if (_user->isParty() == true && _user->isChannel() == true && _user->isDungeon() == false)
+	{
+		if (_user->isPartyLeader())
+		{
+			// 파티원들한테 파티방 터트렸다는 패킷을보냄
+			User_Pack_PartyRoom_Leader_Leave(_user, buf, datasize);
+			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_ROOM_REMOVE_RESULT, buf, datasize);
+			//User_Send_Channel_LeaveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_LEAVE, _user->GetChannelNum(), buf, datasize);
+
+			// 파티없앤다
+			User_Remove_PartyRoom(_user);
+		}
+		else
+		{
+			// 나가는 유저의 정보를 패킹한다
+			User_Pack_Leave_InGame(_user, buf, datasize);
+			// 파티원, 채널에 접속한 유저들한테 send한다.
+			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_LEAVE_INFO, buf, datasize);
+			User_Send_Channel_LeaveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_LEAVE, _user->GetChannelNum(), buf, datasize);
+			User_PartRoom_User_Leave(_user);
+		}
+
+		User_Leave_Channel(_user);
+
+		sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있는상태에 종료 ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		return true;
+	} // 파티에 속해있지않고 채널에 들어와있으면
+	else if (_user->isParty() == false && _user->isChannel() == true)
+	{
+		User_Pack_Leave_InGame(_user, buf, datasize);
+		User_Send_Channel_LeaveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_LEAVE, _user->GetChannelNum(), buf, datasize);
+		User_Leave_Channel(_user);
+
+		sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있지않고 채널에 들어와있는상태에 종료");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		return true;
+	}
+
+	return false;
 }

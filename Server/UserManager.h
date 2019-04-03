@@ -27,6 +27,8 @@ public:
 	void removeUser(User* _user);
 	User* getUser(SOCKET _sock);
 	User* getUser(char* _id);
+	User* getUserCode(char* _code);
+	User* getUserCode(const char* _code);
 	bool isUser(User* _user);
 
 	void startSearch();						// ¸®½ºÆ®
