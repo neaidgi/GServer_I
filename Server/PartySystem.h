@@ -3,6 +3,7 @@
 
 #include "User.h"
 #include "UUIDManager.h"
+#include "MonsterControl.h"
 #include <list>
 
 #define PARTYMAXUSER 4
@@ -39,11 +40,18 @@ private:
 	// 파티 유저 리스트
 	std::list<User*> m_partyuser;	
 	std::list<User*>::iterator save;
+	
+	// 몬스터 컨트롤러
+	MonsterControl* m_monster_control;
 
 public:
-	PartyRoom();
 	PartyRoom(int _partyroomnum);
 	~PartyRoom();
+
+	// 초기화
+	void InitPartyRoom();
+	// 마무리
+	void DestroyPartyRoom();
 
 	// 검색 초기화
 	void StartSearchPartyRoom();

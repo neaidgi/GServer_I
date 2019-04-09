@@ -159,6 +159,8 @@
     <ClCompile Include="LogManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainManager.cpp" />
+    <ClCompile Include="MonsterControl.cpp" />
+    <ClCompile Include="MonsterData.cpp" />
     <ClCompile Include="MsgManager.cpp" />
     <ClCompile Include="NetworkDataManager.cpp" />
     <ClCompile Include="Packet.cpp" />
@@ -199,6 +201,9 @@
     <ClInclude Include="LoginState.h" />
     <ClInclude Include="LogManager.h" />
     <ClInclude Include="MainManager.h" />
+    <ClInclude Include="Monster.h" />
+    <ClInclude Include="MonsterControl.h" />
+    <ClInclude Include="MonsterData.h" />
     <ClInclude Include="MsgManager.h" />
     <ClInclude Include="NetworkDataManager.h" />
     <ClInclude Include="Packet.h" />

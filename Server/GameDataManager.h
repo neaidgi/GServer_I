@@ -6,6 +6,7 @@
 #include "Global.h"
 #include "SpawnData.h"
 #include "CharacterData.h"
+#include "MonsterData.h"
 
 class GameDataManager
 {
@@ -17,10 +18,12 @@ private:
 
 	SpawnData* spawndata;
 	CharacterData * characterdata;
+	MonsterData* monsterdata;
 
 	bool Player_SpawnPos_Load();
 	bool Init_Spawn_Data();			// 스폰위치 초기화(DB에서 스폰위치 읽어옴)
 	bool Init_Character_Data();		// 캐릭터 설계도 초기화
+	bool Init_Monster_Data();		// 몬스터 정보 초기화
 public:
 	static void CreateInstance();
 	static GameDataManager* GetInstance();

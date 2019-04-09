@@ -25,7 +25,7 @@ public:
 	bool SearchTownUser(int _channelnum, User*& _user);		// 리스트
 	
 	void StartSearchInDunUser();							// 리스트
-	bool SearchInDunUser(PartyRoom* _partyuser);			// 리스트
+	bool SearchInDunUser(PartyRoom*& _partyuser);			// 리스트
 
 	bool ChannelEnter(User* _user);
 	bool ChannelEnter(User* _user, int _channelnum);

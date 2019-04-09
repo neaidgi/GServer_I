@@ -1,13 +1,10 @@
 #include"PartySystem.h"
 
 // Class PartyRoom
-PartyRoom::PartyRoom()
-{
-	partyroom_num = 0;
-}
 
 PartyRoom::PartyRoom(int _partyroomnum)
 {
+	m_monster_control = nullptr;
 	partyroom_num = _partyroomnum;
 }
 
@@ -25,6 +22,26 @@ PartyRoom::~PartyRoom()
 		sprintf(msg, "~PartyRoom :: 파티방 소멸자 ");
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
+
+	if (m_monster_control != nullptr)
+	{
+		delete m_monster_control;
+	}
+}
+
+// 초기화
+void PartyRoom::InitPartyRoom()
+{
+	if (m_monster_control == nullptr)
+	{
+		m_monster_control = new MonsterControl();
+	}
+}
+
+// 마무리
+void PartyRoom::DestroyPartyRoom()
+{
+
 }
 
 // 검색 초기화

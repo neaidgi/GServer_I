@@ -519,6 +519,67 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 	}
 }
 
+bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
+{
+	//MYSQL_RES *sql_result;  // the results
+	//MYSQL_ROW sql_row;      // the results row (line by line)
+
+	//char* base_query = "SELECT *";
+	//int state = 0;
+
+	//char query[255];
+	//memset(query, 0, sizeof(query));
+
+	///*
+	//*	쿼리문 만들기
+	//*/
+
+	//// 쿼리 입력 // code, jobname, nick, level
+	//{
+	//	sprintf(query, "%s FROM CharacterOrigin", base_query);
+	//}
+
+	///*
+	//*	끝
+	//*/
+
+	//// 쿼리 날리기
+	//state = mysql_query(mysql, query);
+
+	//// 성공
+	//if (state == 0)
+	//{
+	//	sql_result = mysql_store_result(mysql);
+
+	//	sql_row = mysql_fetch_row(sql_result);
+
+	//	// 1번
+	//	//_monster_out[0]->SetCharacter_JobCode(atoi(sql_row[0]));
+	//	//_monster_out[0]->SetCharacter_JobName(sql_row[1]);
+	//	//_monster_out[0]->SetCharacter_STR(atoi(sql_row[2]));
+	//	//_monster_out[0]->SetCharacter_DEX(atoi(sql_row[3]));
+	//	//_monster_out[0]->SetCharacter_INT(atoi(sql_row[4]));
+	//	//_monster_out[0]->SetCharacter_Health(atoi(sql_row[5]));
+	//	//_monster_out[0]->SetCharacter_Mana(atoi(sql_row[6]));
+
+	//	sql_row = mysql_fetch_row(sql_result);
+
+	//	/*
+	//	* result 지시자와 관련된 점유 메모리를 해제한다.
+	//	*/
+	//	mysql_free_result(sql_result);
+
+	//	return true;
+	//}
+	//else
+	//{
+	//	fprintf(stderr, "Mysql Character_Create error : %s \n", mysql_error(mysql));
+	//	return false;
+	//}
+
+	return true;
+}
+
 // 2019-02-13 수정함
 bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 {

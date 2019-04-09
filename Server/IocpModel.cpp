@@ -65,7 +65,10 @@ void IocpModel::IocpProcess()
 				if (UserManager::GetInstance()->isUser(user))
 				{
 					user->stop();
-					InGameManager::GetInstance()->User_Leave_Channel(user);
+					if (user->isIngame())
+					{
+						InGameManager::GetInstance()->User_InGame_Compulsion_Exit(user);
+					}
 					UserManager::GetInstance()->removeUser(user);
 				}
 			}			
@@ -78,7 +81,10 @@ void IocpModel::IocpProcess()
 					if (UserManager::GetInstance()->isUser(user))
 					{
 						user->stop();
-						InGameManager::GetInstance()->User_Leave_Channel(user);
+						if (user->isIngame())
+						{
+							InGameManager::GetInstance()->User_InGame_Compulsion_Exit(user);
+						}
 						UserManager::GetInstance()->removeUser(user);
 					}
 				}
@@ -96,7 +102,10 @@ void IocpModel::IocpProcess()
 							if (UserManager::GetInstance()->isUser(user))
 							{
 								user->stop();
-								InGameManager::GetInstance()->User_Leave_Channel(user);
+								if (user->isIngame())
+								{
+									InGameManager::GetInstance()->User_InGame_Compulsion_Exit(user);
+								}
 								UserManager::GetInstance()->removeUser(user);
 							}
 						}
@@ -107,7 +116,10 @@ void IocpModel::IocpProcess()
 						if (UserManager::GetInstance()->isUser(user))
 						{
 							user->stop();
-							InGameManager::GetInstance()->User_Leave_Channel(user);
+							if (user->isIngame())
+							{
+								InGameManager::GetInstance()->User_InGame_Compulsion_Exit(user);
+							}
 							UserManager::GetInstance()->removeUser(user);
 						}
 					}
@@ -123,7 +135,10 @@ void IocpModel::IocpProcess()
 					if (UserManager::GetInstance()->isUser(user))
 					{
 						user->stop();
-						InGameManager::GetInstance()->User_Leave_Channel(user);
+						if (user->isIngame())
+						{
+							InGameManager::GetInstance()->User_InGame_Compulsion_Exit(user);
+						}
 						UserManager::GetInstance()->removeUser(user);
 					}
 				}
@@ -141,7 +156,10 @@ void IocpModel::IocpProcess()
 							if (UserManager::GetInstance()->isUser(user))
 							{
 								user->stop();
-								InGameManager::GetInstance()->User_Leave_Channel(user);
+								if (user->isIngame())
+								{
+									InGameManager::GetInstance()->User_InGame_Compulsion_Exit(user);
+								}
 								UserManager::GetInstance()->removeUser(user);
 							}
 						}

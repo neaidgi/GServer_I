@@ -102,6 +102,8 @@ private:
 	void User_Send_LeaveInfoToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);
 	// 다른 유저 인게임에서 떠난 정보 채널에 전송
 	void User_Send_Channel_LeaveInfoToOther(User* _user, PROTOCOL _p, int _channelnum, char* _data, int& _datasize);
+	// 다른 유저 인게임에서 떠난 정보 채널에 전송(파티원 제외)
+	void User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(User* _user, PROTOCOL _p, int _channelnum, char* _data, int& _datasize);
 	// 특정 유저(code) 파티 초대 전송
 	void User_Send_Party_InviteToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize, char* _code);
 	// 파티원에게 전송

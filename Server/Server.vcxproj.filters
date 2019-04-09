@@ -94,6 +94,18 @@
     <Filter Include="소스 파일\UUID">
       <UniqueIdentifier>{1bae8cc9-9520-428f-a222-da46eac13179}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\GameData\Character">
+      <UniqueIdentifier>{05a6b731-9281-4933-a1fd-089f86ab86e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\GameData\Character">
+      <UniqueIdentifier>{eaba6784-9d47-4639-ab6c-03f6476a2b21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\GameData\Monster">
+      <UniqueIdentifier>{aa0e8e2c-3254-4001-b519-23276782b24e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\GameData\Monster">
+      <UniqueIdentifier>{8f9401fa-80eb-476e-9c30-68b1631d569d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -174,12 +186,6 @@
     <ClCompile Include="InGameManager.cpp">
       <Filter>소스 파일\InGame</Filter>
     </ClCompile>
-    <ClCompile Include="CharacterData.cpp">
-      <Filter>소스 파일\GameData</Filter>
-    </ClCompile>
-    <ClCompile Include="Character.cpp">
-      <Filter>소스 파일\GameData</Filter>
-    </ClCompile>
     <ClCompile Include="FileSystem.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -200,6 +206,18 @@
     </ClCompile>
     <ClCompile Include="UUIDManager.cpp">
       <Filter>소스 파일\UUID</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterData.cpp">
+      <Filter>소스 파일\GameData\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>소스 파일\GameData\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="MonsterData.cpp">
+      <Filter>소스 파일\GameData\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="MonsterControl.cpp">
+      <Filter>소스 파일\GameData\Monster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -290,12 +308,6 @@
     <ClInclude Include="InGameManager.h">
       <Filter>헤더 파일\Ingame</Filter>
     </ClInclude>
-    <ClInclude Include="CharacterData.h">
-      <Filter>헤더 파일\GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="Character.h">
-      <Filter>헤더 파일\GameData</Filter>
-    </ClInclude>
     <ClInclude Include="FileSystem.h">
       <Filter>헤더 파일\File</Filter>
     </ClInclude>
@@ -316,6 +328,21 @@
     </ClInclude>
     <ClInclude Include="UUIDManager.h">
       <Filter>헤더 파일\UUID</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>헤더 파일\GameData\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterData.h">
+      <Filter>헤더 파일\GameData\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>헤더 파일\GameData\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="MonsterControl.h">
+      <Filter>헤더 파일\GameData\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="MonsterData.h">
+      <Filter>헤더 파일\GameData\Monster</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

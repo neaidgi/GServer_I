@@ -1447,6 +1447,38 @@ void InGameManager::User_Send_Channel_LeaveInfoToOther(User * _user, PROTOCOL _p
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
+// 다른 유저 인게임에서 떠난 정보 채널에 전송(파티원 제외)
+void InGameManager::User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(User * _user, PROTOCOL _p, int _channelnum, char * _data, int & _datasize)
+{
+	User* user = nullptr;
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	channelsystem->StartSearchTownUser(_channelnum);
+
+	while (channelsystem->SearchTownUser(_channelnum, user))
+	{
+		if (user->isIngame() && user->getSocket() != _user->getSocket() && user->GetPartyNum() != _user->GetPartyNum())
+		{
+			user->Quepack(_p, _data, _datasize);
+			if (user->isSending() == false)
+			{
+				if (user->TakeOutSendPacket())
+				{
+					user->IOCP_SendMsg();
+				}
+			}
+			// 메세지
+			char msg[BUFSIZE];
+			memset(msg, 0, sizeof(msg));
+			sprintf(msg, "User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+				_p, _datasize, user->GetSendQueueSize());
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		}
+	}
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
 // 특정 유저(code) 파티 초대 전송
 void InGameManager::User_Send_Party_InviteToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize, char* _code)
 {
@@ -1534,7 +1566,7 @@ void InGameManager::User_Send_Party_Eneter_Dungeon(User * _user, PROTOCOL _p)
 		User_Pack_Leave_InGame(user, buf, datasize);
 
 		// 파티 유저가 속한 채널에 send
-		User_Send_Channel_LeaveInfoToOther(user, _p, user->GetChannelNum(), buf, datasize);
+		User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(user, _p, user->GetChannelNum(), buf, datasize);
 	}
 }
 
@@ -1849,10 +1881,27 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 	if (_user->isParty() == true && _user->isDungeon() == true)
 	{
 		// 아직 미구현했지요
-
+		if (_user->isPartyLeader())
+		{
+			// 파티원들한테 파티방 터트렸다는 패킷을보냄
+			User_Pack_PartyRoom_Leader_Leave(_user, buf, datasize);
+			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_ROOM_REMOVE_RESULT, buf, datasize);
+			// 파티없앤다
+			User_Remove_PartyRoom(_user);
+		}
+		else
+		{
+			// 나가는 유저의 정보를 패킹한다
+			User_Pack_Leave_InGame(_user, buf, datasize);
+			// 파티원, 채널에 접속한 유저들한테 send한다.
+			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_LEAVE_INFO, buf, datasize);
+			User_PartRoom_User_Leave(_user);
+		}
 
 		sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있는 상태에 종료");
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+		User_Leave_Channel(_user);
 
 		return true;
 	} // 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있으면

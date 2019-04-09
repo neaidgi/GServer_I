@@ -30,7 +30,7 @@ void ChannelList::StartSearchInDunUser()
 }
 
 // 던전채널리스트에서 유저 검색
-bool ChannelList::SearchInDunUser(PartyRoom * _partyuser)
+bool ChannelList::SearchInDunUser(PartyRoom *& _partyuser)
 {
 	// 유저 하나씩 꺼내서 save에 넣음
 	if (DungeonUser != InDunChannel.end())
@@ -175,7 +175,7 @@ bool ChannelList::ChannelLeave(User * _user, int _channelnum)
 // 던전 들어감
 bool ChannelList::DungeonEnter(PartyRoom* _partyroom)
 {
-	PartyRoom* save;
+	PartyRoom* save = nullptr;
 	StartSearchInDunUser();
 	while (SearchInDunUser(save))
 	{

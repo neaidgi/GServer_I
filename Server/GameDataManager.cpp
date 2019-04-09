@@ -108,6 +108,25 @@ bool GameDataManager::Init_Character_Data()
 	return true;
 }
 
+bool GameDataManager::Init_Monster_Data()
+{
+	//// 캐릭터 정보 가져오기
+	//Monster * origin[2];
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	origin[i] = new Monster();
+	//}
+	//MsgManager::GetInstance()->DisplayMsg("메인", "몬스터설계도 로드중");
+	//if (DBManager::GetInstance()->Character_Req_CharacterInfo(origin) == false)
+	//{
+	//	return false;
+	//}
+
+	//characterdata->SetCharacterOrigin(origin);
+	//MsgManager::GetInstance()->DisplayMsg("메인", "몬스터설계도 로드완료");
+	return true;
+}
+
 
 // 플레이어 스폰위치 배열
 void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)

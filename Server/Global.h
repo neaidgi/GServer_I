@@ -7,6 +7,7 @@
 #include <math.h>
 #include <queue>
 #include <list>
+#include <vector>
 #include <ctime>
 #include "Vector3.h"
 

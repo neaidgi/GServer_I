@@ -5,6 +5,7 @@
 
 #include "Global.h"
 #include "Character.h"
+#include "Monster.h"
 #include <mysql.h>
 
 class DBManager
@@ -32,9 +33,12 @@ public:
 
 	bool Character_Req_CharacterSlotCount(const char * _id, int& _count);
 	bool Character_CharacterSlotAdd(const char* _id, char* _code,int  _jobcode,const char* _jobname, char* _nick, int _level, int _num);
+	// 캐릭터 설계도 요청
 	bool Character_Req_CharacterInfo(Character* _character_out[]);
 	bool Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, char* _code);
-	
+	// 몬스터 설계도 요청
+	bool Character_Req_MonsterInfo(Monster* _monster_out[]);
+
 	bool Character_Req_CharacterDelete(const char* _id,int _index);
 	bool Character_Req_CharacterCheckName(const char* _nick);
 	bool Character_Req_CharacterName(const char* _id, int _index, char* _nick);
