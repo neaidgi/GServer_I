@@ -6,7 +6,7 @@
 class MonsterData {
 private:
 	// 몬스터 기본 정보
-	Monster * m_Monster_origin[20];
+	Monster * m_Monster_origin[MAXMONSTERORIGIN];
 	bool isLoad;
 public:
 	MonsterData();

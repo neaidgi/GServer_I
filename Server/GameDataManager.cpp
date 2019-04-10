@@ -7,12 +7,15 @@ GameDataManager* GameDataManager::Instance = nullptr;
 GameDataManager::GameDataManager()
 {
 	spawndata = new SpawnData();
+	m_dungeon_spawndata = new DungeonSpawnData();
 	characterdata = new CharacterData();
 }
 GameDataManager::~GameDataManager()
 {
 	delete spawndata;
+	delete m_dungeon_spawndata;
 	delete characterdata;
+	
 }
 
 void GameDataManager::CreateInstance()
@@ -41,6 +44,11 @@ bool GameDataManager::InitializeManager()
 {
 	MsgManager::GetInstance()->DisplayMsg("메인","게임데이터 로드중");
 	if (Init_Spawn_Data() == false)
+	{
+		return false;
+	}
+	// 던전 스폰위치 초기화
+	if (Init_Dungeon_Spawn_Data() == false)
 	{
 		return false;
 	}
@@ -127,13 +135,48 @@ bool GameDataManager::Init_Monster_Data()
 	return true;
 }
 
+// 던전 스폰위치 저장
+bool GameDataManager::Dungeon_SpawnPos_Load()
+{
+	DBManager* db = DBManager::GetInstance();
+
+	Vector3 pos[DUNGEON_SPAWNPOS_MAXCOUNT];
+	int count = 0;
+
+	if (db->Charactor_Req_DungeonSpawnPos(pos, count) == false)
+	{
+		return false;
+	}
+	else
+	{
+		m_dungeon_spawndata->SetDungeonSpawnPos(pos, count);
+		return true;
+	}
+}
+
+// 던전 스폰위치 초기화
+bool GameDataManager::Init_Dungeon_Spawn_Data()
+{
+	if (Dungeon_SpawnPos_Load() == false)
+	{
+		return false;
+	}
+}
+
 
 // 플레이어 스폰위치 배열
 void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 {
-	memcpy(_pos, spawndata->Character_Spawn_PosData(), sizeof(Vector3)*6);
+	memcpy(_pos, spawndata->Character_Spawn_PosData(), sizeof(Vector3) * 6);
 
 }
+
+// 던전 스폰위치 배열
+void GameDataManager::Dungeon_SpawnPos_Vecotr(Vector3 * _pos)
+{
+	memcpy(_pos, m_dungeon_spawndata->Dungeon_Spawn_PosData(), sizeof(Vector3) * 4);
+}
+
 // 직업에따라 설계도 가져옴
 void GameDataManager::Character_Origin_Data(int _jobcode, const Character*& _job)
 {

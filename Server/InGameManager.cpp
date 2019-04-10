@@ -922,77 +922,29 @@ void InGameManager::User_Pack_Party_Result_Code(User * _user, bool _result, char
 	_datasize = datasize;
 }
 
-// 파티 탈퇴 결과 패킹
-void InGameManager::User_Pack_Party_Result(User * _user, bool _result, char * _data, int & _datasize)
+// 던전 입장시 스폰 지역 패킹
+void InGameManager::User_Pack_Dungeon_SpawnData(User * _user, int _count, char * _data, int & _datasize)
 {
-	int datasize = 0;
-
 	char* ptr = _data;
+	int size = 0;
+	int len = 0;
+
+	int count = 0;
+	Vector3 pos;
+	Vector3 spawnpos[DUNGEON_SPAWNPOS_MAXCOUNT];
+
+	GameDataManager::GetInstance()->Dungeon_SpawnPos_Vecotr(spawnpos);
+	pos = spawnpos[_count];
+
 	char msg[BUFSIZE];
-	bool result = _result;
-
-	// 결과
-	memcpy(ptr, &result, sizeof(bool));
-	datasize += sizeof(bool);
-	ptr += sizeof(bool);
-
-	// 메세지
 	memset(msg, 0, sizeof(msg));
 
-	if (result)
-	{
-		sprintf(msg, "User_Pack_Party_Result :: 파티 탈퇴 결과 [성공] : ");
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-	}
-	else
-	{
-		sprintf(msg, "User_Pack_Party_Result :: 파티 탈퇴 결과 [실패] : ");
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-	}
-
-	_datasize = datasize;
-}
-
-// 파티 리더 위임 결과 패킹
-void InGameManager::User_Pack_Party_Result_Code(User * _user, bool _result, char * _code, char * _data, int & _datasize)
-{
-	int datasize = 0;
-
-	char* ptr = _data;
-	char msg[BUFSIZE];
-	int len = strlen(_code);
-	bool result = _result;
-
-	// 결과
-	memcpy(ptr, &result, sizeof(bool));
-	datasize += sizeof(bool);
-	ptr += sizeof(bool);
-
-	// 메세지
-	memset(msg, 0, sizeof(msg));
-
-	if (result)
-	{
-		// 코드 길이
-		memcpy(ptr, &len, sizeof(int));
-		datasize += sizeof(int);
-		ptr += sizeof(int);
-
-		// 코드
-		memcpy(ptr, _code, len);
-		datasize += len;
-		ptr += len;
-
-		sprintf(msg, "User_Pack_Party_Result_Code :: 파티 리더 위임 [성공] : ");
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-	}
-	else
-	{
-		sprintf(msg, "User_Pack_Party_Result_Code :: 파티 리더 위임 [실패] : ");
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-	}
-
-	_datasize = datasize;
+	// 위치
+	memcpy(ptr, &pos, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+	size += sizeof(Vector3);
+	
+	_datasize = size;
 }
 
 // 채널 이동 요청 언팩
@@ -1480,6 +1432,51 @@ void InGameManager::User_Send_Party_ToOther(User * _user, PROTOCOL _p, char * _d
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
+// 파티원에게 전송(던전 스폰)
+void InGameManager::User_Send_Dungeon_Spawninfo_ToOther(User * _user, PROTOCOL _p)
+{
+	User* user = nullptr;
+	PartyRoom* partyroom = nullptr;
+
+	char buf[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	int datasize = 0;
+
+	int count = 1;
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	partyroom->StartSearchPartyRoom();
+
+	while (partyroom->SearchPartyRoom(user))
+	{
+		if (user->isIngame() && user->getSocket() != _user->getSocket())
+		{
+			// 패킹
+			User_Pack_Dungeon_SpawnData(_user, count, buf, datasize);
+			user->Quepack(_p, buf, datasize);
+			if (user->isSending() == false)
+			{
+				if (user->TakeOutSendPacket())
+				{
+					user->IOCP_SendMsg();
+				}
+			}
+			// 메세지
+			char msg[BUFSIZE];
+			memset(msg, 0, sizeof(msg));
+			sprintf(msg, "User_Send_Dungeon_Spawninfo_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+				_p, datasize, user->GetSendQueueSize());
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+			count++;
+		}
+	}
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
 // 던전에 들어갔을대 채널에 속해있는 유저들한테 전송
 void InGameManager::User_Send_Party_Eneter_Dungeon(User * _user, PROTOCOL _p)
 {
@@ -1782,7 +1779,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_EnterInDun_Channel(_user);
 		User_Send_Party_Eneter_Dungeon(_user, SERVER_INGAME_OTHERPLAYER_LEAVE);
 
-		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
+		User_Send_Dungeon_Spawninfo_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT);
+		User_Pack_Dungeon_SpawnData(_user, 0, buf, datasize);
 		_user->Quepack(SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
 
 		result = RT_INGAME_DUNGEON_ENTER_RESULT;

@@ -10,6 +10,7 @@
 #include "CharacterVerification.h"
 #include "CriticalSectionManager.h"
 #include "ChannelSystem.h"
+#include "GameDataManager.h"
 
 class InGameManager
 {
@@ -32,7 +33,7 @@ private:
 	bool User_Pack_Move(User * _user, char* _buf, int& _datasize, char * _releasedata, int& _rdatasize);
 	// 이동 시작
 	bool User_Pack_MoveStart(User * _user, char * _buf, int & _datasize, char* _relesedata, int& _rdatasize);
-	//  회전 정보. 코드,회전값(vector3)
+	//  회전 정보.  (코드,회전값(vector3))
 	void User_Pack_Rotation(User*_user, char* _data, int& _datasize);
 	// 채널 정보 전송.(채널번호,채널유저수....x6)
 	void User_Pack_ChannelInfo(User* _user);
@@ -44,6 +45,8 @@ private:
 	void User_Pack_Party_Result(User * _user, bool _result, char* _data, int& _datasize);
 	// 파티 결과 및 코드 패킹. (결과,성공이면 코드 실패면 끝)
 	void User_Pack_Party_Result_Code(User* _user, bool _result, char* _code, char* _data, int& _datasize);
+	// 던전 입장시 스폰 지역 패킹
+	void User_Pack_Dungeon_SpawnData(User * _user,int _count, char* _data, int& _datasize);
 
 	// 던전 퇴장시 채널정보 패킹. 채널번호
 
@@ -92,6 +95,8 @@ private:
 	void User_Send_Party_InviteToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize, char* _code);
 	// 파티원에게 전송
 	void User_Send_Party_ToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);
+	// 파티원에게 전송(던전 스폰)
+	void User_Send_Dungeon_Spawninfo_ToOther(User* _user, PROTOCOL _p);
 	// 던전에 들어갔을때 채널에 속해있는 유저들한테 전송
 	void User_Send_Party_Eneter_Dungeon(User* _user, PROTOCOL _p);
 	// 던전에 나갔을때 채널에 속해있는 유저들한테 전송

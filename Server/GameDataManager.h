@@ -17,6 +17,7 @@ private:
 	~GameDataManager();
 
 	SpawnData* spawndata;
+	DungeonSpawnData* m_dungeon_spawndata;
 	CharacterData * characterdata;
 	MonsterData* monsterdata;
 
@@ -24,6 +25,8 @@ private:
 	bool Init_Spawn_Data();			// 스폰위치 초기화(DB에서 스폰위치 읽어옴)
 	bool Init_Character_Data();		// 캐릭터 설계도 초기화
 	bool Init_Monster_Data();		// 몬스터 정보 초기화
+	bool Dungeon_SpawnPos_Load();	// 던전 스폰위치 저장
+	bool Init_Dungeon_Spawn_Data();	// 던전 스폰위치 초기화
 public:
 	static void CreateInstance();
 	static GameDataManager* GetInstance();
@@ -33,6 +36,7 @@ public:
 	void EndManager();
 
 	void Character_SpawnPos_Vector(Vector3 * _pos);
+	void Dungeon_SpawnPos_Vecotr(Vector3* _pos);
 	//const Character* GetTanker() { return characterdata->GetTanker(); }
 	//const Character* GetWarrior() { return characterdata->GetWarrior(); }
 	//const Character* GetMagician() { return characterdata->GetMagician(); }

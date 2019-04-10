@@ -21,4 +21,21 @@ public:
 	const Vector3* Character_Spawn_PosData();
 };
 
+
+class DungeonSpawnData {
+private:
+	// 캐릭터 스폰위치
+	Vector3 m_dungeon_spawn_pos[DUNGEON_SPAWNPOS_MAXCOUNT];
+	// 캐릭터 스폰위치 카운트
+	int m_dungeon_spawnpos_count;
+public:
+	DungeonSpawnData();
+	~DungeonSpawnData();
+
+	void SetDungeonSpawnPos(Vector3* _v, int _count);
+	void SetDungeonSpawnCount(int _count) { m_dungeon_spawnpos_count = _count; }
+
+	// 접근지정자
+	const Vector3* Dungeon_Spawn_PosData();
+};
 #endif

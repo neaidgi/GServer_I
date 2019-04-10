@@ -49,6 +49,7 @@ public:
 	bool Character_Save(const char* _id, Character* _character);										// 유저 캐릭터 저장하기
 
 	bool Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count);
+	bool Charactor_Req_DungeonSpawnPos(Vector3 * _pos, int& _count);
 };
 
 #endif
