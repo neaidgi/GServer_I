@@ -822,34 +822,66 @@ void InGameManager::User_Pack_PartyRoom_Leader_Delegate(User * _user, char * _da
 	_datasize = datasize;
 }
 
-//// 파티 탈퇴한 유저 정보 패킹
-//void InGameManager::User_Pack_Party_LeaveInfo(User * _user, char * _data, int & _datasize)
-//{
-//	int datasize = 0;
-//	int len = strlen(_user->GetCurCharacter()->GetCharacter_Code());
-//	char* ptr = _data;
-//	char msg[BUFSIZE];
-//
-//	Character* curcharacter = _user->GetCurCharacter();
-//
-//	// 코드 사이즈
-//	memcpy(ptr, &len, sizeof(int));
-//	datasize += sizeof(int);
-//	ptr += sizeof(int);
-//
-//	// 코드
-//	memcpy(ptr, curcharacter->GetCharacter_Code(), len);
-//	datasize += len;
-//	ptr += len;
-//
-//	// 메세지
-//	memset(msg, 0, sizeof(msg));
-//	sprintf(msg, "User_Pack_Party_LeaveInfo :: 강퇴당한 유저의 캐릭터 코드 : [%s] ", curcharacter->GetCharacter_Code());
-//	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-//
-//	_datasize = datasize;
-//}
+// 던전 입장시 스폰위치. (파티원수,유저코드,좌표)
+void InGameManager::User_Pack_Party_Dungeon_SpawnData(User * _user, char * _data, int & _datasize)
+{
+	char* ptr = _data;
+	int size = 0;
 
+	int usercount = 0;
+	int codesize = 0;
+
+	PartyRoom* partyroom_temp = nullptr;
+	User* user_temp = nullptr;
+	Character* character_temp = nullptr;
+
+	int count = 0;
+	Vector3 pos;
+	Vector3 spawnpos[DUNGEON_SPAWNPOS_MAXCOUNT];
+
+	GameDataManager::GetInstance()->Dungeon_SpawnPos_Vecotr(spawnpos);
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	// 채널에 들어와있는 유저 정보 패킹
+	partyroom_temp = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+	
+	usercount = partyroom_temp->GetPartRoomUserNum();
+
+	// 유저 숫자
+	memcpy(ptr, &usercount, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	// 검색초기화
+	partyroom_temp->StartSearchPartyRoom();
+
+	while (partyroom_temp->SearchPartyRoom(user_temp))
+	{
+		character_temp = user_temp->GetCurCharacter();
+		codesize = strlen(character_temp->GetCharacter_Code());
+		pos = spawnpos[count];
+
+		memcpy(ptr, &codesize, sizeof(int));
+		ptr += sizeof(int);
+		size += sizeof(int);
+
+		memcpy(ptr, character_temp->GetCharacter_Code(), codesize);
+		ptr += codesize;
+		size += codesize;
+
+		// 스폰지역
+		memcpy(ptr, &pos, sizeof(Vector3));
+		ptr += sizeof(Vector3);
+		size += sizeof(Vector3);
+
+		count++;
+	}
+
+	_datasize = size;
+
+	CriticalSectionManager::GetInstance()->Leave();
+}
 
 // 파티 초대 결과 패킹
 void InGameManager::User_Pack_Party_Result(User * _user, bool _result, char * _data, int & _datasize)
@@ -1433,16 +1465,10 @@ void InGameManager::User_Send_Party_ToOther(User * _user, PROTOCOL _p, char * _d
 }
 
 // 파티원에게 전송(던전 스폰)
-void InGameManager::User_Send_Dungeon_Spawninfo_ToOther(User * _user, PROTOCOL _p)
+void InGameManager::User_Send_Dungeon_Spawninfo_ToOther(User * _user, PROTOCOL _p, char* _data, int& _datasize)
 {
 	User* user = nullptr;
 	PartyRoom* partyroom = nullptr;
-
-	char buf[BUFSIZE];
-	memset(buf, 0, sizeof(buf));
-	int datasize = 0;
-
-	int count = 1;
 
 	CriticalSectionManager::GetInstance()->Enter();
 
@@ -1454,9 +1480,7 @@ void InGameManager::User_Send_Dungeon_Spawninfo_ToOther(User * _user, PROTOCOL _
 	{
 		if (user->isIngame() && user->getSocket() != _user->getSocket())
 		{
-			// 패킹
-			User_Pack_Dungeon_SpawnData(_user, count, buf, datasize);
-			user->Quepack(_p, buf, datasize);
+			user->Quepack(_p, _data, _datasize);
 			if (user->isSending() == false)
 			{
 				if (user->TakeOutSendPacket())
@@ -1468,10 +1492,9 @@ void InGameManager::User_Send_Dungeon_Spawninfo_ToOther(User * _user, PROTOCOL _
 			char msg[BUFSIZE];
 			memset(msg, 0, sizeof(msg));
 			sprintf(msg, "User_Send_Dungeon_Spawninfo_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-				_p, datasize, user->GetSendQueueSize());
+				_p, _datasize, user->GetSendQueueSize());
 			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
-			count++;
 		}
 	}
 	CriticalSectionManager::GetInstance()->Leave();
@@ -1778,9 +1801,9 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	case CLIENT_INGAME_DUNGEON_ENTER:		// 던전 입장 요청
 		User_EnterInDun_Channel(_user);
 		User_Send_Party_Eneter_Dungeon(_user, SERVER_INGAME_OTHERPLAYER_LEAVE);
-
-		User_Send_Dungeon_Spawninfo_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT);
-		User_Pack_Dungeon_SpawnData(_user, 0, buf, datasize);
+	
+		User_Pack_Party_Dungeon_SpawnData(_user, buf, datasize);
+		User_Send_Dungeon_Spawninfo_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf,datasize );
 		_user->Quepack(SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
 
 		result = RT_INGAME_DUNGEON_ENTER_RESULT;

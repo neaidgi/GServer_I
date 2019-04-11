@@ -54,7 +54,17 @@ public:
 	void SetRotation(const Vector3& _rotation) { m_rotation = _rotation; }
 	void SetScale(const Vector3& _scale) { m_scale = _scale; }
 
-	Monster() { m_monster_name = nullptr; }
+	Monster() 
+	{
+		m_monster_name = nullptr;
+		m_monster_code = 0;
+		m_monster_num = 0;
+		m_monster_health = 0;
+		m_monster_mana = 0;
+		m_monster_attackpoint = 0;
+		m_monster_defensepoint = 0;
+		m_monster_speed = 0;
+	}
 	~Monster()
 	{
 		if (m_monster_name != nullptr)

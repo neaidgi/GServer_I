@@ -19,7 +19,7 @@ private:
 	SpawnData* spawndata;
 	DungeonSpawnData* m_dungeon_spawndata;
 	CharacterData * characterdata;
-	MonsterData* monsterdata;
+	MonsterData* m_monsterdata;
 
 	bool Player_SpawnPos_Load();
 	bool Init_Spawn_Data();			// 스폰위치 초기화(DB에서 스폰위치 읽어옴)

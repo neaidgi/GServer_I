@@ -9,13 +9,14 @@ GameDataManager::GameDataManager()
 	spawndata = new SpawnData();
 	m_dungeon_spawndata = new DungeonSpawnData();
 	characterdata = new CharacterData();
+	m_monsterdata = new MonsterData();
 }
 GameDataManager::~GameDataManager()
 {
 	delete spawndata;
 	delete m_dungeon_spawndata;
 	delete characterdata;
-	
+	delete m_monsterdata;
 }
 
 void GameDataManager::CreateInstance()
@@ -59,6 +60,11 @@ bool GameDataManager::InitializeManager()
 		// 로그
 		return false;
 	}
+	// 몬스터 설계도 초기화
+	if (Init_Monster_Data() == false)
+	{
+		return false;
+	}
 
 	MsgManager::GetInstance()->DisplayMsg("메인", "게임데이터 로드완료");
 	return true;
@@ -97,6 +103,7 @@ bool GameDataManager::Init_Spawn_Data()
 	}
 }
 
+// 캐릭터 설계도 초기화
 bool GameDataManager::Init_Character_Data()
 {
 	// 캐릭터 정보 가져오기
@@ -116,22 +123,23 @@ bool GameDataManager::Init_Character_Data()
 	return true;
 }
 
+// 몬스터 설계도 초기화
 bool GameDataManager::Init_Monster_Data()
 {
-	//// 캐릭터 정보 가져오기
-	//Monster * origin[2];
-	//for (int i = 0; i < 20; i++)
-	//{
-	//	origin[i] = new Monster();
-	//}
-	//MsgManager::GetInstance()->DisplayMsg("메인", "몬스터설계도 로드중");
-	//if (DBManager::GetInstance()->Character_Req_CharacterInfo(origin) == false)
-	//{
-	//	return false;
-	//}
+	// 캐릭터 정보 가져오기
+	Monster * origin[MAXMONSTERORIGIN];
+	for (int i = 0; i < MAXMONSTERORIGIN; i++)
+	{
+		origin[i] = new Monster();
+	}
+	MsgManager::GetInstance()->DisplayMsg("메인", "몬스터설계도 로드중");
+	if (DBManager::GetInstance()->Character_Req_MonsterInfo(origin) == false)
+	{
+		return false;
+	}
 
-	//characterdata->SetCharacterOrigin(origin);
-	//MsgManager::GetInstance()->DisplayMsg("메인", "몬스터설계도 로드완료");
+	m_monsterdata->SetMonsterOrigin(origin);
+	MsgManager::GetInstance()->DisplayMsg("메인", "몬스터설계도 로드완료");
 	return true;
 }
 

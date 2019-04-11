@@ -116,6 +116,13 @@ enum PROTOCOL {
 	SERVER_INGAME_DUNGEON_ENTER_RESULT,			// 서버 던전 입장
 	SERVER_INGAME_DUNGEON_LEAVE_RESULT,			// 서버 던전 퇴장
 
+	// 몬스터 프로토콜
+	//CLIENT_INGAME_MONSTER_INFO,
+
+
+	//SERVER_INGAME_MONSTER_INFO_RESLULT,
+
+
 	// 채팅 프로토콜
 	CLIENT_REQ_CHAT_LIST,					// 현재 로그인한 회원리스트 요청 			 프로토콜만
 	SERVER_CHAT_LIST_RESULT,				// 현재 로그인한 회원리스트 요청 결과 		[인원 수] [닉네임 사이즈] [닉네임]...
@@ -230,7 +237,8 @@ struct WSAOVERLAPPEDEx {
 #define ENCRYPT_KEY 951324896
 
 #define MAXCHARACTERORIGIN 4
-#define MAXMONSTERORIGIN 20
+// 몬스터 숫자
+#define MAXMONSTERORIGIN 3
 #define MOVETIME 0.02
 
 #endif

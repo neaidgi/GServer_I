@@ -75,6 +75,9 @@ private:
 	void User_Pack_Party_KickInfo(User* _user, char* _data, int& _datasize, char*_code);
 	// 파티 리더 바뀐 유저 정보 패킷. (코드, 코드)
 	void User_Pack_PartyRoom_Leader_Delegate(User* _user, char* _data, int& _datasize, char* _code);
+	// 던전 입장시 스폰위치. (파티원수,유저코드,좌표)
+	void User_Pack_Party_Dungeon_SpawnData(User* _user,char* _data,int& _datasize);
+
 
 	// 현재 캐릭터 DB에 저장
 	void User_CurCharacter_Save(User* _user);
@@ -96,7 +99,7 @@ private:
 	// 파티원에게 전송
 	void User_Send_Party_ToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);
 	// 파티원에게 전송(던전 스폰)
-	void User_Send_Dungeon_Spawninfo_ToOther(User* _user, PROTOCOL _p);
+	void User_Send_Dungeon_Spawninfo_ToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);
 	// 던전에 들어갔을때 채널에 속해있는 유저들한테 전송
 	void User_Send_Party_Eneter_Dungeon(User* _user, PROTOCOL _p);
 	// 던전에 나갔을때 채널에 속해있는 유저들한테 전송
