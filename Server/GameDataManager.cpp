@@ -10,11 +10,13 @@ GameDataManager::GameDataManager()
 	m_dungeon_spawndata = new DungeonSpawnData();
 	characterdata = new CharacterData();
 	m_monsterdata = new MonsterData();
+	m_monster_spawndata = new MonsterSpawnData();
 }
 GameDataManager::~GameDataManager()
 {
 	delete spawndata;
 	delete m_dungeon_spawndata;
+	delete m_monster_spawndata;
 	delete characterdata;
 	delete m_monsterdata;
 }
@@ -65,7 +67,10 @@ bool GameDataManager::InitializeManager()
 	{
 		return false;
 	}
-
+	if (Init_Monster_Spawn_Data() == false)
+	{
+		return false;
+	}
 	MsgManager::GetInstance()->DisplayMsg("메인", "게임데이터 로드완료");
 	return true;
 }
@@ -166,6 +171,32 @@ bool GameDataManager::Dungeon_SpawnPos_Load()
 bool GameDataManager::Init_Dungeon_Spawn_Data()
 {
 	if (Dungeon_SpawnPos_Load() == false)
+	{
+		return false;
+	}
+}
+
+// 몬스터 스폰위치 저장
+bool GameDataManager::Monster_SpawnPos_Load()
+{
+	Vector3 pos[MONSTER_SPAWNPOS_MAXCOUNT];
+	int count = 0;
+
+	if (DBManager::GetInstance()->Charactor_Req_MonsterSpawnPos(pos, count) == false)
+	{
+		return false;
+	}
+	else
+	{
+		m_monster_spawndata->SetMonsterSpawnPos(pos, count);
+		return true;
+	}
+}
+
+// 몬스터 스폰위치 초기화
+bool GameDataManager::Init_Monster_Spawn_Data()
+{
+	if (Monster_SpawnPos_Load() == false)
 	{
 		return false;
 	}

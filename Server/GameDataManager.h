@@ -18,8 +18,10 @@ private:
 
 	SpawnData* spawndata;
 	DungeonSpawnData* m_dungeon_spawndata;
+	MonsterSpawnData* m_monster_spawndata;
 	CharacterData * characterdata;
 	MonsterData* m_monsterdata;
+
 
 	bool Player_SpawnPos_Load();
 	bool Init_Spawn_Data();			// 스폰위치 초기화(DB에서 스폰위치 읽어옴)
@@ -27,6 +29,8 @@ private:
 	bool Init_Monster_Data();		// 몬스터 정보 초기화
 	bool Dungeon_SpawnPos_Load();	// 던전 스폰위치 저장
 	bool Init_Dungeon_Spawn_Data();	// 던전 스폰위치 초기화
+	bool Monster_SpawnPos_Load();	// 
+	bool Init_Monster_Spawn_Data();	// 스폰위치 초기화(DB에서 스폰위치 읽어옴)
 public:
 	static void CreateInstance();
 	static GameDataManager* GetInstance();

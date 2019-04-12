@@ -24,9 +24,9 @@ public:
 
 class DungeonSpawnData {
 private:
-	// 캐릭터 스폰위치
+	// 던전 캐릭터 스폰위치
 	Vector3 m_dungeon_spawn_pos[DUNGEON_SPAWNPOS_MAXCOUNT];
-	// 캐릭터 스폰위치 카운트
+	// 던전 캐릭터 스폰위치 카운트
 	int m_dungeon_spawnpos_count;
 public:
 	DungeonSpawnData();
@@ -37,5 +37,23 @@ public:
 
 	// 접근지정자
 	const Vector3* Dungeon_Spawn_PosData();
+};
+
+
+class MonsterSpawnData {
+private:
+	// 몬스터 스폰위치
+	Vector3 m_monster_spawn_pos[MONSTER_SPAWNPOS_MAXCOUNT];
+	// 몬스터 스폰위치 카운트
+	int m_dungeon_spawnpos_count;
+public:
+	MonsterSpawnData();
+	~MonsterSpawnData();
+
+	void SetMonsterSpawnPos(Vector3* _v, int _count);
+	void SetMonsterSpawnCount(int _count) { m_dungeon_spawnpos_count = _count; }
+
+	// 접근지정자
+	const Vector3* Monster_Spawn_PosData();
 };
 #endif

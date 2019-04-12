@@ -53,7 +53,7 @@ bool InGameManager::MangerInitialize()
 // 서버 종료
 void InGameManager::EndManager()
 {
-	delete channelsystem;
+
 }
 
 // 접속한 유저리스트 보냄
@@ -1837,7 +1837,6 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 	// 파티에 속해있고 던전에 들어와있으면
 	if (_user->isParty() == true && _user->isDungeon() == true)
 	{
-		// 아직 미구현했지요
 		if (_user->isPartyLeader())
 		{
 			// 파티원들한테 파티방 터트렸다는 패킷을보냄

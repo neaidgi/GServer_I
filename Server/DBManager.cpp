@@ -1005,6 +1005,7 @@ bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 	}
 }
 
+// 던전 캐릭터 스폰위치 요청
 bool DBManager::Charactor_Req_DungeonSpawnPos(Vector3 * _pos, int & _count)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -1053,6 +1054,59 @@ bool DBManager::Charactor_Req_DungeonSpawnPos(Vector3 * _pos, int & _count)
 	else
 	{
 		fprintf(stderr, "Mysql Charactor_Req_DungeonSpawnPos error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+// 몬스터 스폰위치 요청
+bool DBManager::Charactor_Req_MonsterSpawnPos(Vector3 * _pos, int & _count)
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT * FROM MonsterSpawnPos";
+	int state = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, base_query);
+	MsgManager::GetInstance()->DisplayMsg("DB", "몬스터 스폰 위치 요청 중");
+	// 성공
+	if (state == 0)
+	{
+		MsgManager::GetInstance()->DisplayMsg("DB", "몬스터 스폰 위치 요청 성공");
+		sql_result = mysql_store_result(mysql);
+
+		int i = 0;
+
+		while (1)
+		{
+			sql_row = mysql_fetch_row(sql_result);
+			if (sql_row == NULL)
+			{
+				break;
+			}
+
+			_pos[i].x = atof(sql_row[1]);
+			_pos[i].y = atof(sql_row[2]);
+			_pos[i].z = atof(sql_row[3]);
+
+			i++;
+		}
+
+		_count = mysql_num_rows(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Charactor_Req_MonsterSpawnPos error : %s \n", mysql_error(mysql));
 		return false;
 	}
 }
