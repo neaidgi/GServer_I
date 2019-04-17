@@ -160,9 +160,17 @@ bool GameDataManager::Dungeon_SpawnPos_Load()
 	{
 		return false;
 	}
+
+	Vector3 stagepos[DUNGEON_SPAWNPOS_MAXCOUNT];
+	int stage_count = 0;
+	if (db->Charactor_Req_DungeonStageSpawnPos(stagepos, stage_count) == false)
+	{
+		return false;
+	}
 	else
 	{
 		m_dungeon_spawndata->SetDungeonSpawnPos(pos, count);
+		m_dungeon_spawndata->SetDungeonStageSpawnPos(stagepos, count);
 		return true;
 	}
 }
@@ -202,7 +210,6 @@ bool GameDataManager::Init_Monster_Spawn_Data()
 	}
 }
 
-
 // 플레이어 스폰위치 배열
 void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 {
@@ -214,6 +221,12 @@ void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 void GameDataManager::Dungeon_SpawnPos_Vecotr(Vector3 * _pos)
 {
 	memcpy(_pos, m_dungeon_spawndata->Dungeon_Spawn_PosData(), sizeof(Vector3) * 4);
+}
+
+// 던전 스테이지 스폰위치 배열
+void GameDataManager::Dungeon_Stage_SpawnPos_Vecotr(Vector3 * _pos)
+{
+	memcpy(_pos, m_dungeon_spawndata->Dungeon_Stage_Spawn_PosData(), sizeof(Vector3) * 4);
 }
 
 // 직업에따라 설계도 가져옴
@@ -232,6 +245,23 @@ void GameDataManager::Character_Origin_Data(int _jobcode, const Character*& _job
 		break;
 	case GUNNER:
 		_job = characterdata->GetGunner();
+		break;
+	}
+}
+
+// 몬스터 코드에 따라 설계도 가져옴
+void GameDataManager::Monster_Origin_Data(int _monstercode, const Monster *& _monster)
+{
+	switch (_monstercode)
+	{
+	case SPIDER:
+		_monster = m_monsterdata->GetSpider();
+		break;
+	case WORM:
+		_monster = m_monsterdata->GetWorm();
+		break;
+	case BOSS_SPIDER:
+		_monster = m_monsterdata->GetBossSpider();
 		break;
 	}
 }

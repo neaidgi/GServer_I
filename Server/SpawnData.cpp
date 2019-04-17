@@ -28,6 +28,7 @@ const Vector3 * SpawnData::Character_Spawn_PosData()
 DungeonSpawnData::DungeonSpawnData()
 {
 	m_dungeon_spawnpos_count = 0;
+	m_dungeon_stage_spawnpos_count = 0;
 }
 
 DungeonSpawnData::~DungeonSpawnData()
@@ -42,9 +43,22 @@ void DungeonSpawnData::SetDungeonSpawnPos(Vector3 * _v, int _count)
 	}
 }
 
+void DungeonSpawnData::SetDungeonStageSpawnPos(Vector3 * _v, int _count)
+{
+	for (int i = 0; i < _count; i++)
+	{
+		m_dungeon_stage_spawn_pos[i] = _v[i];
+	}
+}
+
 const Vector3 * DungeonSpawnData::Dungeon_Spawn_PosData()
 {
 	return m_dungeon_spawn_pos;
+}
+
+const Vector3 * DungeonSpawnData::Dungeon_Stage_Spawn_PosData()
+{
+	return m_dungeon_stage_spawn_pos;
 }
 
 

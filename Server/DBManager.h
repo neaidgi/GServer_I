@@ -50,6 +50,7 @@ public:
 
 	bool Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count);
 	bool Charactor_Req_DungeonSpawnPos(Vector3 * _pos, int& _count);
+	bool Charactor_Req_DungeonStageSpawnPos(Vector3 * _pos, int& _count);
 	bool Charactor_Req_MonsterSpawnPos(Vector3 * _pos, int& _count);
 };
 

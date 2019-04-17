@@ -8,35 +8,14 @@
 
 #define PARTYMAXUSER 4
 
-// 파티방안에 있는 유저정보 구조체 // 현재사용안함 2019-03-21
-struct PartyUser
-{
-	User* user;
-	bool Partyleader;
-
-	PartyUser()
-	{
-		user = nullptr; Partyleader = false;
-	}
-
-	PartyUser(User* _user)
-	{
-		user = _user; Partyleader = false;
-	}
-
-	~PartyUser()
-	{
-		user = nullptr;
-	}
-};
-
 // 파티방
 class PartyRoom
 {
 private:
 	// 파티 번호
-	char partyroom_num;			
-
+	int partyroom_num;			
+	// 던전 스테이지 번호
+	DUNGEON_STAGE m_dungeon_stage_num;
 	// 파티 유저 리스트
 	std::list<User*> m_partyuser;	
 	std::list<User*>::iterator save;
@@ -83,6 +62,16 @@ public:
 	void DungeonEnter_PartyRoom();
 	// 던전 퇴장
 	void DungeonLeave_PartyRoom();
+
+
+	// 스테이지 변경
+	void SetDungeonStage(DUNGEON_STAGE _stage_num) { m_dungeon_stage_num = _stage_num; }
+	// 지금 몇번째 스테이지인지
+	DUNGEON_STAGE GetDungeonStage() { return m_dungeon_stage_num; }
+	// 스테이지 상승
+	void RiseStage();
+	// 스테이지에 맞는 몬스터 정보 셋팅
+	void SetDungeonMonsterinfo();
 
 };
 

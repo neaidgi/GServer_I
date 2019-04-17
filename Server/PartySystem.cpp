@@ -4,8 +4,9 @@
 
 PartyRoom::PartyRoom(int _partyroomnum)
 {
-	m_monster_control = nullptr;
+	m_monster_control = new MonsterControl();
 	partyroom_num = _partyroomnum;
+	m_dungeon_stage_num = DEFAULT_STAGE;
 }
 
 PartyRoom::~PartyRoom()
@@ -32,10 +33,7 @@ PartyRoom::~PartyRoom()
 // 초기화
 void PartyRoom::InitPartyRoom()
 {
-	if (m_monster_control == nullptr)
-	{
-		m_monster_control = new MonsterControl();
-	}
+
 }
 
 // 마무리
@@ -225,6 +223,65 @@ void PartyRoom::DungeonLeave_PartyRoom()
 	}
 }
 
+// 스테이지 상승
+void PartyRoom::RiseStage()
+{
+	switch (m_dungeon_stage_num)
+	{
+	case DUNGEON_STAGE_NORMAL_1:
+		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_1;
+		break;
+	case DUNGEON_STAGE_BOSS_1:
+		m_dungeon_stage_num = DUNGEON_STAGE_NORMAL_2;
+		break;
+	case DUNGEON_STAGE_NORMAL_2:
+		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_2;
+		break;
+	case DUNGEON_STAGE_BOSS_2:
+		m_dungeon_stage_num = DUNGEON_STAGE_NORMAL_3;
+		break;
+	case DUNGEON_STAGE_NORMAL_3:
+		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_3;
+		break;
+	case DUNGEON_STAGE_BOSS_3:
+		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_4;
+		break;
+	default:
+		break;
+	}
+}
+
+// 스테이지에 맞는 몬스터 정보 셋팅
+void PartyRoom::SetDungeonMonsterinfo()
+{
+	// 스테이지에 맞는 몬스터 정보를 세팅하기전에 데이터가 들어있으면 리셋한다.
+	if (m_monster_control->GetMonsterList_Empty() == false)
+	{
+		m_monster_control->ResetMonsterInfo();
+	}
+
+	switch (m_dungeon_stage_num)
+	{
+	case DUNGEON_STAGE_NORMAL_1:
+		m_monster_control->SetFirstStage_NormalMonster();
+		break;
+	case DUNGEON_STAGE_BOSS_1:
+		break;
+	case DUNGEON_STAGE_NORMAL_2:
+		break;
+	case DUNGEON_STAGE_BOSS_2:
+		break;
+	case DUNGEON_STAGE_NORMAL_3:
+		break;
+	case DUNGEON_STAGE_BOSS_3:
+		break;
+	case DUNGEON_STAGE_BOSS_4:
+		break;
+	default:
+		break;
+	}
+}
+
 
 
 // Class PartySystem
@@ -333,6 +390,8 @@ bool PartySystem::Party_Remove(User * _user)
 		}
 
 		m_partyroom_list.remove(target);
+		delete target;
+		target = nullptr;
 		return true;
 	}
 

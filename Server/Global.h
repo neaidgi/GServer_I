@@ -61,7 +61,7 @@ enum PROTOCOL {
 	SERVER_TENDER_LIST_RESULT,					// 입찰 리스트 요청 결과
 	CLIENT_REQ_TENDER_PARTICIPATE,				// 입찰 요청
 	SERVER_TENDER_PARTICIPATE_RESULT,			// 입찰 요청 결과
-	SERVER_TENDER_END_RESULT,					// 입찰 종료 결과 [프로토콜][char* 메세지]
+	SERVER_TENDER_END_RESULT,					// 입찰 종료 결과		[프로토콜][char* 메세지]
 
 	CLIENT_INGAME_OTHERPLAYERLIST,				// 클라 다른플레이어 리스트 요청	[프로토콜][]
 	CLIENT_INGAME_MOVE_START,					// 클라 이동 시작					[프로토콜]
@@ -70,7 +70,7 @@ enum PROTOCOL {
 	CLIENT_INGAME_MOVE_ROTATION,				// 클라 회전
 	SERVER_INGAME_MOVE_ORDER,					// 서버 이동 명령				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
 	SERVER_INGAME_MOVE_RESULT,					// 서버 이동 결과				[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간]
-	SERVER_INGAME_MOVE_OTHERPLAYERINFO,			// 서버 다른플레이어 이동정보			[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
+	SERVER_INGAME_MOVE_OTHERPLAYERINFO,			// 서버 다른플레이어 이동정보	[프로토콜][FLOAT][FLOAT][FLOAT][FLOAT : 시간][닉네임사이즈][닉네임]
 	SERVER_INGAME_MOVE_ROTATION,				// 클라 회전
 	SERVER_INGAME_OTHERPLAYERLIST_RESULT,		// 서버 플레이어 리스트			[프로토콜][INT:카운트][INT:닉네임사이즈][CHAR:닉네임][VECTOR:위치]...
 	SERVER_INGAME_OTHERPLAYER_CONNECT,			// 서버 플레이어 접속 정보
@@ -112,16 +112,17 @@ enum PROTOCOL {
 	// 던전 프로토콜
 	CLIENT_INGAME_DUNGEON_ENTER,				// 클라 던전 입장
 	CLIENT_INGAME_DUNGEON_LEAVE,				// 클라 던전 퇴장
+	CLIENT_INGAME_DUNGEON_STAGE_IN,				// 클라 던전 스테이지에 입장하겠다는 프로토콜(리더가보냄)
 
-	SERVER_INGAME_DUNGEON_ENTER_RESULT,			// 서버 던전 입장
-	SERVER_INGAME_DUNGEON_LEAVE_RESULT,			// 서버 던전 퇴장
+	SERVER_INGAME_DUNGEON_ENTER_RESULT,			// 서버 던전 입장 결과
+	SERVER_INGAME_DUNGEON_LEAVE_RESULT,			// 서버 던전 퇴장 결과
+	SERVER_INGAME_DUNGEON_STAGE_IN_REULST,		// 서버 던전 스테이지에 입장결과
 
 	// 몬스터 프로토콜
-	CLIENT_INGAME_MONSTER_INFO,
+	CLIENT_INGAME_MONSTER_MOVE,					// 클라 파티리더가 몬스터 이동정보를 보낸다
 
-
-	SERVER_INGAME_MONSTER_INFO_RESLULT,
-
+	SERVER_INGAME_MONSTER_INFO,					// 서버 몬스터 정보를 주는 프로토콜
+	SERVER_INGAME_MONSTER_MOVE_RESULT,			// 서버 몬스터 이동정보
 
 	// 채팅 프로토콜
 	CLIENT_REQ_CHAT_LIST,					// 현재 로그인한 회원리스트 요청 			 프로토콜만
@@ -200,7 +201,8 @@ enum RESULT {
 	RT_INGAME_PARTY_USER_LEAVE_RESULT,		// 탈퇴 결과
 	RT_INGAME_PARTY_LEADER_DELEGATE_RESULT,	// 파티장 위임 결과
 	RT_INGAME_DUNGEON_ENTER_RESULT,			// 던전 입장 결과
-	RT_INGAME_DUNGEON_LEAVE_RESULT			// 던전 퇴장 결과
+	RT_INGAME_DUNGEON_LEAVE_RESULT,			// 던전 퇴장 결과
+	RT_INGAME_DUNGEON_STAGE_IN_RESULT		// 던전 스테이지 입장 결과
 };
 
 // 직업코드
@@ -212,8 +214,29 @@ enum CHARACTER_JOB
 	GUNNER = 4000
 };
 
+// 몬스터코드
+enum MONSTER_ORIGINCODE
+{
+	SPIDER = 1001,
+	WORM = 1002,
+	BOSS_SPIDER = 1003
+
+};
+
 enum IOTYPE {
 	IOTYPE_ACCEPT = 200, IOTYPE_RECV, IOTYPE_SEND, IOTYPE_ONESIDED_SEND
+};
+
+enum DUNGEON_STAGE
+{
+	DEFAULT_STAGE = 0,
+	DUNGEON_STAGE_NORMAL_1 = 10,
+	DUNGEON_STAGE_BOSS_1,
+	DUNGEON_STAGE_NORMAL_2 = 20,
+	DUNGEON_STAGE_BOSS_2,
+	DUNGEON_STAGE_NORMAL_3 = 30,
+	DUNGEON_STAGE_BOSS_3,
+	DUNGEON_STAGE_BOSS_4 = 40
 };
 
 struct WSAOVERLAPPEDEx {
@@ -240,6 +263,8 @@ struct WSAOVERLAPPEDEx {
 #define MAXCHARACTERORIGIN 4
 // 몬스터 숫자
 #define MAXMONSTERORIGIN 3
+// 첫번째 스테이지 몬스터 숫자
+#define FIRSTSTAGE_NORMALMONSTER_1 10
 #define MOVETIME 0.02
 
 #endif
@@ -290,5 +315,6 @@ struct WSAOVERLAPPEDEx {
 
 	[초대받는사람 - 클라 - ]
 	9-1.유저 정보를 받는다(유저숫자,유저코드,유저닉네임,유저직업,유저체력,유저마나) -끝-						/ SERVER_INGAME_PARTY_ROOM_JOIN_RESULT // 서버 파티 참여 결과
+
 
 */

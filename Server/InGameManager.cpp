@@ -40,7 +40,7 @@ void InGameManager::DestroyInstance()
 
 bool InGameManager::MangerInitialize()
 {
-	// 인증, 채널시스템 초기화
+	// 인증, 채널시스템,파티시스템 초기화
 	verification = new CharacterVerification();
 	channelsystem = new ChannelSystem();
 	m_partysystem = new PartySystem();
@@ -883,6 +883,123 @@ void InGameManager::User_Pack_Party_Dungeon_SpawnData(User * _user, char * _data
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
+// 던전 스테이지 입장시 스폰위치. (파티원수,유저코드,좌표)
+void InGameManager::User_Pack_Party_Dungeon_Stage_SpawnData(User * _user, char * _data, int & _datasize)
+{
+	char* ptr = _data;
+	int size = 0;
+
+	int usercount = 0;
+	int codesize = 0;
+
+	PartyRoom* partyroom_temp = nullptr;
+	User* user_temp = nullptr;
+	Character* character_temp = nullptr;
+
+	int count = 0;
+	Vector3 pos;
+	Vector3 spawnpos[DUNGEON_SPAWNPOS_MAXCOUNT];
+
+	GameDataManager::GetInstance()->Dungeon_Stage_SpawnPos_Vecotr(spawnpos);
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	// 채널에 들어와있는 유저 정보 패킹
+	partyroom_temp = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	usercount = partyroom_temp->GetPartRoomUserNum();
+
+	// 유저 숫자
+	memcpy(ptr, &usercount, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	// 검색초기화
+	partyroom_temp->StartSearchPartyRoom();
+
+	while (partyroom_temp->SearchPartyRoom(user_temp))
+	{
+		character_temp = user_temp->GetCurCharacter();
+		codesize = strlen(character_temp->GetCharacter_Code());
+		pos = spawnpos[count];
+
+		memcpy(ptr, &codesize, sizeof(int));
+		ptr += sizeof(int);
+		size += sizeof(int);
+
+		memcpy(ptr, character_temp->GetCharacter_Code(), codesize);
+		ptr += codesize;
+		size += codesize;
+
+		// 스폰지역
+		memcpy(ptr, &pos, sizeof(Vector3));
+		ptr += sizeof(Vector3);
+		size += sizeof(Vector3);
+
+		count++;
+	}
+
+	_datasize = size;
+
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+// 던전 스테이지 입장시 몬스터 정보.
+void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char * _data, int & _datasize)
+{
+	//char* ptr = _data;
+	//int size = 0;
+
+	//int monstercount = 0;
+
+	//PartyRoom* partyroom_temp = nullptr;
+
+	//int count = 0;
+	//Vector3 pos;
+	//Vector3 spawnpos[DUNGEON_SPAWNPOS_MAXCOUNT];
+
+	//GameDataManager::GetInstance()->Dungeon_Stage_SpawnPos_Vecotr(spawnpos);
+
+	//CriticalSectionManager::GetInstance()->Enter();
+
+	//// 파티방
+	//partyroom_temp = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	//// 유저 숫자
+	//memcpy(ptr, &usercount, sizeof(int));
+	//ptr += sizeof(int);
+	//size += sizeof(int);
+
+	//// 검색초기화
+	//partyroom_temp->StartSearchPartyRoom();
+
+	//while (partyroom_temp->SearchPartyRoom(user_temp))
+	//{
+	//	character_temp = user_temp->GetCurCharacter();
+	//	codesize = strlen(character_temp->GetCharacter_Code());
+	//	pos = spawnpos[count];
+
+	//	memcpy(ptr, &codesize, sizeof(int));
+	//	ptr += sizeof(int);
+	//	size += sizeof(int);
+
+	//	memcpy(ptr, character_temp->GetCharacter_Code(), codesize);
+	//	ptr += codesize;
+	//	size += codesize;
+
+	//	// 스폰지역
+	//	memcpy(ptr, &pos, sizeof(Vector3));
+	//	ptr += sizeof(Vector3);
+	//	size += sizeof(Vector3);
+
+	//	count++;
+	//}
+
+	//_datasize = size;
+
+	//CriticalSectionManager::GetInstance()->Leave();
+}
+
 // 파티 초대 결과 패킹
 void InGameManager::User_Pack_Party_Result(User * _user, bool _result, char * _data, int & _datasize)
 {
@@ -1276,7 +1393,7 @@ void InGameManager::User_LeaveInDun_Channel(User * _user)
 	}
 }
 
-// 다른유저에게 전송해줌
+// 다른 유저 이동정보 전송(채널에 접속해있는 유저들한테 전송)
 void InGameManager::User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char * _data, int & _datasize)
 {
 	User* user = nullptr;
@@ -1312,6 +1429,11 @@ void InGameManager::User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char * _
 // 다른 유저 인게임에서 떠난 정보 전송
 void InGameManager::User_Send_LeaveInfoToOther(User * _user, PROTOCOL _p, char * _data, int & _datasize)
 {
+	char buf[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	char* ptr = buf;
+	int datasize = 0;
+
 	User* user = nullptr;
 
 	CriticalSectionManager::GetInstance()->Enter();
@@ -1329,7 +1451,10 @@ void InGameManager::User_Send_LeaveInfoToOther(User * _user, PROTOCOL _p, char *
 	}// 파티에 속해있으며 파티방장이면 파티방 터트린다.
 	else if (_user->isParty() && _user->isPartyLeader())
 	{
+		User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_ROOM_REMOVE_RESULT, buf, datasize);
 
+		// 파티없앤다
+		User_Remove_PartyRoom(_user);
 	}
 
 	CriticalSectionManager::GetInstance()->Leave();
@@ -1464,42 +1589,6 @@ void InGameManager::User_Send_Party_ToOther(User * _user, PROTOCOL _p, char * _d
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
-// 파티원에게 전송(던전 스폰)
-void InGameManager::User_Send_Dungeon_Spawninfo_ToOther(User * _user, PROTOCOL _p, char* _data, int& _datasize)
-{
-	User* user = nullptr;
-	PartyRoom* partyroom = nullptr;
-
-	CriticalSectionManager::GetInstance()->Enter();
-
-	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
-
-	partyroom->StartSearchPartyRoom();
-
-	while (partyroom->SearchPartyRoom(user))
-	{
-		if (user->isIngame() && user->getSocket() != _user->getSocket())
-		{
-			user->Quepack(_p, _data, _datasize);
-			if (user->isSending() == false)
-			{
-				if (user->TakeOutSendPacket())
-				{
-					user->IOCP_SendMsg();
-				}
-			}
-			// 메세지
-			char msg[BUFSIZE];
-			memset(msg, 0, sizeof(msg));
-			sprintf(msg, "User_Send_Dungeon_Spawninfo_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-				_p, _datasize, user->GetSendQueueSize());
-			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-		}
-	}
-	CriticalSectionManager::GetInstance()->Leave();
-}
-
 // 던전에 들어갔을대 채널에 속해있는 유저들한테 전송
 void InGameManager::User_Send_Party_Eneter_Dungeon(User * _user, PROTOCOL _p)
 {
@@ -1609,10 +1698,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 			User_Pack_UserCode(_user, rdata, rdatasize);
 			User_Send_Channel_LeaveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_LEAVE, oldchannelnum, rdata, rdatasize);
 		}
-
 		sendprotocol = SERVER_INGAME_CHANNLE_CHANGE_RESULT;
 		_user->Quepack(sendprotocol, buf, datasize);
-
 		result = RT_INGAME_CHANNEL_CHANGE;
 		break;
 	case CLIENT_INGAME_MENU_REQ_CHARACTER:	// 캐릭터 선택화면 요청
@@ -1643,7 +1730,6 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 
 		// 유저 정보 초기화
 		_user->ResetUserInfo();
-
 		result = RT_INGAME_MENU_LOGOUT;
 		break;
 	case CLIENT_INGAME_MENU_EXIT:			// 게임종료 요청
@@ -1803,7 +1889,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_Send_Party_Eneter_Dungeon(_user, SERVER_INGAME_OTHERPLAYER_LEAVE);
 	
 		User_Pack_Party_Dungeon_SpawnData(_user, buf, datasize);
-		User_Send_Dungeon_Spawninfo_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf,datasize );
+		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf,datasize );
 		_user->Quepack(SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
 
 		result = RT_INGAME_DUNGEON_ENTER_RESULT;
@@ -1813,6 +1899,19 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_LeaveInDun_Channel(_user);
 
 		result = RT_INGAME_DUNGEON_LEAVE_RESULT;
+		break;
+	case CLIENT_INGAME_DUNGEON_STAGE_IN:	// 스테이지 입장 프로토콜
+		// 스테이지 입장시 캐릭터 좌표 전송
+		User_Pack_Party_Dungeon_Stage_SpawnData(_user, buf, datasize);
+		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_STAGE_IN_REULST, buf, datasize);
+		_user->Quepack(SERVER_INGAME_DUNGEON_STAGE_IN_REULST, buf, datasize);
+
+		// 스테이지 입장시 몬스터 정보 전송
+
+		User_Send_Party_ToOther(_user, SERVER_INGAME_MONSTER_MOVE_RESULT, buf, datasize);
+		_user->Quepack(SERVER_INGAME_MONSTER_MOVE_RESULT, buf, datasize);
+
+		result = RT_INGAME_DUNGEON_STAGE_IN_RESULT;
 		break;
 	default:
 		break;

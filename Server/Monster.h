@@ -11,7 +11,7 @@ private:
 	Vector3 m_rotation;				// 방향
 	Vector3 m_scale;				// 크기
 	char* m_monster_name;			// 몬스터 이름
-	int m_monster_code;			// 고유코드
+	int m_monster_code;				// 고유코드
 	int m_monster_num;				// 몬스터 번호
 	float m_monster_health;			// 체력
 	float m_monster_mana;			// 마나
@@ -23,16 +23,16 @@ public:
 
 	const char* GetMonster_Name() const { return m_monster_name; }
 	int GetMonster_Code() const { return m_monster_code; }
-	int GetMonster_Num() { return m_monster_num; }
-	float GetMonster_Health() { return m_monster_health; }
-	float GetMonster_Mana() { return m_monster_mana; }
-	int GetMonster_AttackPoint() { return m_monster_attackpoint; }
-	int GetMonster_DefensePoint() { return m_monster_defensepoint; }
-	int GetMonster_Speed() { return m_monster_speed; }
+	int GetMonster_Num() const { return m_monster_num; }
+	float GetMonster_Health() const { return m_monster_health; }
+	float GetMonster_Mana() const { return m_monster_mana; }
+	int GetMonster_AttackPoint() const { return m_monster_attackpoint; }
+	int GetMonster_DefensePoint() const { return m_monster_defensepoint; }
+	int GetMonster_Speed() const { return m_monster_speed; }
 
-	const Vector3 GetPosition() { return m_position; }
-	const Vector3 GetRotation() { return m_rotation; }
-	const Vector3 GetScale() { return m_scale; }
+	const Vector3 GetPosition() const { return m_position; }
+	const Vector3 GetRotation() const { return m_rotation; }
+	const Vector3 GetScale() const { return m_scale; }
 
 	void SetMonster_Name(const char* _monster_name)
 	{
@@ -54,7 +54,7 @@ public:
 	void SetRotation(const Vector3& _rotation) { m_rotation = _rotation; }
 	void SetScale(const Vector3& _scale) { m_scale = _scale; }
 
-	Monster() 
+	Monster()
 	{
 		m_monster_name = nullptr;
 		m_monster_code = 0;
