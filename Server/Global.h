@@ -119,6 +119,7 @@ enum PROTOCOL {
 	SERVER_INGAME_DUNGEON_STAGE_IN_REULST,		// 서버 던전 스테이지에 입장결과
 
 	// 몬스터 프로토콜
+	CLIENT_INGAME_MONSTER_INFO,					// 클라 몬스터 정보 요청
 	CLIENT_INGAME_MONSTER_MOVE,					// 클라 파티리더가 몬스터 이동정보를 보낸다
 
 	SERVER_INGAME_MONSTER_INFO,					// 서버 몬스터 정보를 주는 프로토콜
@@ -202,7 +203,8 @@ enum RESULT {
 	RT_INGAME_PARTY_LEADER_DELEGATE_RESULT,	// 파티장 위임 결과
 	RT_INGAME_DUNGEON_ENTER_RESULT,			// 던전 입장 결과
 	RT_INGAME_DUNGEON_LEAVE_RESULT,			// 던전 퇴장 결과
-	RT_INGAME_DUNGEON_STAGE_IN_RESULT		// 던전 스테이지 입장 결과
+	RT_INGAME_DUNGEON_MONSTER_INFO_RESULT,	// 던전 몬스터 정보 결과
+	RT_INGAME_DUNGEON_STAGE_IN_RESULT,		// 던전 스테이지 입장 결과
 };
 
 // 직업코드

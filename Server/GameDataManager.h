@@ -41,11 +41,9 @@ public:
 
 	void Character_SpawnPos_Vector(Vector3 * _pos);
 	void Dungeon_SpawnPos_Vecotr(Vector3* _pos);
+	void Dungeon_Monster_SpawnPos_Vector(Vector3* _pos);
 	void Dungeon_Stage_SpawnPos_Vecotr(Vector3* _pos);
-	//const Character* GetTanker() { return characterdata->GetTanker(); }
-	//const Character* GetWarrior() { return characterdata->GetWarrior(); }
-	//const Character* GetMagician() { return characterdata->GetMagician(); }
-	//const Character* GetGunner() { return characterdata->GetGunner(); }
+
 	void GameDataManager::Character_Origin_Data(int _jobcode, const Character*& _job);
 	void Monster_Origin_Data(int _monstercode, const Monster*& _monster);
 };

@@ -90,7 +90,7 @@ void PartyRoom::PartyRoomAddUser(User* _user)
 bool PartyRoom::PartyRoomRemoveUser(User* _user)
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 		if (target == _user)
@@ -106,7 +106,7 @@ bool PartyRoom::PartyRoomRemoveUser(User* _user)
 bool PartyRoom::PartyRoomRemoveUser(char * _code)
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 		if (strcmp(target->GetCurCharacter()->GetCharacter_Code(), _code) == 0)
@@ -122,7 +122,7 @@ bool PartyRoom::PartyRoomRemoveUser(char * _code)
 bool PartyRoom::AppointPartyLeader(User* _user)
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 		if (target == _user)
@@ -138,7 +138,7 @@ bool PartyRoom::AppointPartyLeader(User* _user)
 bool PartyRoom::AppointPartyLeader(char * _code)
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 		if (strcmp(target->GetCurCharacter()->GetCharacter_Code(), _code) == 0)
@@ -154,7 +154,7 @@ bool PartyRoom::AppointPartyLeader(char * _code)
 bool PartyRoom::DismissPartyLeader(User* _user)
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 		// 그 유저가있고 파티장이면
@@ -171,7 +171,7 @@ bool PartyRoom::DismissPartyLeader(User* _user)
 bool PartyRoom::DismissPartyLeader(char * _code)
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 		// 그 유저가있고 파티장이면
@@ -188,7 +188,7 @@ bool PartyRoom::DismissPartyLeader(char * _code)
 User* PartyRoom::WhopartyLeader()
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 		// 그 유저가있고 파티장이면
@@ -203,7 +203,7 @@ User* PartyRoom::WhopartyLeader()
 void PartyRoom::DungeonEnter_PartyRoom()
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 
@@ -215,7 +215,7 @@ void PartyRoom::DungeonEnter_PartyRoom()
 void PartyRoom::DungeonLeave_PartyRoom()
 {
 	User* target = nullptr;
-	for (save = m_partyuser.begin(); save != m_partyuser.end(); save++)
+	for (std::list<User*>::iterator save = m_partyuser.begin(); save != m_partyuser.end(); save++)
 	{
 		target = (*save);
 
@@ -228,6 +228,9 @@ void PartyRoom::RiseStage()
 {
 	switch (m_dungeon_stage_num)
 	{
+	case DEFAULT_STAGE:
+		m_dungeon_stage_num = DUNGEON_STAGE_NORMAL_1;
+		break;
 	case DUNGEON_STAGE_NORMAL_1:
 		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_1;
 		break;
@@ -280,6 +283,12 @@ void PartyRoom::SetDungeonMonsterinfo()
 	default:
 		break;
 	}
+}
+
+// 몬스터 코드 반환
+int PartyRoom::GetMonsterCode(int _count)
+{
+	return m_monster_control->GetMonsterCode_vector(_count);
 }
 
 
@@ -377,21 +386,15 @@ bool PartySystem::Party_Remove(User * _user)
 	if (target != nullptr)
 	{
 		target->StartSearchPartyRoom();
-		while (1)
+		while (target->SearchPartyRoom(user))
 		{
-			if (target->SearchPartyRoom(user) == true)
-			{
-				user->ResetPartyInfo();
-			}
-			else
-			{
-				break;
-			}
+			target->PartyRoomRemoveUser(user);
 		}
 
 		m_partyroom_list.remove(target);
 		delete target;
 		target = nullptr;
+
 		return true;
 	}
 

@@ -223,6 +223,13 @@ void GameDataManager::Dungeon_SpawnPos_Vecotr(Vector3 * _pos)
 	memcpy(_pos, m_dungeon_spawndata->Dungeon_Spawn_PosData(), sizeof(Vector3) * 4);
 }
 
+// 던전 몬스터 스폰위치 배열
+void GameDataManager::Dungeon_Monster_SpawnPos_Vector(Vector3 * _pos)
+{
+	memcpy(_pos, m_monster_spawndata->Monster_Spawn_PosData(), sizeof(Vector3) * 3);
+
+}
+
 // 던전 스테이지 스폰위치 배열
 void GameDataManager::Dungeon_Stage_SpawnPos_Vecotr(Vector3 * _pos)
 {

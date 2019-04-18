@@ -63,6 +63,10 @@ bool InGameState::Read(User * _user)
 		{
 			state = INGAME_INIT_RECV;
 		}
+		else if (result == RT_INGAME_DUNGEON_MONSTER_INFO_RESULT)
+		{
+			state = INGAME_INIT_RECV;
+		}
 		else if (result == RT_INGAME_DUNGEON_STAGE_IN_RESULT)
 		{
 			state = INGAME_INIT_RECV;

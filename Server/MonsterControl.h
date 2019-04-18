@@ -44,6 +44,8 @@ private:
 
 	// 몬스터 종류 갯수
 	int number_monster_types;
+	std::vector<MONSTER_ORIGINCODE> m_monstercode_vector;
+	std::vector<MONSTER_ORIGINCODE>::iterator m_monstercode_save;
 public:
 
 	MonsterControl();
@@ -52,6 +54,13 @@ public:
 	void StartSearchMonsterinfo();
 	bool SearchMonsterinfo(MonsterInfo*& _monsterinfo);
 	
+	int GetMonsterTypes() {	return m_monstercode_vector.size(); }
+	
+	// 몬스터 코드 추가
+	void AddMonsterCode_vector(MONSTER_ORIGINCODE _code);
+	// 몬스터 코드 반환
+	MONSTER_ORIGINCODE GetMonsterCode_vector(int _count);
+
 	// 몬스터 실제 조립
 	Monster* MonsterSelect(int _monster_code);
 	// 몬스터 정보 검색

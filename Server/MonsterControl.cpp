@@ -37,6 +37,18 @@ bool MonsterControl::SearchMonsterinfo(MonsterInfo *& _monsterinfo)
 	}
 }
 
+// 몬스터 코드 추가
+void MonsterControl::AddMonsterCode_vector(MONSTER_ORIGINCODE _code)
+{
+	m_monstercode_vector.push_back(_code);
+}
+
+// 몬스터 코드 반환
+MONSTER_ORIGINCODE MonsterControl::GetMonsterCode_vector(int _count)
+{
+	return m_monstercode_vector.at(_count);
+}
+
 // 몬스터 실제 조립
 Monster * MonsterControl::MonsterSelect(int _monster_code)
 {
@@ -101,6 +113,7 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num,const Ve
 void MonsterControl::ResetMonsterInfo()
 {
 	MonsterInfo* target = nullptr;
+	MONSTER_ORIGINCODE code;
 
 	for (m_monsterinfo_save = m_monsterinfo_list.begin(); m_monsterinfo_save != m_monsterinfo_list.end(); ++m_monsterinfo_save)
 	{
@@ -109,7 +122,8 @@ void MonsterControl::ResetMonsterInfo()
 		delete target;
 	}
 
-	//m_monsterinfo_list.clear();
+	// 메모리에 문제있을듯 수정해야함
+	m_monstercode_vector.clear();
 }
 
 // 리스트 비어있는지(비어있으면 true 아니면 false)
@@ -132,5 +146,8 @@ void MonsterControl::SetFirstStage_NormalMonster()
 		SetMonsterinfo(WORM, i);
 	}
 
-	number_monster_types = 2;
+	AddMonsterCode_vector(SPIDER);
+	AddMonsterCode_vector(WORM);
+
+	/*number_monster_types = m_monstercode_vector.size();*/
 }

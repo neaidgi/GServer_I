@@ -67,11 +67,16 @@ public:
 	// 스테이지 변경
 	void SetDungeonStage(DUNGEON_STAGE _stage_num) { m_dungeon_stage_num = _stage_num; }
 	// 지금 몇번째 스테이지인지
-	DUNGEON_STAGE GetDungeonStage() { return m_dungeon_stage_num; }
+	int GetDungeonStage() { return m_dungeon_stage_num; }
+	// 몬스터 종류는 몇마리인지
+	int GetMonsterTypes() { return m_monster_control->GetMonsterTypes(); }
+
 	// 스테이지 상승
 	void RiseStage();
 	// 스테이지에 맞는 몬스터 정보 셋팅
 	void SetDungeonMonsterinfo();
+	// 몬스터 코드 반환
+	int GetMonsterCode(int _count);
 
 };
 

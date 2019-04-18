@@ -1,4 +1,4 @@
-﻿create database userinfo;
+create database userinfo;
 
 use userinfo;
 
@@ -15,7 +15,7 @@ create table UserCharacterInfo(
 	
 	id varchar(20) not null, 
 
-	character_jobcode INT not null,
+	character_origin_code INT not null,
 
 	character_jobname VARCHAR(20) not null,
 
@@ -38,6 +38,13 @@ create table SpawnPos
 	z float not null
 );
 
+create table DungeonSpawnPos
+(
+	num int not null primary key auto_increment,
+	x float not null,
+	y float not null,
+	z float not null
+);
 use userinfo;
 
 create table CharacterOrigin
@@ -83,6 +90,33 @@ create table CharacterPos
     FOREIGN KEY(character_code) REFERENCES UserCharacterInfo(character_code)
 );
 
+create table Monsterinfo
+(
+	monster_code int NOT NULL PRIMARY KEY,
+	monster_name VARCHAR(20),
+    monster_health INT NOT NULL,
+	monster_mana INT NOT NULL,
+	monster_attackpoint INT,
+    monster_defensepoint INT
+    
+);
+
+create table MonsterSpawnPos
+(
+	monster_spawn_num INT NOT NULL PRIMARY KEY,
+	monster_spawn_pos_x FLOAT,
+	monster_spawn_pos_y FLOAT,
+	monster_spawn_pos_z FLOAT
+);
+
+create table DungeonStageSpawnpos
+(
+	stage_spawn_num INT NOT NULL PRIMARY KEY,
+	stage_spawn_pos_x FLOAT,
+	stage_spawn_pos_y FLOAT,
+	stage_spawn_pos_z FLOAT
+);
+
 use userinfo;
 
 INSERT INTO CharacterOrigin VALUES (1000,'Tanker',15,10,10,150,100,0,0,100,10,5,5,100,50),
@@ -97,10 +131,27 @@ INSERT INTO ItemInfo VALUES (1,'HealthPotion',1,1,1,'체력을 50 회복해준�
                             (4,'Staff',2,1,2,'마법사의 기본무기',3),
                             (5,'ClothAmor',3,1,3,'기본 천갑옷',4);
                             
-INSERT INTO SpawnPos( x,y,z) VALUES (-3750.0,28330.0,6848.0),
-									(-3060.0,28330.0,6848.0),
-									(-2380.0,28330.0,6848.0),
-									(-1690.0,28330.0,6848.0),
-									(-930.0,28330.0,6848.0),
-									(-160.0,28330.0,6848.0)
-                    
+INSERT INTO SpawnPos( x,y,z) VALUES (162.0,28408.0,6870.0),
+									(-619.0,28330.0,6870.0),
+									(-1400.0,28330.0,6870.0),
+									(-2381.0,28330.0,6870.0),
+									(-2962.0,28330.0,6870.0),
+									(-3743.0,28330.0,6870.0);
+                                    
+INSERT INTO dungeonspawnpos( x,y,z) VALUES	(-3407.0,23905.0,6870.0),
+											(-3007.0,23905.0,6870.0),
+											(-2607.0,23905.0,6870.0),
+											(-2207.0,23905.0,6870.0);
+                                            
+INSERT INTO DungeonStageSpawnpos VALUES	(1,4690.0,18890.0,6389.0),
+										(2,4387.0,19442.0,6389.0),
+										(3,4381.0,18360.0,6389.0),
+										(4,5325.0,18888.0,6389.0);
+                                         
+INSERT INTO Monsterinfo VALUES 	(10000,'Spider',100,100,10,10),
+								(10001,'Warm',100,100,10,10),
+                                (10002,'BossSpider',100,100,10,10);
+                                
+INSERT INTO MonsterSpawnPos VALUES	(1,4892.0,15000.0,6451.0),
+									(2,4844.0,22780.0,6451.0),
+									(3,8584.0,18840.0,6090.0)

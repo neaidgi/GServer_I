@@ -105,6 +105,10 @@ private:
 	void User_Send_Party_Eneter_Dungeon(User* _user, PROTOCOL _p);
 	// 던전에 나갔을때 채널에 속해있는 유저들한테 전송
 	void User_Send_Party_Leave_Dungeon(User* _user, PROTOCOL _p);
+
+	// 스테이지 상승 및 몬스터정보 셋팅
+	void User_Dungeon_Stage_Rise(User* _user);
+
 public:
 	static void CreateInstance();
 	static InGameManager* GetInstance();
@@ -148,6 +152,8 @@ public:
 	void User_EnterInDun_Channel(User* _user);
 	// 던전 채널 나가기
 	void User_LeaveInDun_Channel(User* _user);
+
+
 };
 
 #endif
