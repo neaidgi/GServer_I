@@ -1140,6 +1140,53 @@ void InGameManager::User_Unpack_PartyRoom_Invite_Result(User * _user, char * _bu
 	_partyroomnum = partyroomnum;
 }
 
+// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표)
+void InGameManager::User_Unpack_Monster_Move(User * _user, char * _buf)
+{
+	Vector3 prePos;
+	Vector3 curPos;
+	PartyRoom* partyroom = nullptr;
+	MonsterInfo* monsterinfo = nullptr;
+	float dirx, diry;
+	bool lesult;
+	int datasize = 0;
+	int len = 0;
+	int monster_code = 0;
+	int monster_num = 0;
+	char* ptr = _buf;
+	char msg[BUFSIZE];
+
+	// 몬스터 코드 복사
+	memcpy(&monster_code, ptr, sizeof(int));
+	ptr += sizeof(int);
+
+	// 몬스터 번호 복사
+	memcpy(&monster_num, ptr, sizeof(int));
+	ptr += sizeof(int);
+
+	// 위치 복사
+	memcpy(&curPos, ptr, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	if (partyroom->GetMonsterinfo(monster_code, monster_num, monsterinfo) == false)
+	{
+		return;
+	}
+
+	// 몬스터 정보 저장
+	partyroom->SetMonsterinfo(monster_code, monster_num, curPos);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "몬스터 이동 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,curPos.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+
+
+}
+
 // 이동이나 회전 정보 Vecotr3. 
 void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _datasize)
 {
@@ -1400,6 +1447,7 @@ void InGameManager::User_Dungeon_Stage_Rise(User * _user)
 	}
 	partyroom->RiseStage();
 	partyroom->SetDungeonMonsterinfo();
+	partyroom->Start_MonsterTimer();
 }
 
 // 다른 유저 이동정보 전송(채널에 접속해있는 유저들한테 전송)
@@ -1901,6 +1949,13 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf,datasize );
 		_user->Quepack(SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
 
+		// 임시로 사용중 스테이지 입장시 몬스터 정보 주는용
+		User_Dungeon_Stage_Rise(_user);
+
+		User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
+		User_Send_Party_ToOther(_user, SERVER_INGAME_MONSTER_INFO, buf, datasize);
+		_user->Quepack(SERVER_INGAME_MONSTER_INFO, buf, datasize);
+
 		result = RT_INGAME_DUNGEON_ENTER_RESULT;
 		break;
 	case CLIENT_INGAME_DUNGEON_LEAVE:	// 던전 퇴장 요청
@@ -1919,14 +1974,20 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		break;
 	case CLIENT_INGAME_MONSTER_INFO:	// 몬스터 정보 요청 프로토콜
 
+		/*
 		// 스테이지 입장시 몬스터 정보 전송
 		User_Dungeon_Stage_Rise(_user);
 
 		User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
 		User_Send_Party_ToOther(_user, SERVER_INGAME_MONSTER_INFO, buf, datasize);
 		_user->Quepack(SERVER_INGAME_MONSTER_INFO, buf, datasize);
-
+		*/
 		result = RT_INGAME_DUNGEON_MONSTER_INFO_RESULT;
+
+		break;
+	case CLIENT_INGAME_MONSTER_MOVE:	// 몬스터 이동 정봉
+		User_Unpack_Monster_Move(_user, buf);
+
 
 		break;
 	default:

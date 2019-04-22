@@ -4,6 +4,7 @@
 #include "User.h"
 #include "UUIDManager.h"
 #include "MonsterControl.h"
+#include "MonsterTime.h"
 #include <list>
 
 #define PARTYMAXUSER 4
@@ -22,6 +23,8 @@ private:
 	
 	// 몬스터 컨트롤러
 	MonsterControl* m_monster_control;
+	// 몬스터 타이머
+	MonsterTime* m_monster_timer;
 
 public:
 	PartyRoom(int _partyroomnum);
@@ -75,9 +78,18 @@ public:
 	void RiseStage();
 	// 스테이지에 맞는 몬스터 정보 셋팅
 	void SetDungeonMonsterinfo();
+	// 몬스터 시간 초기화
+	void Start_MonsterTimer();
+	// 몬스터 시간 2초 지났는지 확인
+	bool End_MonsterTimer();
 	// 몬스터 코드 반환
 	int GetMonsterCode(int _count);
-
+	// 몬스터 정보 요청
+	bool GetMonsterinfo(int _monster_code, int _monster_num, MonsterInfo*& _monsterinfo);
+	// 몬스터 저장(몬스터코드,몬스터번호) - 새롭게 저장할때
+	void SetMonsterinfo(int _monster_code, int _monster_num);
+	// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
+	void SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos);
 };
 
 // 파티시스템

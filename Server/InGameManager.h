@@ -57,6 +57,10 @@ private:
 	void User_Unpack_UserCode(User* _user, char* _buf, char* _code);
 	// 초대 요청 언팩 (결과,코드,파티번호)
 	void User_Unpack_PartyRoom_Invite_Result(User* _user, char*_buf, bool& _result, char* _code, int& _partyroomnum);
+	// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표)
+	void User_Unpack_Monster_Move(User* _user, char* _buf);
+
+
 
 	// ** 다른유저에게 줄 정보 Pack ** //
 	// 이동이나 회전 정보 패킹 (코드,백터3)
@@ -108,6 +112,10 @@ private:
 
 	// 스테이지 상승 및 몬스터정보 셋팅
 	void User_Dungeon_Stage_Rise(User* _user);
+
+
+	// 해당 유저의 파티의 몬스터 시간이 정해둔 시간을 지났는가.
+	bool User_PartyRoom_Monster_TimeOver_Check();
 
 public:
 	static void CreateInstance();

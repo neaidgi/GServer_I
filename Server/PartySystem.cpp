@@ -5,6 +5,7 @@
 PartyRoom::PartyRoom(int _partyroomnum)
 {
 	m_monster_control = new MonsterControl();
+	m_monster_timer = new MonsterTime();
 	partyroom_num = _partyroomnum;
 	m_dungeon_stage_num = DEFAULT_STAGE;
 }
@@ -27,6 +28,11 @@ PartyRoom::~PartyRoom()
 	if (m_monster_control != nullptr)
 	{
 		delete m_monster_control;
+	}
+
+	if (m_monster_timer != nullptr)
+	{
+		delete m_monster_timer;
 	}
 }
 
@@ -285,11 +291,44 @@ void PartyRoom::SetDungeonMonsterinfo()
 	}
 }
 
+// 몬스터 시간 초기화
+void PartyRoom::Start_MonsterTimer()
+{
+	m_monster_timer->Start_Time();
+}
+
+// 몬스터 시간 2초 지났는지 확인
+bool PartyRoom::End_MonsterTimer()
+{
+	int time = m_monster_timer->End_Time();
+	return time;
+}
+
 // 몬스터 코드 반환
 int PartyRoom::GetMonsterCode(int _count)
 {
 	return m_monster_control->GetMonsterCode_vector(_count);
 }
+
+// 몬스터 정보 요청
+bool PartyRoom::GetMonsterinfo(int _monster_code, int _monster_num, MonsterInfo *& _monsterinfo)
+{
+	return m_monster_control->GetMonsterinfo(_monster_code, _monster_num, _monsterinfo);
+}
+
+// 몬스터 저장(몬스터코드,몬스터번호) - 새롭게 저장할때
+void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num)
+{
+	m_monster_control->SetMonsterinfo(_monster_code, _monster_num);
+}
+
+// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
+void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos)
+{
+	m_monster_control->SetMonsterinfo(_monster_code, _monster_num, _pos);
+}
+
+
 
 
 

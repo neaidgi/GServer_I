@@ -101,12 +101,12 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num)
 }
 
 // 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
-void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num,const Vector3 _pos,const Vector3 _rot)
+void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num,const Vector3 _pos)
 {
 	MonsterInfo* monsterinfo = nullptr;
 	GetMonsterinfo(_monster_code, _monster_num, monsterinfo);
 	monsterinfo->GetMonster()->SetPosition(_pos);
-	monsterinfo->GetMonster()->SetRotation(_rot);
+	//monsterinfo->GetMonster()->SetRotation(_rot);
 }
 
 // 몬스터 리스트 초기화(스테이지 클리어 or 새로운 상태일때 리스트를 초기화하고 새로운 몹을 넣기전 작업)
@@ -141,13 +141,13 @@ void MonsterControl::SetFirstStage_NormalMonster()
 		SetMonsterinfo(SPIDER, i);
 	}
 	// 애벌래 저장
-	for (int i = 0; i < FIRSTSTAGE_NORMALMONSTER_1; i++)
-	{
-		SetMonsterinfo(WORM, i);
-	}
+	//for (int i = 0; i < FIRSTSTAGE_NORMALMONSTER_1; i++)
+	//{
+	//	SetMonsterinfo(WORM, i);
+	//}
 
 	AddMonsterCode_vector(SPIDER);
-	AddMonsterCode_vector(WORM);
+	//AddMonsterCode_vector(WORM);
 
 	/*number_monster_types = m_monstercode_vector.size();*/
 }

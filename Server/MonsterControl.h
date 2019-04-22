@@ -68,7 +68,7 @@ public:
 	// 몬스터 저장(몬스터코드,몬스터번호) - 새롭게 저장할때
 	void SetMonsterinfo(int _monster_code, int _monster_num);
 	// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
-	void SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos, const Vector3 _rot);
+	void SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos);
 	// 몬스터 리스트 초기화(스테이지 클리어 or 새로운 상태일때 리스트를 초기화하고 새로운 몹을 넣기전 작업)
 	void ResetMonsterInfo();
 	// 리스트 비어있는지(비어있으면 true 아니면 false)

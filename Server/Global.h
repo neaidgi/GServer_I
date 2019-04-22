@@ -266,7 +266,7 @@ struct WSAOVERLAPPEDEx {
 // 몬스터 숫자
 #define MAXMONSTERORIGIN 3
 // 첫번째 스테이지 몬스터 숫자
-#define FIRSTSTAGE_NORMALMONSTER_1 10
+#define FIRSTSTAGE_NORMALMONSTER_1 5
 #define MOVETIME 0.02
 
 #endif

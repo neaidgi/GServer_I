@@ -106,6 +106,9 @@
     <Filter Include="소스 파일\GameData\Monster">
       <UniqueIdentifier>{8f9401fa-80eb-476e-9c30-68b1631d569d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Time">
+      <UniqueIdentifier>{828143f8-4c0f-4972-9cdb-33c55a96edfe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -218,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="MonsterControl.cpp">
       <Filter>소스 파일\GameData\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="MonsterTime.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -343,6 +349,9 @@
     </ClInclude>
     <ClInclude Include="MonsterData.h">
       <Filter>헤더 파일\GameData\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="MonsterTime.h">
+      <Filter>헤더 파일\Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
