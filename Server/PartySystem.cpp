@@ -301,7 +301,16 @@ void PartyRoom::Start_MonsterTimer()
 bool PartyRoom::End_MonsterTimer()
 {
 	int time = m_monster_timer->End_Time();
-	return time;
+	
+	if (time > MONSTERTIME)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
 }
 
 // 몬스터 코드 반환

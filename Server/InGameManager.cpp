@@ -16,6 +16,19 @@ InGameManager::~InGameManager()
 	delete m_partysystem;
 }
 
+bool InGameManager::User_PartyRoom_Monster_TimeOver_Check(User* _user)
+{
+	PartyRoom* partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	if (partyroom == nullptr)
+	{
+		return false;
+	}
+
+	return partyroom-> End_MonsterTimer();
+
+}
+
 void InGameManager::CreateInstance()
 {
 	if (Instance == nullptr)

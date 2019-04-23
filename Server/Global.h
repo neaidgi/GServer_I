@@ -269,6 +269,9 @@ struct WSAOVERLAPPEDEx {
 #define FIRSTSTAGE_NORMALMONSTER_1 5
 #define MOVETIME 0.02
 
+// 몬스터 시간
+#define MONSTERTIME 2.0
+
 #endif
 
 /*

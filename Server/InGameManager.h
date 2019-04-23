@@ -115,7 +115,7 @@ private:
 
 
 	// 해당 유저의 파티의 몬스터 시간이 정해둔 시간을 지났는가.
-	bool User_PartyRoom_Monster_TimeOver_Check();
+	bool User_PartyRoom_Monster_TimeOver_Check(User* _user);
 
 public:
 	static void CreateInstance();
