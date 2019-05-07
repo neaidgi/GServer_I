@@ -50,6 +50,11 @@ private:
 
 	// 던전 퇴장시 채널정보 패킹. 채널번호
 
+	// 몬스터 이동정보 패킹(몬스터숫자,몬스터코드,몬스터번호,몬스터좌표)
+	void User_Pack_Monster_MoveInfo(User* _user, int _code, int _num, char* _data, int& _datasize);
+
+
+
 	// **UnPack 함수**
 	// 채널 이동 요청 언팩 (채널번호)
 	void User_UnPack_ChannelChange(User* _user, char* _buf, int& _channelnum);
@@ -58,7 +63,7 @@ private:
 	// 초대 요청 언팩 (결과,코드,파티번호)
 	void User_Unpack_PartyRoom_Invite_Result(User* _user, char*_buf, bool& _result, char* _code, int& _partyroomnum);
 	// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표)
-	void User_Unpack_Monster_Move(User* _user, char* _buf);
+	void User_Unpack_Monster_Move(User* _user, char* _buf, int& _code, int& _num);
 
 
 
@@ -113,9 +118,10 @@ private:
 	// 스테이지 상승 및 몬스터정보 셋팅
 	void User_Dungeon_Stage_Rise(User* _user);
 
-
+	// 몬스터 시간 초기화
+	void User_PartyRoom_Monster_Time_ReSet(User* _user, int _code, int _num);
 	// 해당 유저의 파티의 몬스터 시간이 정해둔 시간을 지났는가.
-	bool User_PartyRoom_Monster_TimeOver_Check(User* _user);
+	bool User_PartyRoom_Monster_TimeOver_Check(User* _user, int _code, int _num);
 
 public:
 	static void CreateInstance();

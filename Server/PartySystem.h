@@ -74,14 +74,18 @@ public:
 	// 몬스터 종류는 몇마리인지
 	int GetMonsterTypes() { return m_monster_control->GetMonsterTypes(); }
 
+	// 몬스터 검색 초기화
+	void StartSearchMonsterinfo();
+	// 몬스터 검색
+	bool SearchMonsterinfo(MonsterInfo*& _monsterinfo);
 	// 스테이지 상승
 	void RiseStage();
 	// 스테이지에 맞는 몬스터 정보 셋팅
 	void SetDungeonMonsterinfo();
 	// 몬스터 시간 초기화
-	void Start_MonsterTimer();
-	// 몬스터 시간 2초 지났는지 확인
-	bool End_MonsterTimer();
+	void Start_MonsterTimer(int _code, int _num);
+	// 몬스터 시간 지났는지 확인
+	bool End_MonsterTimer(int _code, int _num);
 	// 몬스터 코드 반환
 	int GetMonsterCode(int _count);
 	// 몬스터 정보 요청
@@ -90,6 +94,8 @@ public:
 	void SetMonsterinfo(int _monster_code, int _monster_num);
 	// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
 	void SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos);
+	// 몬스터 정보 삭제
+	bool RemoveMonsterInfo(int _monster_code, int _monster_num);
 };
 
 // 파티시스템

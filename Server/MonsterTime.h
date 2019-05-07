@@ -8,7 +8,7 @@ class MonsterTime
 {
 private:
 	clock_t start, end;
-	int result;
+	double result;
 
 
 public:
@@ -16,7 +16,7 @@ public:
 	~MonsterTime() {}
 
 	void Start_Time();
-	int End_Time();
+	double End_Time();
 };
 
 #endif

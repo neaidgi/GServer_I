@@ -10,12 +10,8 @@ bool LoginState::Read(User* _user)
 	switch (state)
 	{
 	case LoginState::INIT_RECV:
-		result = loginmanager->logoutMenuChoice(_user);
-		if (result == RT_LOGINMENU)
-		{
-			state = INIT_SEND;
-		}
-		else if (result == RT_LOGIN)
+		result = loginmanager->TitleProcess(_user);
+		if (result == RT_LOGIN)
 		{
 			state = LOGIN_RESULT_SEND;
 		}
@@ -23,18 +19,7 @@ bool LoginState::Read(User* _user)
 		{
 			state = LOGINFAIL_RESULT_SEND;
 		}
-		else if (result == RT_JOINMENU)
-		{
-			state = REQUEST_RESULT_SEND;
-		}
-		else if (result == RT_USER_DISCONNECT)
-		{
-			return false;
-		}
-		break;
-	case LoginState::REQUEST_RECV:
-		result = loginmanager->loginProcess(_user);
-		if (result == RT_ID_OVERLAP)
+		else if (result == RT_ID_OVERLAP)
 		{
 			state = REQUEST_RESULT_SEND;
 		}
@@ -42,9 +27,9 @@ bool LoginState::Read(User* _user)
 		{
 			state = JOIN_RESULT_SEND;
 		}
-		else if (result = RT_EXIT_JOIN)
+		else if (result == RT_USER_DISCONNECT)
 		{
-			state = JOIN_EXIT_SEND;
+			return false;
 		}
 		break;
 	default:
@@ -62,12 +47,9 @@ bool LoginState::Write(User* _user)
 		state = INIT_RECV;
 		break;
 	case LoginState::REQUEST_RESULT_SEND:
-		state = REQUEST_RECV;
-		break;
-	case LoginState::JOIN_RESULT_SEND:
 		state = INIT_RECV;
 		break;
-	case LoginState::JOIN_EXIT_SEND:
+	case LoginState::JOIN_RESULT_SEND:
 		state = INIT_RECV;
 		break;
 	case LoginState::LOGIN_RESULT_SEND:

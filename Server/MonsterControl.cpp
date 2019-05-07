@@ -1,5 +1,33 @@
 #include "MonsterControl.h"
 
+// 몬스터 타이머 시간초기화
+void MonsterInfo::InitMonsterTime()
+{
+	m_monster_time->Start_Time();
+}
+
+// 몬스터 시간이 지났는지
+bool MonsterInfo::Is_End_MonsterTime()
+{
+	double time = m_monster_time->End_Time();
+	
+	// 메세지
+	//char msg[BUFSIZE];
+	//memset(msg, 0, sizeof(msg));
+	//sprintf(msg, " 몬스터 타임 [%lf]", time );
+	//MsgManager::GetInstance()->DisplayMsg("TIME", msg);
+
+	if (time >= MONSTERTIME)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
 MonsterControl::MonsterControl()
 {
 	number_monster_types = 0;
@@ -71,6 +99,31 @@ Monster * MonsterControl::MonsterSelect(int _monster_code)
 	return monster;
 }
 
+// 몬스터 타이머 추가
+MonsterTime* MonsterControl::AddMonsterTimer()
+{
+	MonsterTime* monstertime = new MonsterTime();
+	return monstertime;
+}
+
+// 몬스터 타이머 시간초기화
+void MonsterControl::InitMonsterTime(int _code, int _num)
+{
+	MonsterInfo* monsterinfo = nullptr;
+	GetMonsterinfo(_code, _num, monsterinfo);
+
+	monsterinfo->InitMonsterTime();
+}
+
+// 몬스터 시간이 지났는지
+bool MonsterControl::Is_End_MonsterTime(int _code, int _num)
+{
+	MonsterInfo* monsterinfo = nullptr;
+	GetMonsterinfo(_code, _num, monsterinfo);
+
+	return 	monsterinfo->Is_End_MonsterTime();
+}
+
 // 몬스터 정보 검색
 bool MonsterControl::GetMonsterinfo(int _monster_code, int _monster_num, MonsterInfo *& _monsterinfo)
 {
@@ -96,6 +149,9 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num)
 
 	monsterinfo->SetMonster(MonsterSelect(_monster_code));
 	monsterinfo->SetMonsterNum(_monster_num);
+	monsterinfo->SetMonsterTime(AddMonsterTimer());
+
+	monsterinfo->InitMonsterTime();
 
 	m_monsterinfo_list.push_back(monsterinfo);
 }
@@ -107,6 +163,26 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num,const Ve
 	GetMonsterinfo(_monster_code, _monster_num, monsterinfo);
 	monsterinfo->GetMonster()->SetPosition(_pos);
 	//monsterinfo->GetMonster()->SetRotation(_rot);
+}
+
+// 몬스터 정보 삭제
+bool MonsterControl::RemoveMonsterInfo(int _monster_code, int _monster_num)
+{
+	MonsterInfo* monsterinfo = nullptr;
+
+	StartSearchMonsterinfo();
+	while (SearchMonsterinfo(monsterinfo))
+	{
+		if (monsterinfo->GetMonster()->GetMonster_Code() == _monster_code && monsterinfo->GetMonsterNum() == _monster_num)
+		{
+			m_monsterinfo_list.remove(monsterinfo);
+			delete monsterinfo;
+			monsterinfo = nullptr;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 // 몬스터 리스트 초기화(스테이지 클리어 or 새로운 상태일때 리스트를 초기화하고 새로운 몹을 넣기전 작업)
@@ -149,5 +225,6 @@ void MonsterControl::SetFirstStage_NormalMonster()
 	AddMonsterCode_vector(SPIDER);
 	//AddMonsterCode_vector(WORM);
 
-	/*number_monster_types = m_monstercode_vector.size();*/
+	number_monster_types = m_monstercode_vector.size();
 }
+

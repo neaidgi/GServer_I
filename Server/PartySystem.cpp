@@ -229,6 +229,18 @@ void PartyRoom::DungeonLeave_PartyRoom()
 	}
 }
 
+// 몬스터 검색 초기화
+void PartyRoom::StartSearchMonsterinfo()
+{
+	m_monster_control->StartSearchMonsterinfo();
+}
+
+// 몬스터 검색
+bool PartyRoom::SearchMonsterinfo(MonsterInfo *& _monsterinfo)
+{
+	return m_monster_control->SearchMonsterinfo(_monsterinfo);
+}
+
 // 스테이지 상승
 void PartyRoom::RiseStage()
 {
@@ -292,25 +304,15 @@ void PartyRoom::SetDungeonMonsterinfo()
 }
 
 // 몬스터 시간 초기화
-void PartyRoom::Start_MonsterTimer()
+void PartyRoom::Start_MonsterTimer(int _code, int _num)
 {
-	m_monster_timer->Start_Time();
+	m_monster_control->InitMonsterTime(_code, _num);
 }
 
-// 몬스터 시간 2초 지났는지 확인
-bool PartyRoom::End_MonsterTimer()
+// 몬스터 시간 지났는지 확인
+bool PartyRoom::End_MonsterTimer(int _code, int _num)
 {
-	int time = m_monster_timer->End_Time();
-	
-	if (time > MONSTERTIME)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	
+	return m_monster_control->Is_End_MonsterTime(_code, _num);
 }
 
 // 몬스터 코드 반환
@@ -335,6 +337,11 @@ void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num)
 void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos)
 {
 	m_monster_control->SetMonsterinfo(_monster_code, _monster_num, _pos);
+}
+
+bool PartyRoom::RemoveMonsterInfo(int _monster_code, int _monster_num)
+{
+	return false;
 }
 
 
@@ -522,7 +529,7 @@ PartyRoom * PartySystem::GetPartyRoomSearch(int _partyroomnum)
 {
 	PartyRoom* target = nullptr;
 
-	for (save = m_partyroom_list.begin(); save != m_partyroom_list.end(); save++)
+	for (std::list<PartyRoom*>::iterator save = m_partyroom_list.begin(); save != m_partyroom_list.end(); save++)
 	{
 		target = (*save);
 		if (target->GetPartyRoomNum() == _partyroomnum)

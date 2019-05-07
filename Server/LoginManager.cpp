@@ -62,14 +62,19 @@ void LoginManager::EndManager()
 // ID 중복체크
 void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 {
-	int len;
+	INT64 protocol = 0;
+	int len = 0;
 	char id[IDSIZE];
 	char msg[BUFSIZE];
 	bool check = false;
 
+	memset(id, 0, sizeof(IDSIZE));
+	memset(msg, 0, sizeof(BUFSIZE));
+
+	// 아이디 길이
 	memcpy(&len, _buf, sizeof(int));
 	_buf += sizeof(int);
-
+	// 아이디
 	memcpy(id, _buf, len);
 
 
@@ -81,35 +86,48 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 	}
 	sprintf(msg, "%s : %s", id, check ? "중복" : "중복아님");
 	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
-	user->Quepack(SERVER_ID_OVERLAP_CHECK, &check, sizeof(bool));
+
+	protocol = user->BitPackProtocol(protocol, PROTOCOL_ID_OVERLAP_CHECK);
+	user->Quepack(protocol, &check, sizeof(bool));
 }
 
+// 회원가입 결과
 void LoginManager::reqJoin(User* user, char* _buf)
 {
 	if (userCount >= USERCOUNT)
 		return;
 
-	int len;
+	INT64 protocol = 0;
+	int len = 0;
 	char id[IDSIZE];
 	char pw[IDSIZE];
 	char tempbuf[IDSIZE + 10];
 	bool result = false;
 	bool resultslot = false;
 
+	memset(id, 0, sizeof(IDSIZE));
+	memset(pw, 0, sizeof(IDSIZE));
+	memset(tempbuf, 0, sizeof(IDSIZE + 10));
+
+	// 아이디 길이
 	memcpy(&len, _buf, sizeof(int));
 	_buf += sizeof(int);
+	// 아이디
 	memcpy(id, _buf, len);
 	_buf += len;
 
+	// 비밀번호 길이
 	memcpy(&len, _buf, sizeof(int));
 	_buf += sizeof(int);
+	// 비밀번호
 	memcpy(pw, _buf, len);
 
 	// 추가했음 : 기존에 입력했던 중복된 아이디가 아니라면 회원가입 취소
 	if (strcmp(id, user->getID()))
 	{
 		result = false;
-		user->Quepack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
+		protocol = user->BitPackProtocol(protocol, PROTOCOL_JOIN_RESULT);
+		user->Quepack(protocol, &result, sizeof(bool));
 		return;
 	}
 
@@ -124,17 +142,20 @@ void LoginManager::reqJoin(User* user, char* _buf)
 		user->setPW(info->pw);
 	}
 
-	//userList[userCount++] = info;
-	user->Quepack(SERVER_JOIN_SUCCESS, &result, sizeof(bool));
+
+	protocol = user->BitPackProtocol(protocol, PROTOCOL_JOIN_RESULT);
+	user->Quepack(protocol, &result, sizeof(bool));
 
 	sprintf(tempbuf, "%s [회원가입].", user->getID());
 	LogManager::GetInstance()->LogWrite(tempbuf);
 	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
 }
 
+// 로그인 결과
 bool LoginManager::reqLogin(User* user, char* _buf)
 {
-	int len;
+	INT64 protocol = 0;
+	int len = 0;
 	char id[IDSIZE];
 	char pw[IDSIZE];
 	char tempbuf[IDSIZE + 10];
@@ -165,12 +186,13 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	}
 
 	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
-	user->Quepack(SERVER_LOGIN_SUCCESS, &result, sizeof(bool));
+	protocol = user->BitPackProtocol(protocol, PROTOCOL_LOGIN_RESULT);
+	user->Quepack(protocol, &result, sizeof(bool));
 	
 	return result;
 }
 
-// 
+// 회원가입 화면
 RESULT LoginManager::loginProcess(User * _user)
 {
 	PROTOCOL protocol;
@@ -199,6 +221,86 @@ RESULT LoginManager::loginProcess(User * _user)
 	return result;
 }
 
+// 타이틀
+RESULT LoginManager::TitleProcess(User * _user)
+{
+	INT64 protocol = 0;
+	char buf[BUFSIZE];
+	char msg[BUFSIZE];
+	bool check = false;
+	int choice = 0;
+
+	memset(buf, 0, sizeof(buf));
+	memset(msg, 0, sizeof(msg));
+
+	_user->BitunPack(&protocol,&buf);
+
+	RESULT result = RT_DEFAULT;
+
+	// 프로토콜 중간틀 타이틀이면
+	if ((protocol&PROTOCOL_LOGIN) == PROTOCOL_LOGIN)
+	{
+		// 로그인 요청
+		if ((protocol&PROTOCOL_REQ_LOGIN) == PROTOCOL_REQ_LOGIN)
+		{
+			sprintf(msg, "%s : 로그인 요청", _user->getID());
+			MsgManager::GetInstance()->DisplayMsg("로그인", msg);
+			check = reqLogin(_user, buf);
+			if (check == false)
+			{
+				result = RT_LOGINFAIL;
+			}
+			result = RT_LOGIN;
+		}
+		// 가입 요청
+		else if ((protocol&PROTOCOL_REQ_JOIN) == PROTOCOL_REQ_JOIN)
+		{
+			sprintf(msg, "%s : 가입 요청", _user->getID());
+			MsgManager::GetInstance()->DisplayMsg("로그인", msg);
+			reqJoin(_user, buf);
+			result = RT_JOIN;
+		}
+		// 아이디 중복확인
+		else if ((protocol&PROTOCOL_REQ_ID_OVERLAP_CHECK) == PROTOCOL_REQ_ID_OVERLAP_CHECK)
+		{
+			reqIdOverlapCheck(_user, buf);
+			result = RT_ID_OVERLAP;
+		}
+	}
+
+
+	//// 수정했음
+	//switch (protocol)
+	//{
+	//case CLIENT_REQ_LOGIN:	// 로그인 요청
+	//	sprintf(msg, "%s : 로그인 요청", _user->getID());
+	//	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
+	//	check = reqLogin(_user, buf);
+	//	if (check == false)
+	//	{
+	//		result = RT_LOGINFAIL;
+	//		break;
+	//	}
+	//	result = RT_LOGIN;
+	//	break;
+	//case CLIENT_REQ_ID_OVERLAP_CHECK:	// 아이디 중복체크 요청
+	//	reqIdOverlapCheck(_user, buf);
+	//	result = RT_ID_OVERLAP;
+	//	break;
+	//case CLIENT_REQ_JOIN:	// 회원가입 요청
+	//	sprintf(msg, "%s : 가입 요청", _user->getID());
+	//	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
+	//	reqJoin(_user, buf);
+	//	result = RT_JOIN;
+	//	break;
+	//default:
+	//	break;
+	//}
+
+	return result;
+}
+
+// 타이틀 화면
 RESULT LoginManager::logoutMenuChoice(User* _user)
 {
 	PROTOCOL protocol;
@@ -216,7 +318,7 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 	// 수정했음
 	switch (protocol)
 	{
-	case CLIENT_REQ_LOGIN:
+	case CLIENT_REQ_LOGIN: // 로그인 요청
 		sprintf(msg, "%s : 로그인 요청", _user->getID());
 		MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 		check = reqLogin(_user, buf);
@@ -227,7 +329,7 @@ RESULT LoginManager::logoutMenuChoice(User* _user)
 		}
 		result = RT_LOGIN;
 		break;
-	case CLIENT_JOIN_MENU_CHOICE:
+	case CLIENT_JOIN_MENU_CHOICE: // 회원가입 매뉴 버튼 누름
 		sendprotocol = SERVER_JOIN;
 		_user->Quepack(sendprotocol, buf, 0);
 		result = RT_JOINMENU;

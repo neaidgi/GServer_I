@@ -197,9 +197,9 @@ void Packet::ClearSendQueue()
 bool Packet::TakeOutSendPacket()
 {
 	CriticalSectionManager::GetInstance()->Enter();
-	char msg[BUFSIZE];
-	sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	//char msg[BUFSIZE];
+	//sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	if (isSendQueue() && isSending() == false)
 	{
 		SendPacket* sendpacket = sendQueue.front();
@@ -210,9 +210,9 @@ bool Packet::TakeOutSendPacket()
 		sendQueue.pop();
 		sending = true;
 		CriticalSectionManager::GetInstance()->Leave();
-		char msg[BUFSIZE];
-		sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		//char msg[BUFSIZE];
+		//sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		return true;
 	}
 	else
@@ -277,6 +277,36 @@ void Packet::Quepack(PROTOCOL p, void * data, int size)
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
+// Data 패킹 Send 큐사용. BitProtocol 추가
+void Packet::Quepack(INT64 p, void * data, int size)
+{
+	CriticalSectionManager::GetInstance()->Enter();
+
+	SendPacket* temp = new SendPacket();
+
+	char* ptr = temp->sendBuf;
+
+	temp->sendSize = sizeof(INT64) + size;
+
+	memcpy(ptr, &temp->sendSize, sizeof(int));
+	ptr += sizeof(int);
+
+	memcpy(ptr, &p, sizeof(INT64));
+	ptr += sizeof(INT64);
+
+	memcpy(ptr, data, size);
+
+	temp->sendSize += sizeof(size);		// 보낼 사이즈
+
+	// 암호화
+	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(INT64), temp->sendSize);
+	// 큐에 넣기
+
+	sendQueue.push(temp);
+
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
 void Packet::bitpack(PROTOCOL p, void * data, int size)
 {
 	memset(sendBuf, 0, sizeof(sendBuf));
@@ -319,6 +349,38 @@ void Packet::unPack(PROTOCOL * p, void * data)
 
 	CriticalSectionManager::GetInstance()->Leave();
 }
+
+// 비트연산 프로토콜 pack. _existingprotocol : 기존 프로토콜, _additionalprotocol : 추가할 프로토콜
+INT64 Packet::BitPackProtocol(INT64 _existingprotocol, INT64 _additionalprotocol)
+{
+	INT64 protocol = 0;
+	protocol = _existingprotocol | _additionalprotocol;
+
+	return protocol;
+}
+
+// 비트 연산 프로토콜 unpack
+void Packet::BitunPack(INT64 * _p, void * _data)
+{
+	CriticalSectionManager::GetInstance()->Enter();
+
+	char* ptr = recvBuf;
+	INT64 protocol = 0;
+
+	EncryptManager::GetInstance()->decoding(recvBuf, recvSize);
+
+	memcpy(&protocol, ptr, sizeof(INT64));
+	ptr += sizeof(INT64);
+
+	memcpy(_data, ptr, recvSize - sizeof(INT64));
+	*_p = protocol;
+
+	IOCP_InitializeBuffer();
+
+	CriticalSectionManager::GetInstance()->Leave();
+}
+
+
 
 bool Packet::isSendQueue()
 {
@@ -412,9 +474,9 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 			{
 				recvedSize -= recvSize;
 
-				char msg[BUFSIZE];
-				sprintf(msg, "IOCP_isRecvSuccess: sock : [%d] recvedSize : [%d]", sock, recvedSize);
-				MsgManager::GetInstance()->DisplayMsg("[recvedSize] INFO ", msg);
+				//char msg[BUFSIZE];
+				//sprintf(msg, "IOCP_isRecvSuccess: sock : [%d] recvedSize : [%d]", sock, recvedSize);
+				//MsgManager::GetInstance()->DisplayMsg("[recvedSize] INFO ", msg);
 				CriticalSectionManager::GetInstance()->Leave();
 				return true;
 			}

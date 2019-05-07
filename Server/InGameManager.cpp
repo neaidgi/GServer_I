@@ -16,18 +16,6 @@ InGameManager::~InGameManager()
 	delete m_partysystem;
 }
 
-bool InGameManager::User_PartyRoom_Monster_TimeOver_Check(User* _user)
-{
-	PartyRoom* partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
-
-	if (partyroom == nullptr)
-	{
-		return false;
-	}
-
-	return partyroom-> End_MonsterTimer();
-
-}
 
 void InGameManager::CreateInstance()
 {
@@ -77,6 +65,7 @@ void InGameManager::User_Pack_OtherUserPosData(User * _user)
 	// count자리 비워두기. 나중에 count 넣어줄때는 ptr 사용하기
 	PROTOCOL sendprotocol;
 	char data[BUFSIZE];
+	memset(data, 0, sizeof(data));
 	char* ptr = data;
 	int size = 0;
 
@@ -255,11 +244,11 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 	memcpy(&curPos, ptr, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 
-	// 메세지
-	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
-		curPos.z);
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	//// 메세지
+	//memset(msg, 0, sizeof(msg));
+	//sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
+	//	curPos.z);
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 버퍼 클리어
 	ptr = _buf;
@@ -327,11 +316,11 @@ bool InGameManager::User_Pack_MoveStart(User * _user, char * _buf, int & _datasi
 	memcpy(&curRot, ptr, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 
-	// 메세지
-	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
-		curPos.z, curRot.x, curRot.y, curRot.z);
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	//// 메세지
+	//memset(msg, 0, sizeof(msg));
+	//sprintf(msg, "이동 완료 데이터 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,
+	//	curPos.z, curRot.x, curRot.y, curRot.z);
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	// 초기화
 	ptr = _buf;
@@ -426,12 +415,12 @@ void InGameManager::User_Pack_Rotation(User * _user, char * _data, int & _datasi
 
 	_datasize = datasize;
 
-	// 메세지
-	char msg[BUFSIZE];
-	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "회전 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curRot.x, curRot.y,
-		curRot.z);
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	//// 메세지
+	//char msg[BUFSIZE];
+	//memset(msg, 0, sizeof(msg));
+	//sprintf(msg, "회전 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curRot.x, curRot.y,
+	//	curRot.z);
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 }
 
@@ -457,7 +446,7 @@ void InGameManager::User_Pack_UserCode(User * _user, char * _data, int & _datasi
 
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "User_Pack_UserCode :: 떠나는 유저의 캐릭터 코드 : [%s] ", curcharacter->GetCharacter_Code());
+	sprintf(msg, "User_Pack_UserCode :: 유저의 코드 패킹 : [%s] ", curcharacter->GetCharacter_Code());
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
@@ -750,9 +739,9 @@ void InGameManager::User_Pack_Party_InviteResultToOther(User * _user, char * _da
 	ptr += sizeof(bool);
 
 	// 메세지
-	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "User_Pack_Party_InviteResultToOther ::  ");
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	//memset(msg, 0, sizeof(msg));
+	//sprintf(msg, "User_Pack_Party_InviteResultToOther ::  ");
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
 }
@@ -858,7 +847,7 @@ void InGameManager::User_Pack_Party_Dungeon_SpawnData(User * _user, char * _data
 
 	// 채널에 들어와있는 유저 정보 패킹
 	partyroom_temp = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
-	
+
 	usercount = partyroom_temp->GetPartRoomUserNum();
 
 	// 유저 숫자
@@ -962,11 +951,11 @@ void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char * _da
 {
 	char* ptr = _data;
 	int size = 0;
-
+	char msg[BUFSIZE];
 	PartyRoom* partyroom_temp = nullptr;
 	int monstercode = 0;
 	int monsternum = 0;
-
+	float time = MONSTERSPAWNTIME;
 	Vector3 spawnpos[MONSTER_SPAWNPOS_MAXCOUNT];
 
 	GameDataManager::GetInstance()->Dungeon_Monster_SpawnPos_Vector(spawnpos);
@@ -983,12 +972,17 @@ void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char * _da
 	ptr += sizeof(int);
 	size += sizeof(int);
 
+	// 몬스터 스폰 시간
+	memcpy(ptr, &time, sizeof(float));
+	ptr += sizeof(float);
+	size += sizeof(float);
+
 	for (int i = 0; i < monster_typecount; i++)
 	{
 		// 몬스터 코드
 		monstercode = partyroom_temp->GetMonsterCode(i);
-		monsternum = 10;
-		
+		monsternum = FIRSTSTAGE_NORMALMONSTER_1;
+
 		memcpy(ptr, &monstercode, sizeof(int));
 		ptr += sizeof(int);
 		size += sizeof(int);
@@ -1002,6 +996,12 @@ void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char * _da
 		memcpy(ptr, &spawnpos[i], sizeof(Vector3));
 		ptr += sizeof(Vector3);
 		size += sizeof(Vector3);
+
+		// 메세지
+		memset(msg, 0, sizeof(msg));
+		sprintf(msg, "몬스터 스폰 좌표 :: 몬스터 코드: [%d] 몬스터 숫자: [%d] 위치: [%f] [%f] [%f]", monstercode, monsternum, spawnpos[i].x, spawnpos[i].y,
+			spawnpos[i].z);
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
 
 	_datasize = size;
@@ -1027,12 +1027,12 @@ void InGameManager::User_Pack_Party_Result(User * _user, bool _result, char * _d
 
 	if (result)
 	{
-		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [성공] : ");
+		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [성공]");
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
 	else
 	{
-		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [실패] : ");
+		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [실패]");
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
 	_datasize = datasize;
@@ -1068,12 +1068,12 @@ void InGameManager::User_Pack_Party_Result_Code(User * _user, bool _result, char
 		datasize += len;
 		ptr += len;
 
-		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [성공] : ");
+		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [성공]");
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
 	else
 	{
-		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [실패] : ");
+		sprintf(msg, "User_Pack_Party_Result :: 파티 초대 결과 [실패]");
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
 
@@ -1101,8 +1101,64 @@ void InGameManager::User_Pack_Dungeon_SpawnData(User * _user, int _count, char *
 	memcpy(ptr, &pos, sizeof(Vector3));
 	ptr += sizeof(Vector3);
 	size += sizeof(Vector3);
-	
+
 	_datasize = size;
+}
+
+// 몬스터 이동정보 패킹(몬스터숫자,몬스터코드,몬스터번호,몬스터좌표)
+void InGameManager::User_Pack_Monster_MoveInfo(User * _user, int _code, int _num, char* _data, int& _datasize)
+{
+	char* ptr = _data;
+	int size = 0;
+
+	int code = 0;
+	int monsternum = 0;
+
+	PartyRoom* partyroom = nullptr;
+	MonsterInfo* monsterinfo = nullptr;
+	Vector3 pos;
+
+	char msg[BUFSIZE];
+
+	CriticalSectionManager::GetInstance()->Enter();
+
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	// 몬스터 정보 검색 시작
+	partyroom->StartSearchMonsterinfo();
+	while (partyroom->SearchMonsterinfo(monsterinfo))
+	{
+		if (monsterinfo->GetMonster()->GetMonster_Code() == _code && monsterinfo->GetMonsterNum() == _num)
+		{
+			code = monsterinfo->GetMonster()->GetMonster_Code();
+			monsternum = monsterinfo->GetMonsterNum();
+
+			// 몬스터 코드
+			memcpy(ptr, &code, sizeof(int));
+			ptr += sizeof(int);
+			size += sizeof(int);
+
+			// 몬스터 번호
+			memcpy(ptr, &monsternum, sizeof(int));
+			ptr += sizeof(int);
+			size += sizeof(int);
+
+			// 몬스터 위치
+			memcpy(ptr, &monsterinfo->GetMonster()->GetPosition(), sizeof(Vector3));
+			ptr += sizeof(Vector3);
+			size += sizeof(Vector3);
+
+			_datasize = size;
+
+			memset(msg, 0, sizeof(msg));
+			sprintf(msg, "몬스터 정보 전송. 코드 : [%d] 번호 : [%d] x : [%f] y : [%f] z [%f]", code, monsternum, monsterinfo->GetMonster()->GetPosition().x, monsterinfo->GetMonster()->GetPosition().y, monsterinfo->GetMonster()->GetPosition().z);
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+			break;
+		}
+	}
+
+	CriticalSectionManager::GetInstance()->Leave();
 }
 
 // 채널 이동 요청 언팩
@@ -1154,7 +1210,7 @@ void InGameManager::User_Unpack_PartyRoom_Invite_Result(User * _user, char * _bu
 }
 
 // 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표)
-void InGameManager::User_Unpack_Monster_Move(User * _user, char * _buf)
+void InGameManager::User_Unpack_Monster_Move(User * _user, char * _buf, int& _code, int& _num)
 {
 	Vector3 prePos;
 	Vector3 curPos;
@@ -1185,19 +1241,21 @@ void InGameManager::User_Unpack_Monster_Move(User * _user, char * _buf)
 
 	if (partyroom->GetMonsterinfo(monster_code, monster_num, monsterinfo) == false)
 	{
+		memset(msg, 0, sizeof(msg));
+		sprintf(msg, "몬스터 이동 :: 좌표 받기 실패");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		return;
 	}
 
 	// 몬스터 정보 저장
 	partyroom->SetMonsterinfo(monster_code, monster_num, curPos);
 
+	_code = monster_code;
+	_num = monster_num;
 	// 메세지
-	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "몬스터 이동 :: 아이디: [%s] 위치: [%f] [%f] [%f]", _user->getID(), curPos.x, curPos.y,curPos.z);
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-
-
+	//memset(msg, 0, sizeof(msg));
+	//sprintf(msg, "몬스터 이동 :: 몬스터 코드: [%d]  몬스터 번호: [%d] 위치: [%f] [%f] [%f]", monster_code, monster_num, curPos.x, curPos.y, curPos.z);
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 }
 
 // 이동이나 회전 정보 Vecotr3. 
@@ -1225,11 +1283,11 @@ void InGameManager::User_Pack_MoveInfoToOther(User* _user, char * _data, int & _
 	datasize += sizeof(Vector3);
 	ptr += sizeof(Vector3);
 
-	// 메세지
-	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "User_Pack_MoveInfoToOther :: 코드 : [%s] 위치: [%f] [%f] [%f]", curcharacter->GetCharacter_Code(), curcharacter->GetPosition().x, curcharacter->GetPosition().y,
-		curcharacter->GetPosition().z);
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	//// 메세지
+	//memset(msg, 0, sizeof(msg));
+	//sprintf(msg, "User_Pack_MoveInfoToOther :: 코드 : [%s] 위치: [%f] [%f] [%f]", curcharacter->GetCharacter_Code(), curcharacter->GetPosition().x, curcharacter->GetPosition().y,
+	//	curcharacter->GetPosition().z);
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
 }
@@ -1460,7 +1518,6 @@ void InGameManager::User_Dungeon_Stage_Rise(User * _user)
 	}
 	partyroom->RiseStage();
 	partyroom->SetDungeonMonsterinfo();
-	partyroom->Start_MonsterTimer();
 }
 
 // 다른 유저 이동정보 전송(채널에 접속해있는 유저들한테 전송)
@@ -1485,11 +1542,11 @@ void InGameManager::User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char * _
 				}
 			}
 			// 메세지
-			char msg[BUFSIZE];
-			memset(msg, 0, sizeof(msg));
-			sprintf(msg, "User_Send_MoveInfoToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-				_p, _datasize, user->GetSendQueueSize());
-			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+			//char msg[BUFSIZE];
+			//memset(msg, 0, sizeof(msg));
+			//sprintf(msg, "User_Send_MoveInfoToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+			//	_p, _datasize, user->GetSendQueueSize());
+			//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 	}
 
@@ -1552,11 +1609,11 @@ void InGameManager::User_Send_Channel_LeaveInfoToOther(User * _user, PROTOCOL _p
 				}
 			}
 			// 메세지
-			char msg[BUFSIZE];
-			memset(msg, 0, sizeof(msg));
-			sprintf(msg, "User_Send_Channel_LeaveInfoToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-				_p, _datasize, user->GetSendQueueSize());
-			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+			//char msg[BUFSIZE];
+			//memset(msg, 0, sizeof(msg));
+			//sprintf(msg, "User_Send_Channel_LeaveInfoToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+			//	_p, _datasize, user->GetSendQueueSize());
+			//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 	}
 	CriticalSectionManager::GetInstance()->Leave();
@@ -1584,11 +1641,11 @@ void InGameManager::User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_memb
 				}
 			}
 			// 메세지
-			char msg[BUFSIZE];
-			memset(msg, 0, sizeof(msg));
-			sprintf(msg, "User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-				_p, _datasize, user->GetSendQueueSize());
-			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+			//char msg[BUFSIZE];
+			//memset(msg, 0, sizeof(msg));
+			//sprintf(msg, "User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+			//	_p, _datasize, user->GetSendQueueSize());
+			//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 	}
 	CriticalSectionManager::GetInstance()->Leave();
@@ -1614,11 +1671,11 @@ void InGameManager::User_Send_Party_InviteToOther(User* _user, PROTOCOL _p, char
 			}
 		}
 		// 메세지
-		char msg[BUFSIZE];
-		memset(msg, 0, sizeof(msg));
-		sprintf(msg, "User_Send_Party_InviteToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-			_p, _datasize, user->GetSendQueueSize());
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		//char msg[BUFSIZE];
+		//memset(msg, 0, sizeof(msg));
+		//sprintf(msg, "User_Send_Party_InviteToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+		//	_p, _datasize, user->GetSendQueueSize());
+		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
 
 	CriticalSectionManager::GetInstance()->Leave();
@@ -1649,11 +1706,11 @@ void InGameManager::User_Send_Party_ToOther(User * _user, PROTOCOL _p, char * _d
 				}
 			}
 			// 메세지
-			char msg[BUFSIZE];
-			memset(msg, 0, sizeof(msg));
-			sprintf(msg, "User_Send_Party_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-				_p, _datasize, user->GetSendQueueSize());
-			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+			//char msg[BUFSIZE];
+			//memset(msg, 0, sizeof(msg));
+			//sprintf(msg, "User_Send_Party_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+			//	_p, _datasize, user->GetSendQueueSize());
+			//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 	}
 	CriticalSectionManager::GetInstance()->Leave();
@@ -1711,6 +1768,27 @@ void InGameManager::User_Send_Party_Leave_Dungeon(User * _user, PROTOCOL _p)
 	}
 }
 
+// 몬스터 시간 초기화
+void InGameManager::User_PartyRoom_Monster_Time_ReSet(User * _user, int _code, int _num)
+{
+	PartyRoom* partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	partyroom->Start_MonsterTimer(_code, _num);
+}
+
+// 해당 유저의 파티의 몬스터 시간이 정해둔 시간을 지났는가.
+bool InGameManager::User_PartyRoom_Monster_TimeOver_Check(User* _user, int _code, int _num)
+{
+	PartyRoom* partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	if (partyroom == nullptr)
+	{
+		return false;
+	}
+
+	return partyroom->End_MonsterTimer(_code, _num);
+}
+
 
 RESULT InGameManager::InGame_Init_Packet(User * _user)
 {
@@ -1725,6 +1803,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	int choice = 0;
 	int oldchannelnum = 0;
 	int partyroomnum = 0;
+	int monstercode = 0;
+	int monsternum = 0;
 	int datasize = 0;
 	int rdatasize = 0;
 
@@ -1745,7 +1825,15 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		break;
 	case CLIENT_INGAME_MOVE_REPORT:			// 클라 이동
 		User_Pack_Move(_user, buf, datasize, rdata, rdatasize);
-		User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
+		if (_user->isDungeon())
+		{
+			User_Send_Party_ToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
+		}
+		else
+		{
+			User_Send_MoveInfoToOther(_user, SERVER_INGAME_MOVE_OTHERPLAYERINFO, rdata, rdatasize);
+		}
+		
 		sendprotocol = SERVER_INGAME_MOVE_RESULT;
 		_user->Quepack(sendprotocol, buf, datasize);
 		result = RT_INGAME_MOVE;
@@ -1957,17 +2045,10 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	case CLIENT_INGAME_DUNGEON_ENTER:		// 던전 입장 요청
 		User_EnterInDun_Channel(_user);
 		User_Send_Party_Eneter_Dungeon(_user, SERVER_INGAME_OTHERPLAYER_LEAVE);
-	
+
 		User_Pack_Party_Dungeon_SpawnData(_user, buf, datasize);
-		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf,datasize );
+		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
 		_user->Quepack(SERVER_INGAME_DUNGEON_ENTER_RESULT, buf, datasize);
-
-		// 임시로 사용중 스테이지 입장시 몬스터 정보 주는용
-		User_Dungeon_Stage_Rise(_user);
-
-		User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
-		User_Send_Party_ToOther(_user, SERVER_INGAME_MONSTER_INFO, buf, datasize);
-		_user->Quepack(SERVER_INGAME_MONSTER_INFO, buf, datasize);
 
 		result = RT_INGAME_DUNGEON_ENTER_RESULT;
 		break;
@@ -1983,25 +2064,42 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 		User_Send_Party_ToOther(_user, SERVER_INGAME_DUNGEON_STAGE_IN_REULST, buf, datasize);
 		_user->Quepack(SERVER_INGAME_DUNGEON_STAGE_IN_REULST, buf, datasize);
 
+		// 임시로 사용중 스테이지 입장시 몬스터 정보 주는용
+		User_Dungeon_Stage_Rise(_user);
+
+		User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
+		User_Send_Party_ToOther(_user, SERVER_INGAME_MONSTER_INFO, buf, datasize);
+		_user->Quepack(SERVER_INGAME_MONSTER_INFO, buf, datasize);
+
 		result = RT_INGAME_DUNGEON_STAGE_IN_RESULT;
 		break;
 	case CLIENT_INGAME_MONSTER_INFO:	// 몬스터 정보 요청 프로토콜
 
-		/*
 		// 스테이지 입장시 몬스터 정보 전송
 		User_Dungeon_Stage_Rise(_user);
 
 		User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
 		User_Send_Party_ToOther(_user, SERVER_INGAME_MONSTER_INFO, buf, datasize);
 		_user->Quepack(SERVER_INGAME_MONSTER_INFO, buf, datasize);
-		*/
+
 		result = RT_INGAME_DUNGEON_MONSTER_INFO_RESULT;
 
 		break;
-	case CLIENT_INGAME_MONSTER_MOVE:	// 몬스터 이동 정봉
-		User_Unpack_Monster_Move(_user, buf);
+	case CLIENT_INGAME_MONSTER_MOVE:	// 몬스터 이동 정보
+		User_Unpack_Monster_Move(_user, buf, monstercode, monsternum);
+		
+		// 시간이 지났으면 새로 정보를 보낸다
+		if (User_PartyRoom_Monster_TimeOver_Check(_user, monstercode,monsternum))
+		{
+			User_Pack_Monster_MoveInfo(_user, monstercode, monsternum, rdata, rdatasize);
+			User_Send_Party_ToOther(_user, SERVER_INGAME_MONSTER_MOVE_RESULT, rdata, rdatasize);
+			_user->Quepack(SERVER_INGAME_MONSTER_MOVE_RESULT, rdata, rdatasize);
 
+			// 시간 초기화
+			User_PartyRoom_Monster_Time_ReSet(_user, monstercode, monsternum);
+		}
 
+		result = RT_INGMAE_MONSTER_MOVE_RESULT;
 		break;
 	default:
 		break;
@@ -2032,7 +2130,7 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 			// 파티원들한테 파티방 터트렸다는 패킷을보냄
 			User_Pack_Party_Protocol(_user, buf, datasize);
 			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_ROOM_REMOVE_RESULT, buf, datasize);
-			
+
 			// 파티없앤다
 			User_Remove_PartyRoom(_user);
 		}
@@ -2063,6 +2161,9 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 
 			// 파티없앤다
 			User_Remove_PartyRoom(_user);
+
+			sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있는상태에 종료 : 방장임 ");
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 		else
 		{
@@ -2072,12 +2173,15 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 			User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_LEAVE_INFO, buf, datasize);
 			User_Send_Channel_LeaveInfoToOther(_user, SERVER_INGAME_OTHERPLAYER_LEAVE, _user->GetChannelNum(), buf, datasize);
 			User_PartRoom_User_Leave(_user);
+
+			sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있는상태에 종료 : 파티원임 ");
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 
 		User_Leave_Channel(_user);
 
-		sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있는상태에 종료 ");
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		/*sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있는상태에 종료 ");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);*/
 		return true;
 	} // 파티에 속해있지않고 채널에 들어와있으면
 	else if (_user->isParty() == false && _user->isChannel() == true)

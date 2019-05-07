@@ -71,6 +71,10 @@ bool InGameState::Read(User * _user)
 		{
 			state = INGAME_INIT_RECV;
 		}
+		else if (result == RT_INGMAE_MONSTER_MOVE_RESULT)
+		{
+			state = INGAME_INIT_RECV;
+		}
 		break;
 	default:
 		break;

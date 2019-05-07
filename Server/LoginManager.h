@@ -35,6 +35,8 @@ public:
 	bool InitializeManager();
 	void EndManager();
 
+	// 타이틀
+	RESULT TitleProcess(User* _user);
 	// INIR상태에서 매뉴 선택(로그인,회원가입 매뉴선택,나가기)
 	RESULT logoutMenuChoice(User* user);
 	// 회원가입상태에 따른 선택(중복확인,회원가입)
