@@ -21,6 +21,9 @@ Packet::Packet(SOCKET _socket, SOCKADDR_IN _addr) : TCPClient(_socket, _addr)
 	recvedSize = 0;
 	sending = false;
 
+	memset(sendBuf, 0, sizeof(sendBuf));
+	memset(recvBuf, 0, sizeof(recvBuf));
+
 	ZeroMemory(&sendEx.overlapped, sizeof(sendEx.overlapped));
 	ZeroMemory(&recvEx.overlapped, sizeof(recvEx.overlapped));
 	ZeroMemory(&os_sendEx.overlapped, sizeof(os_sendEx.overlapped));
@@ -197,9 +200,9 @@ void Packet::ClearSendQueue()
 bool Packet::TakeOutSendPacket()
 {
 	CriticalSectionManager::GetInstance()->Enter();
-	//char msg[BUFSIZE];
-	//sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
-	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	char msg[BUFSIZE];
+	sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	if (isSendQueue() && isSending() == false)
 	{
 		SendPacket* sendpacket = sendQueue.front();
@@ -210,9 +213,9 @@ bool Packet::TakeOutSendPacket()
 		sendQueue.pop();
 		sending = true;
 		CriticalSectionManager::GetInstance()->Leave();
-		//char msg[BUFSIZE];
-		//sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
-		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		char msg[BUFSIZE];
+		sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		return true;
 	}
 	else
@@ -278,7 +281,7 @@ void Packet::Quepack(PROTOCOL p, void * data, int size)
 }
 
 // Data 패킹 Send 큐사용. BitProtocol 추가
-void Packet::Quepack(INT64 p, void * data, int size)
+void Packet::Quepack(UINT64 p, void * data, int size)
 {
 	CriticalSectionManager::GetInstance()->Enter();
 
@@ -286,20 +289,20 @@ void Packet::Quepack(INT64 p, void * data, int size)
 
 	char* ptr = temp->sendBuf;
 
-	temp->sendSize = sizeof(INT64) + size;
+	temp->sendSize = sizeof(UINT64) + size;
 
 	memcpy(ptr, &temp->sendSize, sizeof(int));
 	ptr += sizeof(int);
 
-	memcpy(ptr, &p, sizeof(INT64));
-	ptr += sizeof(INT64);
+	memcpy(ptr, &p, sizeof(UINT64));
+	ptr += sizeof(UINT64);
 
 	memcpy(ptr, data, size);
 
 	temp->sendSize += sizeof(size);		// 보낼 사이즈
 
 	// 암호화
-	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(INT64), temp->sendSize);
+	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(int), temp->sendSize);
 	// 큐에 넣기
 
 	sendQueue.push(temp);
@@ -351,29 +354,42 @@ void Packet::unPack(PROTOCOL * p, void * data)
 }
 
 // 비트연산 프로토콜 pack. _existingprotocol : 기존 프로토콜, _additionalprotocol : 추가할 프로토콜
-INT64 Packet::BitPackProtocol(INT64 _existingprotocol, INT64 _additionalprotocol)
+UINT64 Packet::BitPackProtocol(UINT64 _existingprotocol, UINT64 _additionalprotocol)
 {
-	INT64 protocol = 0;
+	UINT64 protocol = 0;
 	protocol = _existingprotocol | _additionalprotocol;
 
 	return protocol;
 }
 
+// 비트연산 프로토콜 pack. 기존프로토콜, 큰틀프로토콜, 중간틀프로토콜, 세부프로토콜
+UINT64 Packet::BitPackProtocol(UINT64 _existingprotocol, UINT64 _first_additionalprotocol, UINT64 _second_additionalprotocol, UINT64 _third_additionalprotocol)
+{
+	UINT64 protocol = 0;
+	protocol = _existingprotocol | _first_additionalprotocol;
+	protocol = protocol | _second_additionalprotocol;
+	protocol = protocol | _third_additionalprotocol;
+
+	return protocol;
+}
+
 // 비트 연산 프로토콜 unpack
-void Packet::BitunPack(INT64 * _p, void * _data)
+void Packet::BitunPack(UINT64 & _p, void * _data)
 {
 	CriticalSectionManager::GetInstance()->Enter();
 
 	char* ptr = recvBuf;
-	INT64 protocol = 0;
+	UINT64 protocol = 0;
 
 	EncryptManager::GetInstance()->decoding(recvBuf, recvSize);
 
-	memcpy(&protocol, ptr, sizeof(INT64));
-	ptr += sizeof(INT64);
+	memcpy(&protocol, ptr, sizeof(protocol));
+	ptr += sizeof(protocol);
 
-	memcpy(_data, ptr, recvSize - sizeof(INT64));
-	*_p = protocol;
+	int int64size = sizeof(protocol);
+
+	memcpy(_data, ptr, recvSize - sizeof(protocol));
+	_p = protocol;
 
 	IOCP_InitializeBuffer();
 

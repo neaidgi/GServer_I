@@ -87,7 +87,7 @@ void LoginManager::reqIdOverlapCheck(User* user, char* _buf)
 	sprintf(msg, "%s : %s", id, check ? "중복" : "중복아님");
 	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 
-	protocol = user->BitPackProtocol(protocol, PROTOCOL_ID_OVERLAP_CHECK);
+	protocol = user->BitPackProtocol(protocol, PROTOCOL_TITLE, PROTOCOL_LOGIN, PROTOCOL_ID_OVERLAP_CHECK);
 	user->Quepack(protocol, &check, sizeof(bool));
 }
 
@@ -126,7 +126,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	if (strcmp(id, user->getID()))
 	{
 		result = false;
-		protocol = user->BitPackProtocol(protocol, PROTOCOL_JOIN_RESULT);
+		protocol = user->BitPackProtocol(protocol, PROTOCOL_TITLE, PROTOCOL_LOGIN, PROTOCOL_JOIN_RESULT);
 		user->Quepack(protocol, &result, sizeof(bool));
 		return;
 	}
@@ -143,7 +143,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 	}
 
 
-	protocol = user->BitPackProtocol(protocol, PROTOCOL_JOIN_RESULT);
+	protocol = user->BitPackProtocol(protocol, PROTOCOL_TITLE, PROTOCOL_LOGIN, PROTOCOL_JOIN_RESULT);
 	user->Quepack(protocol, &result, sizeof(bool));
 
 	sprintf(tempbuf, "%s [회원가입].", user->getID());
@@ -154,7 +154,7 @@ void LoginManager::reqJoin(User* user, char* _buf)
 // 로그인 결과
 bool LoginManager::reqLogin(User* user, char* _buf)
 {
-	INT64 protocol = 0;
+	UINT64 protocol = 0;
 	int len = 0;
 	char id[IDSIZE];
 	char pw[IDSIZE];
@@ -186,7 +186,7 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	}
 
 	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
-	protocol = user->BitPackProtocol(protocol, PROTOCOL_LOGIN_RESULT);
+	protocol = user->BitPackProtocol(protocol, PROTOCOL_TITLE, PROTOCOL_LOGIN, PROTOCOL_LOGIN_RESULT);
 	user->Quepack(protocol, &result, sizeof(bool));
 	
 	return result;
@@ -224,7 +224,7 @@ RESULT LoginManager::loginProcess(User * _user)
 // 타이틀
 RESULT LoginManager::TitleProcess(User * _user)
 {
-	INT64 protocol = 0;
+	UINT64 protocol = 0;
 	char buf[BUFSIZE];
 	char msg[BUFSIZE];
 	bool check = false;
@@ -233,7 +233,7 @@ RESULT LoginManager::TitleProcess(User * _user)
 	memset(buf, 0, sizeof(buf));
 	memset(msg, 0, sizeof(msg));
 
-	_user->BitunPack(&protocol,&buf);
+	_user->BitunPack(protocol,&buf);
 
 	RESULT result = RT_DEFAULT;
 
@@ -267,35 +267,6 @@ RESULT LoginManager::TitleProcess(User * _user)
 			result = RT_ID_OVERLAP;
 		}
 	}
-
-
-	//// 수정했음
-	//switch (protocol)
-	//{
-	//case CLIENT_REQ_LOGIN:	// 로그인 요청
-	//	sprintf(msg, "%s : 로그인 요청", _user->getID());
-	//	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
-	//	check = reqLogin(_user, buf);
-	//	if (check == false)
-	//	{
-	//		result = RT_LOGINFAIL;
-	//		break;
-	//	}
-	//	result = RT_LOGIN;
-	//	break;
-	//case CLIENT_REQ_ID_OVERLAP_CHECK:	// 아이디 중복체크 요청
-	//	reqIdOverlapCheck(_user, buf);
-	//	result = RT_ID_OVERLAP;
-	//	break;
-	//case CLIENT_REQ_JOIN:	// 회원가입 요청
-	//	sprintf(msg, "%s : 가입 요청", _user->getID());
-	//	MsgManager::GetInstance()->DisplayMsg("로그인", msg);
-	//	reqJoin(_user, buf);
-	//	result = RT_JOIN;
-	//	break;
-	//default:
-	//	break;
-	//}
 
 	return result;
 }

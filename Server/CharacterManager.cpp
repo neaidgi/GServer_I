@@ -203,7 +203,7 @@ bool CharacterManager::CreateCharacter(User * _user, char* _buf)
 // 게임시작
 bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 {
-	PROTOCOL sendprotocol;
+	UINT64 sendprotocol =0;
 	char data[BUFSIZE];
 	char* ptr = data;
 	int index = 0;
@@ -306,7 +306,8 @@ bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 		ptr_temp += sizeof(int);
 		size += sizeof(int);
 
-		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
+		sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_CHRACTER, PROTOCOL_CHARACER_MENU, PROTOCOL_CHARACTER_ENTER_RESULT);
+
 		_user->Quepack(sendprotocol, data, size);
 
 		delete slotdata;
@@ -318,8 +319,8 @@ bool CharacterManager::InitEnterGame(User * _user, char * _buf)
 		size = sizeof(bool);
 
 		// 채널 꽉참
+		sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_CHRACTER, PROTOCOL_CHARACER_MENU, PROTOCOL_CHARACTER_ENTER_RESULT);
 
-		sendprotocol = SERVER_CHARACTER_ENTER_RESULT;
 		_user->Quepack(sendprotocol, data, size);
 	}
 	return enter;
@@ -393,22 +394,16 @@ Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, 
 	return player;
 }
 
-// 캐릭터 초기화면
-RESULT CharacterManager::Character_Init_Choice(User * _user)
+// 캐릭터 생성창
+RESULT CharacterManager::Character_Management_Process(User * _user)
 {
-	PROTOCOL protocol;
+	UINT64 protocol = 0;
+	UINT64 sendprotocol = 0;
 	char buf[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
 	char* ptr = buf;
 	bool check;
-	int choice;
 
-	memset(buf, 0, sizeof(buf));
-
-	_user->unPack(&protocol, &buf);
-
-	PROTOCOL sendprotocol;
-
-	RESULT result = RT_DEFAULT;
 	SlotData* slotdata[3];
 	memset(slotdata, 0, sizeof(slotdata));
 	int count = 0;
@@ -416,184 +411,163 @@ RESULT CharacterManager::Character_Init_Choice(User * _user)
 	bool is_slot;
 	int size = 0;
 
-	// 수정했음
-	switch (protocol)
-	{
-	case CLIENT_REQ_CHARACTER_SLOT:
-		// 슬롯 개수 요청
-		if (GetCharacter_SlotCount(_user, count) == false)
-		{
-			count = 0;
-		}
-
-		// DB에서 슬롯캐릭터 받아오기
-		while (i < count)
-		{
-			slotdata[i] = new SlotData();
-			memset(slotdata[i], 0, sizeof(SlotData));
-			if (GetCharacter_Slot(_user, i + 1, slotdata[i]) == false)
-			{
-				count = i;
-				delete slotdata[i];
-				break;
-			}
-
-			++i;
-		}
-
-		// 슬롯에 캐릭터가 없을경우
-		if (count == 0)
-		{
-			is_slot = false;
-
-			// 프로토콜 데이터 패킹
-			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
-			memcpy(buf, &is_slot, sizeof(bool));
-			_user->Quepack(sendprotocol, buf, sizeof(bool));
-			result = RT_CHARACTER_SLOTRESULT;
-		}
-		else
-		{
-			is_slot = true;
-			size = 0;
-
-			// 프로토콜 데이터 패킹
-			sendprotocol = SERVER_CHARACTER_SLOT_RESULT;
-
-			memcpy(ptr, &is_slot, sizeof(bool));
-			ptr += sizeof(bool);
-			size += sizeof(bool);
-
-			memcpy(ptr, &count, sizeof(int));
-			ptr += sizeof(int);
-			size += sizeof(int);
-
-			for (int i = 0; i < count; i++)
-			{
-				int joblen = strlen(slotdata[i]->jobname);
-				int nicklen = strlen(slotdata[i]->nick);
-
-				memcpy(ptr, &joblen, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
-
-				memcpy(ptr, slotdata[i]->jobname, joblen);
-				ptr += joblen;
-				size += joblen;
-
-				memcpy(ptr, &slotdata[i]->level, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
-
-				memcpy(ptr, &nicklen, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
-
-				memcpy(ptr, slotdata[i]->nick, nicklen);
-				ptr += nicklen;
-				size += nicklen;
-
-				memcpy(ptr, &slotdata[i]->code, sizeof(int));
-				ptr += sizeof(int);
-				size += sizeof(int);
-			}
-
-			_user->Quepack(sendprotocol, buf, size);
-			result = RT_CHARACTER_SLOTRESULT;
-
-			//뒤처리 받아온 슬롯데이터 삭제
-			for (int i = 0; i < count; i++)
-				delete slotdata[i];
-		}// else문의 끝
-		break;
-	case CLIENT_NEW_CHARACTER_MENU:
-		sendprotocol = SERVER_CHARACTER_MENU;
-		_user->Quepack(sendprotocol, buf, 0);
-		result = RT_CHARACTER_ENTERCREATE;
-		break;
-	case CLIENT_CHARACTER_ENTER:
-		if (InitEnterGame(_user, buf))
-		{
-			_user->SetEnterGame();
-			result = RT_CHARACTER_ENTERGAME;
-		}
-		else
-		{
-			result = RT_CHARACTER_ENTERGAME;
-		}
-		break;
-	case CLIENT_CHARACTER_DELETE:
-		if (DeleateCharacter(_user, buf))
-		{
-			MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 성공");
-			check = true;
-		}
-		else
-		{
-			MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 실패");
-			check = false;
-		}
-		_user->Quepack(SERVER_CHARACTER_DELETE_RESULT, &check, sizeof(bool));
-
-		result = RT_CHARACTER_DELETE;
-		break;
-	default:
-		break;
-	}
-
-	return result;
-}
-
-// 캐릭터 생성창
-RESULT CharacterManager::Character_Management_Process(User * _user)
-{
-	PROTOCOL protocol;
-	char buf[BUFSIZE];
-	char* ptr = buf;
-	bool check;
-	int choice;
-
-	_user->unPack(&protocol, &buf);
-
-	PROTOCOL sendprotocol;
+	_user->BitunPack(protocol, &buf);
 
 	RESULT result = RT_DEFAULT;
 
-	switch (protocol)
+	// 프로토콜 중간틀 캐릭터선택화면이면
+	if ((protocol&PROTOCOL_CHARACER_MENU) == PROTOCOL_CHARACER_MENU)
 	{
-	case CLIENT_REQ_CHARACTER:
-		if (NickOverlapCheck(_user, buf))
+		// 캐릭터 생성요청
+		if ((protocol&PROTOCOL_REQ_CHARACTER_CREATE) == PROTOCOL_REQ_CHARACTER_CREATE)
 		{
-			// 중복 있음
-			check = false;
-			result = RT_CHARACTER_NICKOVERLAP_TRUE;
-			_user->Quepack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
-			//_user->include_wset = true;
-		}
-		else
-		{
-			// 중복 없음
-			// 캐릭터 개수 제한 체크 추가
-			if (CreateCharacter(_user, buf))
+			sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_CHRACTER, PROTOCOL_CHARACER_MENU, PROTOCOL_CHARACTER_RESULT);
+
+			if (NickOverlapCheck(_user, buf))
 			{
-				check = true;
-				result = RT_CHARACTER_CREATE;
+				// 중복 있음
+				check = false;
+				_user->Quepack(sendprotocol, &check, sizeof(bool));
+				result = RT_CHARACTER_NICKOVERLAP_TRUE;
 			}
 			else
 			{
-				check = false;
-				result = RT_CHARACTER_NICKOVERLAP_TRUE;
+				// 중복 없음
+				// 캐릭터 개수 제한 체크 추가
+				if (CreateCharacter(_user, buf))
+				{
+					check = true;
+					result = RT_CHARACTER_CREATE;
+				}
+				else
+				{
+					check = false;
+					result = RT_CHARACTER_NICKOVERLAP_TRUE;
+				}
+				_user->Quepack(sendprotocol, &check, sizeof(bool));
 			}
-			_user->Quepack(SERVER_CHARACTER_RESULT, &check, sizeof(bool));
-			//_user->include_wset = true;
 		}
-		break;
-	case CLIENT_CHARACTER_EXIT:				// 캐릭터 생성 취소
-		_user->Quepack(SERVER_CHARACTER_EXIT_RESULT, buf, 0);
-		result = RT_CHARACTER_EXIT;
-		break;
-	default:
-		break;
+		// 캐릭터 삭제 요청
+		else if ((protocol&PROTOCOL_CHARACTER_DELETE) == PROTOCOL_CHARACTER_DELETE)
+		{
+			if (DeleateCharacter(_user, buf))
+			{
+				MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 성공");
+				check = true;
+			}
+			else
+			{
+				MsgManager::GetInstance()->DisplayMsg("DB", "캐릭터 삭제 실패");
+				check = false;
+			}
+			sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_CHRACTER, PROTOCOL_CHARACER_MENU, PROTOCOL_CHARACTER_DELETE_RESULT);
+
+			_user->Quepack(sendprotocol, &check, sizeof(bool));
+
+			result = RT_CHARACTER_DELETE;
+		}
+		// 캐릭터 선택 입장 요청
+		else if ((protocol&PROTOCOL_CHARACTER_ENTER) == PROTOCOL_CHARACTER_ENTER)
+		{
+			if (InitEnterGame(_user, buf))
+			{
+				_user->SetEnterGame();
+				result = RT_CHARACTER_ENTERGAME;
+			}
+			else
+			{
+				result = RT_CHARACTER_ENTERGAMEFAIL;
+			}
+		}
+		// 슬롯 정보 요청
+		else if ((protocol&PROTOCOL_REQ_CHARACTER_SLOT) == PROTOCOL_REQ_CHARACTER_SLOT)
+		{
+			// 슬롯 개수 요청
+			if (GetCharacter_SlotCount(_user, count) == false)
+			{
+				count = 0;
+			}
+
+			// DB에서 슬롯캐릭터 받아오기
+			while (i < count)
+			{
+				slotdata[i] = new SlotData();
+				memset(slotdata[i], 0, sizeof(SlotData));
+				if (GetCharacter_Slot(_user, i + 1, slotdata[i]) == false)
+				{
+					count = i;
+					delete slotdata[i];
+					break;
+				}
+				++i;
+			}
+
+			sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_CHRACTER, PROTOCOL_CHARACER_MENU, PROTOCOL_CHARACTER_SLOT_INFO);
+
+
+			// 슬롯에 캐릭터가 없을경우
+			if (count == 0)
+			{
+				is_slot = false;
+
+				memcpy(buf, &is_slot, sizeof(bool));
+				_user->Quepack(sendprotocol, buf, sizeof(bool));
+				result = RT_CHARACTER_SLOTRESULT;
+			}
+			else	// 슬롯에 캐릭터가 있을경우
+			{
+				is_slot = true;
+				size = 0;
+
+				memcpy(ptr, &is_slot, sizeof(bool));
+				ptr += sizeof(bool);
+				size += sizeof(bool);
+
+				memcpy(ptr, &count, sizeof(int));
+				ptr += sizeof(int);
+				size += sizeof(int);
+
+				for (int i = 0; i < count; i++)
+				{
+					int joblen = strlen(slotdata[i]->jobname);
+					int nicklen = strlen(slotdata[i]->nick);
+
+					memcpy(ptr, &joblen, sizeof(int));
+					ptr += sizeof(int);
+					size += sizeof(int);
+
+					memcpy(ptr, slotdata[i]->jobname, joblen);
+					ptr += joblen;
+					size += joblen;
+
+					memcpy(ptr, &slotdata[i]->level, sizeof(int));
+					ptr += sizeof(int);
+					size += sizeof(int);
+
+					memcpy(ptr, &nicklen, sizeof(int));
+					ptr += sizeof(int);
+					size += sizeof(int);
+
+					memcpy(ptr, slotdata[i]->nick, nicklen);
+					ptr += nicklen;
+					size += nicklen;
+
+					memcpy(ptr, &slotdata[i]->code, sizeof(int));
+					ptr += sizeof(int);
+					size += sizeof(int);
+				}
+
+				_user->Quepack(sendprotocol, buf, size);
+				result = RT_CHARACTER_SLOTRESULT;
+
+				//뒤처리 받아온 슬롯데이터 삭제
+				for (int a = 0; a < count; a++)
+				{
+					delete slotdata[a];
+				}
+					
+			}
+		}
 	}
 
 	return result;

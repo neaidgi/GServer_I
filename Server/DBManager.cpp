@@ -449,7 +449,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 	}
 }
 
-// 캐릭터 슬롯 요청 (번호 받아서 해당 레코드 가져옴) 19-2-13 수정완료
+// 캐릭터 슬롯 요청 (번호 받아서 해당 레코드 가져옴)
 bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, char * _code)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -508,7 +508,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.
 		*/
-		mysql_free_result(sql_result);
+			mysql_free_result(sql_result);
 
 		return true;
 	}
@@ -519,6 +519,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 	}
 }
 
+// 몬스터 설계도 요청
 bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
 {
 	MYSQL_RES *sql_result;  // the results
@@ -579,7 +580,7 @@ bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
 	return true;
 }
 
-// 2019-02-13 수정함
+// 캐릭터 삭제
 bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -671,7 +672,7 @@ bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 	}
 }
 
-// 19-02-09 수정해야함
+// 
 bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* _nick)
 {
 	MYSQL_RES *sql_result;  // the results
@@ -721,7 +722,7 @@ bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* 
 	}
 	else
 	{
-		fprintf(stderr, "Mysql Character_Pos error : %s \n", mysql_error(mysql));
+		fprintf(stderr, "Mysql Character_Req_CharacterName error : %s \n", mysql_error(mysql));
 		return false;
 	}
 }
@@ -787,6 +788,7 @@ bool DBManager::Character_Req_CharacterPos(char* _code, Vector3& _pos)
 		return false;
 	}
 }
+
 // 캐릭터 위치 추가
 bool DBManager::Charactor_CharacterPosAdd(int _code)
 {

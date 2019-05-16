@@ -9,7 +9,7 @@ bool CharacterState::Read(User * _user)
 	switch (state)
 	{
 	case CharacterState::CHARACTER_MENU_RECV:
-		result = charactermanager->Character_Init_Choice(_user);
+		result = charactermanager->Character_Management_Process(_user);
 		if (result == RT_CHARACTER_SLOTRESULT)
 		{
 			state = CHARACTER_SLOT_RESULT_SEND;
@@ -22,18 +22,15 @@ bool CharacterState::Read(User * _user)
 		{
 			state = CHARACTER_ENTER_SEND;
 		}
-		else if (result == RT_CHARACTER_DELETE)
-		{
-			state = CHARACTER_DELETE_SEND;
-		}
 		else if (result == RT_CHARACTER_ENTERGAMEFAIL)
 		{
 			state = CHARACTER_ENTERFAIL_SEND;
 		}
-		break;
-	case CharacterState::CHARACTER_REQ_RECV:
-		result = charactermanager->Character_Management_Process(_user);
-		if (result == RT_CHARACTER_NICKOVERLAP_TRUE)
+		else if (result == RT_CHARACTER_DELETE)
+		{
+			state = CHARACTER_DELETE_SEND;
+		}
+		else if (result == RT_CHARACTER_NICKOVERLAP_TRUE)
 		{
 			state = CHARACTER_REQ_OVLAP_NICK_SEND;
 		}
@@ -41,10 +38,7 @@ bool CharacterState::Read(User * _user)
 		{
 			state = CHARACTER_REQ_CHARACTER_SEND;
 		}
-		else if (result == RT_CHARACTER_EXIT)
-		{
-			state = CHARACTER_EXIT_SEND;
-		}
+		break;
 	default:
 		break;
 	}
@@ -60,7 +54,7 @@ bool CharacterState::Write(User * _user)
 		state = CHARACTER_MENU_RECV;
 		break;
 	case CharacterState::CHARACTER_CREATE_MENU_SEND:
-		state = CHARACTER_REQ_RECV;
+		state = CHARACTER_MENU_RECV;
 		break;
 	case CharacterState::CHARACTER_ENTER_SEND:
 		state = CHARACTER_MENU_RECV;
@@ -70,7 +64,7 @@ bool CharacterState::Write(User * _user)
 		state = CHARACTER_MENU_RECV;
 		break;
 	case CharacterState::CHARACTER_REQ_OVLAP_NICK_SEND:
-		state = CHARACTER_REQ_RECV;
+		state = CHARACTER_MENU_RECV;
 		break;
 	case CharacterState::CHARACTER_REQ_CHARACTER_SEND:
 		state = CHARACTER_MENU_RECV;

@@ -17,6 +17,7 @@ Character & Character::operator=(const Character & rhs)
 	character_growstr = rhs.character_growstr;
 	character_growdex = rhs.character_growdex;
 	character_growint = rhs.character_growint;
+	character_jumpstate = rhs.character_jumpstate;
 
 	return *this;
 }

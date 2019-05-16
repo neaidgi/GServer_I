@@ -54,7 +54,6 @@ private:
 	void User_Pack_Monster_MoveInfo(User* _user, int _code, int _num, char* _data, int& _datasize);
 
 
-
 	// **UnPack 함수**
 	// 채널 이동 요청 언팩 (채널번호)
 	void User_UnPack_ChannelChange(User* _user, char* _buf, int& _channelnum);
@@ -64,7 +63,8 @@ private:
 	void User_Unpack_PartyRoom_Invite_Result(User* _user, char*_buf, bool& _result, char* _code, int& _partyroomnum);
 	// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표)
 	void User_Unpack_Monster_Move(User* _user, char* _buf, int& _code, int& _num);
-
+	// 유저가 특정 몬스터를 공격했다는 패킷
+	void User_Unpakc_Monster_Attack_Success(User* _user, char* _buf, int& _monstercode, int& _monsternum);
 
 
 	// ** 다른유저에게 줄 정보 Pack ** //
@@ -99,21 +99,22 @@ private:
 
 	// **Send 함수** //
 	// 다른 유저 이동정보 전송(채널에 접속해있는 유저들한테 전송)
-	void User_Send_MoveInfoToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);
+	void User_Send_MoveInfoToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
 	// 다른 유저 인게임에서 떠난 정보 전송
-	void User_Send_LeaveInfoToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);
+	void User_Send_LeaveInfoToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
 	// 다른 유저 인게임에서 떠난 정보 채널에 전송
-	void User_Send_Channel_LeaveInfoToOther(User* _user, PROTOCOL _p, int _channelnum, char* _data, int& _datasize);
+	void User_Send_Channel_LeaveInfoToOther(User* _user, UINT64 _p, int _channelnum, char* _data, int& _datasize);
 	// 다른 유저 인게임에서 떠난 정보 채널에 전송(파티원 제외)
-	void User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(User* _user, PROTOCOL _p, int _channelnum, char* _data, int& _datasize);
+	void User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(User* _user, UINT64 _p, int _channelnum, char* _data, int& _datasize);
 	// 특정 유저(code) 파티 초대 전송
-	void User_Send_Party_InviteToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize, char* _code);
+	void User_Send_Party_InviteToOther(User* _user, UINT64 _p, char* _data, int& _datasize, char* _code);
 	// 파티원에게 전송
-	void User_Send_Party_ToOther(User* _user, PROTOCOL _p, char* _data, int& _datasize);
+	void User_Send_Party_ToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
 	// 던전에 들어갔을때 채널에 속해있는 유저들한테 전송
-	void User_Send_Party_Eneter_Dungeon(User* _user, PROTOCOL _p);
+	void User_Send_Party_Eneter_Dungeon(User* _user, UINT64 _p);
 	// 던전에 나갔을때 채널에 속해있는 유저들한테 전송
-	void User_Send_Party_Leave_Dungeon(User* _user, PROTOCOL _p);
+	void User_Send_Party_Leave_Dungeon(User* _user, UINT64 _p);
+
 
 	// 스테이지 상승 및 몬스터정보 셋팅
 	void User_Dungeon_Stage_Rise(User* _user);
@@ -167,6 +168,8 @@ public:
 	// 던전 채널 나가기
 	void User_LeaveInDun_Channel(User* _user);
 
+	// 몬스터가 피격이 가능한가
+	//bool Monster_Attack_Is_
 
 };
 

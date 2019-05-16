@@ -28,6 +28,7 @@ private:
 	int	character_growstr;			// 성장 힘
 	int	character_growdex;			// 성장 민
 	int	character_growint;			// 성장 지
+	bool character_jumpstate;		// 점프상태
 
 public:
 	const char* GetCharacter_Name() const { return character_name; }
@@ -48,6 +49,7 @@ public:
 	int GetCharacter_GrowSTR()const { return character_growstr; }
 	int GetCharacter_GrowDEX()const { return character_growdex; }
 	int GetCharacter_GrowINT()const { return character_growint; }
+	bool GetCharacter_JumpState()const { return character_jumpstate; }
 
 	const Vector3 GetPosition() { return Position; }
 	const Vector3 GetRotation() { return Rotation; }
@@ -92,11 +94,18 @@ public:
 	void SetCharacter_GrowSTR(int _character_growstr) { character_growstr = _character_growstr; }
 	void SetCharacter_GrowDEX(int _character_growdex) { character_growdex = _character_growdex; }
 	void SetCharacter_GrowINT(int _character_growint) { character_growint = _character_growint; }
+	void SetCharacter_JumpState(int _character_jumpstate) { character_jumpstate = _character_jumpstate; }
 
 	void SetPosition(const Vector3& _position) { Position = _position; }
 	void SetRotation(const Vector3& _rotation) { Rotation = _rotation; }
 	void SetScale(const Vector3& _scale) { Scale = _scale; }
-	Character() { character_name = nullptr; character_code = nullptr; character_jobname = nullptr; }
+	Character() 
+	{
+		character_name = nullptr; 
+		character_code = nullptr; 
+		character_jobname = nullptr; 
+		character_jumpstate = false;
+	}
 	~Character() 
 	{ 
 		if(character_name != nullptr)

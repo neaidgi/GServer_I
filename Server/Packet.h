@@ -57,17 +57,18 @@ public:
 	bool TakeOutSendPacket();
 
 	void Quepack(PROTOCOL p, void *data, int size);
-	void Quepack(INT64 p, void *data, int size);
+	void Quepack(UINT64 p, void *data, int size);
 	void pack(PROTOCOL p, void *data, int size);
 	void bitpack(PROTOCOL p, void *data, int size);
 	void unPack(PROTOCOL *p, void *data);
 	bool isSendSuccess();
 	bool isRecvSuccess();
 	// 비트연산 프로토콜 pack. _existingprotocol : 기존 프로토콜, _additionalprotocol : 추가할 프로토콜
-	INT64 BitPackProtocol(INT64 _existingprotocol,INT64 _additionalprotocol);
-
+	UINT64 BitPackProtocol(UINT64 _existingprotocol, UINT64 _additionalprotocol); 
+	// 비트연산 프로토콜 pack. 기존프로토콜, 큰틀프로토콜, 중간틀프로토콜, 세부프로토콜
+	UINT64 BitPackProtocol(UINT64 _existingprotocol, UINT64 _first_additionalprotocol, UINT64 _second_additionalprotocol, UINT64 _third_additionalprotocol);
 	// 비트 연산 프로토콜 unpack
-	void BitunPack(INT64 *_p, void* _data);
+	void BitunPack(UINT64 &_p, void* _data);
 
 	// 큰틀 결과
 
