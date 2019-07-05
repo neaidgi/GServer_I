@@ -1,5 +1,28 @@
 #include "MonsterControl.h"
 
+MonsterInfo::MonsterInfo()
+{
+	m_monster_time = nullptr;
+	m_monster = nullptr;
+	m_monster_info_num = -1;
+	m_monster_activate = true;
+}
+
+MonsterInfo::~MonsterInfo()
+{
+	if (m_monster_time != nullptr)
+	{
+		delete m_monster_time;
+		m_monster_time = nullptr;
+	}
+
+	if (m_monster != nullptr)
+	{
+		delete m_monster;
+		m_monster = nullptr;
+	}
+}
+
 // 몬스터 타이머 시간초기화
 void MonsterInfo::InitMonsterTime()
 {
@@ -27,7 +50,7 @@ bool MonsterInfo::Is_End_MonsterTime()
 	}
 }
 
-
+// MonsterControl
 MonsterControl::MonsterControl()
 {
 	number_monster_types = 0;
@@ -87,15 +110,18 @@ Monster * MonsterControl::MonsterSelect(int _monster_code)
 	monster->SetMonster_AttackPoint(origin_monster->GetMonster_AttackPoint());
 	monster->SetMonster_Code(origin_monster->GetMonster_Code());
 	monster->SetMonster_DefensePoint(origin_monster->GetMonster_DefensePoint());
-	monster->SetMonster_Health(origin_monster->GetMonster_Health());
-	monster->SetMonster_Mana(origin_monster->GetMonster_Mana());
+	monster->SetMonster_HP(origin_monster->GetMonster_HP());
+	monster->SetMonster_MP(origin_monster->GetMonster_MP());
+	monster->SetMonster_Current_HP(origin_monster->GetMonster_HP());
+	monster->SetMonster_Current_MP(origin_monster->GetMonster_MP());
 	monster->SetMonster_Name(origin_monster->GetMonster_Name());
 	monster->SetMonster_Num(origin_monster->GetMonster_Num());
 	monster->SetMonster_Speed(origin_monster->GetMonster_Speed());
 	monster->SetPosition(origin_monster->GetPosition());
 	monster->SetRotation(origin_monster->GetRotation());
 	monster->SetScale(origin_monster->GetScale());
-
+	monster->SetFirstAttack(origin_monster->GetFirstAttack());
+	monster->SetSecondAttack(origin_monster->GetSecondAttack());
 	return monster;
 }
 
@@ -226,5 +252,34 @@ void MonsterControl::SetFirstStage_NormalMonster()
 	//AddMonsterCode_vector(WORM);
 
 	number_monster_types = m_monstercode_vector.size();
+}
+
+// 몬스터 체력 감소
+bool MonsterControl::Monster_HP_Down(int _monster_code, int _monster_num, int _damage)
+{
+	MonsterInfo* monsterinfo = nullptr;
+
+	if (GetMonsterinfo(_monster_code, _monster_num, monsterinfo) == false)
+	{
+		return false;
+	}
+
+	CriticalSectionManager::GetInstance()->Enter();
+	float hp = monsterinfo->GetMonster()->GetMonster_Current_HP() - _damage;
+
+	// 죽으면 false
+	if (hp <= 0)
+	{
+		monsterinfo->GetMonster()->SetMonster_Current_HP(0);
+		monsterinfo->SetMonsterDie();
+		CriticalSectionManager::GetInstance()->Leave();
+		return false;
+	}
+	else // 살아있으면 true
+	{
+		monsterinfo->GetMonster()->SetMonster_Current_HP(hp);
+		CriticalSectionManager::GetInstance()->Leave();
+		return true;
+	}
 }
 

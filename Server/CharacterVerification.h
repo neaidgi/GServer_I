@@ -1,17 +1,23 @@
 #pragma once
 
 #include "User.h"
+#include "Collision.h"
+#include "MsgManager.h"
 
 // 캐릭터 검증작업을 담당하는 객체
 
-class CharacterVerification {
+class CharacterVerification 
+{
 private:
 	float Move_MarginofError;		// 이동 오차 범위
 	float CommuTime;				// 통신 시간
+	Collision* m_collision;			// 충돌 처리담당
 public:
 	CharacterVerification(){}
 	~CharacterVerification(){}
 
-	void Initialize(float CommuTime, float _Move_MarginofError);								// 초기화
+	void Initialize(float _CommuTime, float _Move_MarginofError);								// 초기화
 	bool CharacterMoveVerificate(Vector3 _curPos, Vector3 _prePos, float _speed);				// 캐릭터 이동 검증
-};
+	// 공격 판정(공격하는자 위치, 공격 방향, 공격범위, 공격 범위 각도, 타겟 위치,타겟 크기)
+	bool AttackVerificate(Vector3 _AttackerPos, Vector3 _attackerDir, float _attackerRange, int _attackerAngle, Vector3 _targetPos, float _targetRange);
+}; 

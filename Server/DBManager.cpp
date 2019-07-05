@@ -363,8 +363,8 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[0]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[0]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[0]->SetCharacter_INT(atoi(sql_row[4]));
-		_character_out[0]->SetCharacter_Health(atoi(sql_row[5]));
-		_character_out[0]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[0]->SetCharacter_HP(atoi(sql_row[5]));
+		_character_out[0]->SetCharacter_MP(atoi(sql_row[6]));
 		_character_out[0]->SetCharacter_AttackPoint(atoi(sql_row[7]));
 		_character_out[0]->SetCharacter_DefensePoint(atoi(sql_row[8]));
 		_character_out[0]->SetCharacter_Speed(atoi(sql_row[9]));
@@ -383,8 +383,8 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[1]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[1]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[1]->SetCharacter_INT(atoi(sql_row[4]));
-		_character_out[1]->SetCharacter_Health(atoi(sql_row[5]));
-		_character_out[1]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[1]->SetCharacter_HP(atoi(sql_row[5]));
+		_character_out[1]->SetCharacter_MP(atoi(sql_row[6]));
 		_character_out[1]->SetCharacter_AttackPoint(atoi(sql_row[7]));
 		_character_out[1]->SetCharacter_DefensePoint(atoi(sql_row[8]));
 		_character_out[1]->SetCharacter_Speed(atoi(sql_row[9]));
@@ -403,8 +403,8 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[2]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[2]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[2]->SetCharacter_INT(atoi(sql_row[4]));
-		_character_out[2]->SetCharacter_Health(atoi(sql_row[5]));
-		_character_out[2]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[2]->SetCharacter_HP(atoi(sql_row[5]));
+		_character_out[2]->SetCharacter_MP(atoi(sql_row[6]));
 		_character_out[2]->SetCharacter_AttackPoint(atoi(sql_row[7]));
 		_character_out[2]->SetCharacter_DefensePoint(atoi(sql_row[8]));
 		_character_out[2]->SetCharacter_Speed(atoi(sql_row[9]));
@@ -423,8 +423,8 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[3]->SetCharacter_STR(atoi(sql_row[2]));
 		_character_out[3]->SetCharacter_DEX(atoi(sql_row[3]));
 		_character_out[3]->SetCharacter_INT(atoi(sql_row[4]));
-		_character_out[3]->SetCharacter_Health(atoi(sql_row[5]));
-		_character_out[3]->SetCharacter_Mana(atoi(sql_row[6]));
+		_character_out[3]->SetCharacter_HP(atoi(sql_row[5]));
+		_character_out[3]->SetCharacter_MP(atoi(sql_row[6]));
 		_character_out[3]->SetCharacter_AttackPoint(atoi(sql_row[7]));
 		_character_out[3]->SetCharacter_DefensePoint(atoi(sql_row[8]));
 		_character_out[3]->SetCharacter_Speed(atoi(sql_row[9]));
@@ -551,17 +551,24 @@ bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
 	if (state == 0)
 	{
 		sql_result = mysql_store_result(mysql);
+		Vector3 monster_scale;
 
 		for (int i = 0; i < MAXMONSTERORIGIN; i++)
 		{
 			sql_row = mysql_fetch_row(sql_result);
+			
+			monster_scale = _monster_out[i]->GetScale();
 
 			_monster_out[i]->SetMonster_Code(atoi(sql_row[0]));
 			_monster_out[i]->SetMonster_Name(sql_row[1]);
-			_monster_out[i]->SetMonster_Health(atoi(sql_row[2]));
-			_monster_out[i]->SetMonster_Mana(atoi(sql_row[3]));
+			_monster_out[i]->SetMonster_HP(atoi(sql_row[2]));
+			_monster_out[i]->SetMonster_MP(atoi(sql_row[3]));
 			_monster_out[i]->SetMonster_AttackPoint(atoi(sql_row[4]));
 			_monster_out[i]->SetMonster_DefensePoint(atoi(sql_row[5]));
+			monster_scale.x = atoi(sql_row[6]);
+			monster_scale.y = atoi(sql_row[7]);
+			monster_scale.z = atoi(sql_row[8]);
+			_monster_out[i]->SetScale(monster_scale);
 		}
 
 		/*
@@ -578,6 +585,229 @@ bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
 	}
 
 	return true;
+}
+
+// 캐릭터 공격(기본공격 및 스킬) 정보 요청
+bool DBManager::Character_Req_AttackInfo(Character * _character_out[])
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT *";
+	int state = 0;
+	int count = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	{
+		sprintf(query, "%s FROM characterattackinfo", base_query);
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		while (1)
+		{
+			// AttackInfo* attackinfo = new AttackInfo();
+			AttackInfo attackinfo;
+			sql_row = mysql_fetch_row(sql_result);
+
+			if (sql_row == nullptr)
+			{
+				break;
+			}
+
+			count = atoi(sql_row[0]);
+
+			switch (count)
+			{
+			case 1001:
+				attackinfo = _character_out[0]->GetBasicAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atof(sql_row[3]);
+				attackinfo.attack_ratio = atof(sql_row[4]);
+				_character_out[0]->SetBasicAttack(attackinfo);
+				break;
+			case 1002:
+				attackinfo = _character_out[0]->GetSecondAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atof(sql_row[3]);
+				attackinfo.attack_ratio = atof(sql_row[4]);
+				_character_out[0]->SetSecondAttack(attackinfo);
+				break;
+			default:
+				break;
+			}
+		}
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Character_Req_AttackInfo error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+// 몬스터 공격(기본공격 및 스킬) 정보 요청
+bool DBManager::Monster_Req_AttackInfo(Monster * _monster_out[])
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT *";
+	int state = 0;
+	int count = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	{
+		sprintf(query, "%s FROM MonsterAttackInfo", base_query);
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		while (1)
+		{
+			MonsterAttackInfo attackinfo;
+			sql_row = mysql_fetch_row(sql_result);
+
+			if (sql_row == nullptr)
+			{
+				break;
+			}
+
+			count = atoi(sql_row[0]);
+
+			switch (count)
+			{
+			case SPIDER_FIRST_ATTACK:
+				attackinfo = _monster_out[0]->GetFirstAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[0]->SetFirstAttack(attackinfo);
+				break;
+			case SPIDER_SECOND_ATTACK:
+				attackinfo = _monster_out[0]->GetSecondAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[0]->SetSecondAttack(attackinfo);
+				break;
+			case WORM_FIRST_ATTACK:
+				attackinfo = _monster_out[1]->GetFirstAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[1]->SetFirstAttack(attackinfo);
+				break;
+			case BOSS_SPIDER_FIRST_ATTACK:
+				attackinfo = _monster_out[2]->GetFirstAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[2]->SetFirstAttack(attackinfo);
+				break;
+			case DOG_FIRST_ATTACK:
+				attackinfo = _monster_out[3]->GetFirstAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[3]->SetFirstAttack(attackinfo);
+				break;
+			case ORCCANNONSOLDIER_FIRST_ATTACK:
+				attackinfo = _monster_out[4]->GetFirstAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[4]->SetFirstAttack(attackinfo);
+				break;
+			case BEAR_FIRST_ATTACK:
+				attackinfo = _monster_out[6]->GetFirstAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[6]->SetFirstAttack(attackinfo);
+				break;
+			case DINOSAUR_FIRST_ATTACK:
+				attackinfo = _monster_out[7]->GetFirstAttack();
+				attackinfo.attack_code = atoi(sql_row[0]);
+				attackinfo.attack_angle = atoi(sql_row[2]);
+				attackinfo.attack_range = atoi(sql_row[3]);
+				attackinfo.attack_ratio = atoi(sql_row[4]);
+				attackinfo.attack_type = atoi(sql_row[5]);
+				_monster_out[7]->SetFirstAttack(attackinfo);
+				break;
+			default:
+				break;
+			}
+		}
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Monster_Req_AttackInfo error : %s \n", mysql_error(mysql));
+		return false;
+	}
 }
 
 // 캐릭터 삭제

@@ -122,6 +122,10 @@ bool GameDataManager::Init_Character_Data()
 	{
 		return false;
 	}
+	if (DBManager::GetInstance()->Character_Req_AttackInfo(origin) == false)
+	{
+		return false;
+	}
 
 	characterdata->SetCharacterOrigin(origin);
 	MsgManager::GetInstance()->DisplayMsg("메인", "캐릭터설계도 로드완료");
@@ -139,6 +143,10 @@ bool GameDataManager::Init_Monster_Data()
 	}
 	MsgManager::GetInstance()->DisplayMsg("메인", "몬스터설계도 로드중");
 	if (DBManager::GetInstance()->Character_Req_MonsterInfo(origin) == false)
+	{
+		return false;
+	}
+	if (DBManager::GetInstance()->Monster_Req_AttackInfo(origin) == false)
 	{
 		return false;
 	}

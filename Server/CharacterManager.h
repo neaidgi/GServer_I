@@ -38,7 +38,6 @@ public:
 
 	Character* CharacterSelect(User* _user, SlotData*& _slotdata, int _index); // 게임 시작시 실제 캐릭터 조립
 
-	RESULT Character_Init_Choice(User* _user);				// 캐릭터 초기화면
 	RESULT Character_Management_Process(User* _user);		// 캐릭터 생성창
 };
 

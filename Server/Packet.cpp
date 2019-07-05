@@ -200,9 +200,9 @@ void Packet::ClearSendQueue()
 bool Packet::TakeOutSendPacket()
 {
 	CriticalSectionManager::GetInstance()->Enter();
-	char msg[BUFSIZE];
-	sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
-	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	//char msg[BUFSIZE];
+	//sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	if (isSendQueue() && isSending() == false)
 	{
 		SendPacket* sendpacket = sendQueue.front();
@@ -213,9 +213,9 @@ bool Packet::TakeOutSendPacket()
 		sendQueue.pop();
 		sending = true;
 		CriticalSectionManager::GetInstance()->Leave();
-		char msg[BUFSIZE];
-		sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
-		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		//char msg[BUFSIZE];
+		//sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
+		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		return true;
 	}
 	else
@@ -396,8 +396,6 @@ void Packet::BitunPack(UINT64 & _p, void * _data)
 	CriticalSectionManager::GetInstance()->Leave();
 }
 
-
-
 bool Packet::isSendQueue()
 {
 	CriticalSectionManager::GetInstance()->Enter();
@@ -540,7 +538,6 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 bool Packet::IOCP_isRecvSuccess()
 {
 	CriticalSectionManager::GetInstance()->Enter();
-	
 	if (recvSize < sizeof(int)) // recvSize를 받아야한다면
 	{
 		// 받은크기가 받아야할 크기 보다 크면

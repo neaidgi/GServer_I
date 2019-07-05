@@ -9,6 +9,7 @@
 #include <list>
 #include <vector>
 #include <ctime>
+#include <complex.h>
 #include "Vector3.h"
 
 // 패킷 : [전체크기 4Byte][프로토콜 4Byte][데이터]
@@ -53,12 +54,12 @@
 
 // 인게임 중간틀				
 #define PROTOCOL_INGMAE_MENU 0x4000								// [중간틀 - 인게임] 매뉴관련
-#define PROTOCOL_INGMAE_MONSTER 0x2000							// [중간틀 - 인게임] 몬스터관련
+#define PROTOCOL_INGAME_ANIMATION 0x2000						// [중간틀 - 인게임] 애니메이션 관련
 #define PROTOCOL_INGAME_DUNGEON 0x1000							// [중간틀 - 인게임] 던전관련
 
 #define PROTOCOL_INGAME_PARTY 0x800								// [중간틀 - 인게임] 파티관련
 #define PROTOCOL_INGAME_CHANNEL 0x400							// [중간틀 - 인게임] 채널관련
-#define PROTOCOL_INGAME_ANIMATION 0x200							// [중간틀 - 인게임] 애니메이션 관련
+#define PROTOCOL_INGMAE_MONSTER 0x200							// [중간틀 - 인게임] 몬스터관련
 #define PROTOCOL_INGAME_CHARACER 0x100							// [중간틀 - 인게임] 캐릭터관련
 
 // 인게임 세부틀(PROTOCOL_INGAME_CHARACER) - 캐릭터 관련
@@ -78,21 +79,23 @@
 #define PROTOCOL_INGAME_MOVE_RESULT 0x20000000					// [세부틀 - 캐릭터관련] [서버->클라] 유저 이동 결과
 #define PROTOCOL_INGAME_OTHERPLAYERLIST_INFO 0x10000000			// [세부틀 - 캐릭터관련] [서버->클라] 유저들 정보
 
-// 인게임 세부틀(PROTOCOL_INGAME_ANIMATION) - 애니메이션 관련
-#define PROTOCOL_SERVER_INGAME_ANIMATION_COMPART 0x3000000				// [세부틀 - 애니메이션관련] [프로토콜 연산용]
+// 인게임 세부틀(PROTOCOL_INGMAE_MONSTER) - 몬스터 관련
+#define PROTOCOL_SERVER_INGAME_MONSTER_COMPART 0xF0000000		// [세부틀 - 던전관련] [프로토콜 연산용]
 
-#define PROTOCOL_MONSTER_ANIMATION 0x2000000					// [세부틀 - 애니메이션관련] [서버->클라] 몬스터 애니메이션
-#define PROTOCOL_CHARACER_ANIMATION 0x1000000					// [세부틀 - 애니메이션관련] [서버->클라] 캐릭터 애니메이션
+#define PROTOCOL_INGAME_MONSTER_OTHER_ATTACK_RESULT 0x80000000	// [세부틀 - 몬스터관련] [서버->클라] 몬스터 다른유저 공격결과
+#define PROTOCOL_INGAME_MONSTER_ATTACK_RESULT 0x40000000		// [세부틀 - 몬스터관련] [서버->클라] 몬스터 유저 공격결과
+#define PROTOCOL_MONSTER_INFO 0x20000000						// [세부틀 - 몬스터관련] [서버->클라] 정보를 주는 프로토콜
+#define PROTOCOL_MONSTER_MOVE_RESULT 0x10000000					// [세부틀 - 몬스터관련] [서버->클라] 몬스터 이동정보
 
 // 인게임 세부틀(PROTOCOL_INGAME_CHANNEL) - 채널 관련
-#define PROTOCOL_SERVER_INGAME_CHANNEL_COMPART 0x7000000				// [세부틀 - 채널관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_CHANNEL_COMPART 0x7000000		// [세부틀 - 채널관련] [프로토콜 연산용]
 
 #define PROTOCOL_CHANNLE_USER_CHANGE 0x4000000					// [세부틀 - 채널관련] [서버->클라] 채널 이동한 유저 정보
 #define PROTOCOL_CHANNLE_CHANGE_RESULT 0x2000000				// [세부틀 - 채널관련] [서버->클라] 채널 변경 결과
 #define PROTOCOL_CHANNLE_INFO 0x1000000							// [세부틀 - 채널관련] [서버->클라] 채널 정보
 
 // 인게임 세부틀(PROTOCOL_INGAME_PARTY) - 파티 관련
-#define PROTOCOL_SERVER_INGAME_PARTY_COMPART 0x1FFF0000000			// [세부틀 - 파티관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_PARTY_COMPART 0x1FFF0000000		// [세부틀 - 파티관련] [프로토콜 연산용]
 
 #define PROTOCOL_PARTY_USER_INFO 0x10000000000					// [세부틀 - 파티관련] [서버->클라] 파티원정보
 
@@ -112,17 +115,18 @@
 #define PROTOCOL_PARTY_ROOM_INVITE 0x10000000					// [세부틀 - 파티관련] [서버->클라] 파티 초대(특정유저에게)
 
 // 인게임 세부틀(PROTOCOL_INGAME_DUNGEON) - 던전 관련
-#define PROTOCOL_SERVER_INGAME_DUNGEON_COMPART 0x70000000			// [세부틀 - 던전관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_DUNGEON_COMPART 0x70000000		// [세부틀 - 던전관련] [프로토콜 연산용]
 
 #define PROTOCOL_DUNGEON_STAGE_IN_RESULT 0x40000000				// [세부틀 - 던전관련] [서버->클라] 스테이지에 입장결과
 #define PROTOCOL_DUNGEON_LEAVE_RESULT 0x20000000				// [세부틀 - 던전관련] [서버->클라] 던전 퇴장 결과
 #define PROTOCOL_DUNGEON_ENTER_RESULT 0x10000000				// [세부틀 - 던전관련] [서버->클라] 던전 입장 결과
 
-// 인게임 세부틀(PROTOCOL_INGMAE_MONSTER) - 몬스터 관련
-#define PROTOCOL_SERVER_INGAME_MONSTER_COMPART 0x70000000			// [세부틀 - 던전관련] [프로토콜 연산용]
+// 인게임 세부틀(PROTOCOL_INGAME_ANIMATION) - 애니메이션 관련
+#define PROTOCOL_SERVER_INGAME_ANIMATION_COMPART 0x7000000		// [세부틀 - 애니메이션관련] [프로토콜 연산용]
 
-#define PROTOCOL_MONSTER_INFO 0x20000000						// [세부틀 - 몬스터관련] [서버->클라] 정보를 주는 프로토콜
-#define PROTOCOL_MONSTER_MOVE_RESULT 0x10000000					// [세부틀 - 몬스터관련] [서버->클라] 몬스터 이동정보
+#define PROTOCOL_MONSTER_ANIMATION_ATTACK 0x4000000				// [세부틀 - 애니메이션관련] [서버->클라] 몬스터 애니메이션(공격)
+#define PROTOCOL_MONSTER_ANIMATION 0x2000000					// [세부틀 - 애니메이션관련] [서버->클라] 몬스터 애니메이션
+#define PROTOCOL_CHARACER_ANIMATION 0x1000000					// [세부틀 - 애니메이션관련] [서버->클라] 캐릭터 애니메이션
 
 // 인게임 세부틀(PROTOCOL_INGMAE_MENU) - 매뉴 관련
 #define PROTOCOL_SERVER_INGAME_MENU_COMPART 0x7000000				// [세부틀 - 몬스터관련] [프로토콜 연산용]
@@ -172,16 +176,18 @@
 
 // 인게임 중간틀				
 #define PROTOCOL_INGMAE_MENU 0x4000								// [중간틀 - 인게임] 매뉴관련
-#define PROTOCOL_INGMAE_MONSTER 0x2000							// [중간틀 - 인게임] 몬스터관련
+#define PROTOCOL_INGAME_ANIMATION 0x2000						// [중간틀 - 인게임] 애니메이션 관련
 #define PROTOCOL_INGAME_DUNGEON 0x1000							// [중간틀 - 인게임] 던전관련
 
 #define PROTOCOL_INGAME_PARTY 0x800								// [중간틀 - 인게임] 파티관련
 #define PROTOCOL_INGAME_CHANNEL 0x400							// [중간틀 - 인게임] 채널관련
-#define PROTOCOL_INGAME_ANIMATION 0x200							// [중간틀 - 인게임] 애니메이션 관련
+#define PROTOCOL_INGMAE_MONSTER 0x200							// [중간틀 - 인게임] 몬스터관련
 #define PROTOCOL_INGAME_CHARACER 0x100							// [중간틀 - 인게임] 캐릭터관련
 
 
 // 인게임 세부틀(PROTOCOL_INGAME_CHARACER) - 캐릭터 관련
+#define PROTOCOL_CLIENT_INGAME_CHARACTER_COMPART 0x7F0000000	// [세부틀 - 캐릭터관련] [프로토콜 연산용]
+
 #define PROTOCOL_INGAME_ATTACK_SUCCESS 0x400000000				// [세부틀 - 캐릭터관련] [클라->서버] 공격했는데 몬스터랑 피격판정이난것같다.
 #define PROTOCOL_INGAME_ATTACK 0x200000000						// [세부틀 - 캐릭터관련] [클라->서버] 공격했다는 정보
 #define PROTOCOL_INGAME_MOVE_END_JUMP 0x100000000				// [세부틀 - 캐릭터관련] [클라->서버] 점프 끝났다는 정보(착지)
@@ -191,15 +197,22 @@
 #define PROTOCOL_MOVE_REPORT 0x20000000							// [세부틀 - 캐릭터관련] [클라->서버] 이동 정보
 #define PROTOCOL_REQ_OTHERPLAYERLIST 0x10000000					// [세부틀 - 캐릭터관련] [클라->서버] 다른 유저 요청
 
-// 인게임 세부틀(PROTOCOL_INGAME_ANIMATION) - 애니메이션 관련
-#define PROTOCOL_CLIENT_MONSTER_ANIMATION 0x2000000			    // [세부틀 - 애니메이션관련] [클라->서버] 몬스터 애니메이션
-#define PROTOCOL_CLIENT_CHARACER_ANIMATION 0x1000000		    // [세부틀 - 애니메이션관련] [클라->서버] 캐릭터 애니메이션
+// 인게임 세부틀(PROTOCOL_INGMAE_MONSTER) - 몬스터 관련
+#define PROTOCOL_CLIENT_INGAME_MONSTER_COMPART 0x70000000		// [세부틀 - 몬스터관련] [프로토콜 연산용]
+
+#define PROTOCOL_REQ_MONSTER_ATTACK 0x40000000					// [세부틀 - 몬스터관련] [클라->서버] 몬스터 유저를 공격했다
+#define PROTOCOL_MONSTER_MOVE 0x20000000						// [세부틀 - 몬스터관련] [클라->서버] 몬스터 이동
+#define PROTOCOL_REQ_MONSTER_INFO 0x10000000					// [세부틀 - 몬스터관련] [클라->서버] 몬스터 정보 요청
 
 // 인게임 세부틀(PROTOCOL_INGAME_CHANNEL) - 채널 관련
-#define PROTOCOL_REQ_CHANNEL_CHANGE 0x2000000					// [세부틀 - 애니메이션관련] [클라->서버] 채널 이동 요청
-#define PROTOCOL_REQ_CHANNEL_INFO 0x1000000						// [세부틀 - 애니메이션관련] [클라->서버] 채널 정보 요청
+#define PROTOCOL_CLIENT_INGAME_CHANNEL_COMPART 0x3000000		// [세부틀 - 채널관련] [프로토콜 연산용]
+
+#define PROTOCOL_REQ_CHANNEL_CHANGE 0x2000000					// [세부틀 - 채널관련] [클라->서버] 채널 이동 요청
+#define PROTOCOL_REQ_CHANNEL_INFO 0x1000000						// [세부틀 - 채널관련] [클라->서버] 채널 정보 요청
 
 // 인게임 세부틀(PROTOCOL_INGAME_PARTY) - 파티 관련
+#define PROTOCOL_CLIENT_INGAME_PARTY_COMPART 0x1F0000000		// [세부틀 - 파티관련] [프로토콜 연산용]
+
 #define PROTOCOL_REQ_LEADER_DELEGATE 0x100000000				// [세부틀 - 파티관련] [클라->서버] 파티장 위임 요청
 
 #define PROTOCOL_REQ_USER_LEAVE 0x80000000						// [세부틀 - 파티관련] [클라->서버] 파티 탈퇴 요청
@@ -208,16 +221,22 @@
 #define PROTOCOL_REQ_PARTY_ROOM_INVITE 0x10000000				// [세부틀 - 파티관련] [클라->서버] 파티 초대 요청
 
 // 인게임 세부틀(PROTOCOL_INGAME_DUNGEON) - 던전 관련
+#define PROTOCOL_CLIENT_INGAME_DUNGEON_COMPART 0x70000000		// [세부틀 - 던전관련] [프로토콜 연산용]
+
 #define PROTOCOL_DUNGEON_STAGE_IN 0x40000000					// [세부틀 - 던전관련] [클라->서버] 스테이지 입장 요청
 #define PROTOCOL_REQ_DUNGEON_LEAVE 0x20000000					// [세부틀 - 던전관련] [클라->서버] 던전 나가기 요청
 #define PROTOCOL_REQ_DUNGEON_ENTER 0x10000000					// [세부틀 - 던전관련] [클라->서버] 던전 입장 요청
 
-// 인게임 세부틀(PROTOCOL_INGMAE_MONSTER) - 몬스터 관련
+// 인게임 세부틀(PROTOCOL_INGAME_ANIMATION) - 애니메이션 관련
+#define PROTOCOL_CLIENT_INGAME_ANIMATION_COMPART 0x7000000		// [세부틀 - 애니메이션관련] [프로토콜 연산용]
 
-#define PROTOCOL_MONSTER_MOVE 0x20000000						// [세부틀 - 몬스터관련] [클라->서버] 몬스터 이동
-#define PROTOCOL_REQ_MONSTER_INFO 0x10000000					// [세부틀 - 몬스터관련] [클라->서버] 몬스터 정보 요청
+#define PROTOCOL_CLIENT_MONSTER_ANIMATION_ATTACK 0x4000000		// [세부틀 - 애니메이션관련] [클라->서버] 몬스터 애니메이션(공격)
+#define PROTOCOL_CLIENT_MONSTER_ANIMATION 0x2000000			    // [세부틀 - 애니메이션관련] [클라->서버] 몬스터 애니메이션
+#define PROTOCOL_CLIENT_CHARACER_ANIMATION 0x1000000		    // [세부틀 - 애니메이션관련] [클라->서버] 캐릭터 애니메이션
 
 // 인게임 세부틀(PROTOCOL_INGMAE_MENU) - 매뉴 관련
+#define PROTOCOL_CLIENT_INGAME_MENU_COMPART 0x7000000		// [세부틀 - 매뉴관련] [프로토콜 연산용]
+
 #define PROTOCOL_MENU_EXIT 0x4000000						    // [세부틀 - 매뉴관련] [클라->서버] 종료
 #define PROTOCOL_MENU_REQ_LOGOUT 0x2000000					    // [세부틀 - 매뉴관련] [클라->서버] 로그아웃 요청
 #define PROTOCOL_MENU_REQ_CHARACTER 0x1000000				    // [세부틀 - 매뉴관련] [클라->서버] 캐릭터 선택화면으로 요청
@@ -404,7 +423,7 @@ enum RESULT {
 	RT_INGAME_OTHERPLAYER_INFO,				// 다른 플레이어 정보
 	RT_INGAME_OTHERPLAYER_LIST,				// 다른 플레이어 리스트
 	RT_INGAME_ATTACK,						// 공격
-	RT_INGAME_ATTACK_SUCCESS,				// 공격성공
+	RT_INGAME_ATTACK_RESULT,				// 공격성공
 	RT_INGAME_CHANNEL_INFO,					// 채널 정보
 	RT_INGAME_CHANNEL_CHANGE,				// 채널 이동
 	RT_INGAME_MENU_CHARACTER,				// 캐릭터 선택화면
@@ -419,7 +438,8 @@ enum RESULT {
 	RT_INGAME_DUNGEON_LEAVE_RESULT,			// 던전 퇴장 결과
 	RT_INGAME_DUNGEON_MONSTER_INFO_RESULT,	// 던전 몬스터 정보 결과
 	RT_INGAME_DUNGEON_STAGE_IN_RESULT,		// 던전 스테이지 입장 결과
-	RT_INGMAE_MONSTER_MOVE_RESULT			// 몬스터 이동 결과
+	RT_INGMAE_MONSTER_MOVE_RESULT,			// 몬스터 이동 결과
+	RT_INGAME_MONSTER_ATTACK				// 몬스터 공격
 };
 
 // 직업코드
@@ -434,10 +454,26 @@ enum CHARACTER_JOB
 // 몬스터코드
 enum MONSTER_ORIGINCODE
 {
-	SPIDER = 1001,
-	WORM = 1002,
-	BOSS_SPIDER = 1003
-
+	SPIDER = 10001,
+	WORM = 10002,
+	BOSS_SPIDER = 10003,
+	DOG = 20001,
+	ORCCANNONSOLDIER = 20002,
+	KING_OF_THEAXE = 20003,
+	BEAR = 30001,
+	DINOSAUR = 30002
+};
+// 몬스터 공격 코드
+enum MONSTER_ATTACK_CODE
+{
+	SPIDER_FIRST_ATTACK = 10011,
+	SPIDER_SECOND_ATTACK = 10021,
+	WORM_FIRST_ATTACK = 10012,
+	BOSS_SPIDER_FIRST_ATTACK = 10013,
+	DOG_FIRST_ATTACK = 20011,
+	ORCCANNONSOLDIER_FIRST_ATTACK = 20012,
+	BEAR_FIRST_ATTACK = 30011,
+	DINOSAUR_FIRST_ATTACK = 30012
 };
 
 enum IOTYPE {
@@ -478,15 +514,28 @@ struct WSAOVERLAPPEDEx {
 #define ENCRYPT_KEY 951324896
 
 #define MAXCHARACTERORIGIN 4
+
 // 몬스터 종류숫자
-#define MAXMONSTERORIGIN 3
+#define MAXMONSTERORIGIN 8
 // 몬스터 스폰 시간
 #define MONSTERSPAWNTIME 1.5
 // 첫번째 스테이지 몬스터 숫자
-#define FIRSTSTAGE_NORMALMONSTER_1 5
+#define FIRSTSTAGE_NORMALMONSTER_1 2
 #define MOVETIME 0.02
 
 // 몬스터 시간
 #define MONSTERTIME 0.5
+
+// 360도
+#define CIRCLE_THETA 360
+//PI정의
+#define PI 3.14159265359
+// 라디안으로
+#define DEG2RAD PI/180
+// 디그리로
+#define RAD2DEG 180/PI
+// 오차범위
+#define MARGIN_OF_ERROR 0.05
+
 
 #endif

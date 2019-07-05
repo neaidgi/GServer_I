@@ -19,6 +19,7 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr) : Packet(_sock, _addr)
 	is_partyleader = false;
 	is_callback = true;
 	is_dungeon = false;
+	is_Characterlive = true;
 }
 
 User::~User()
@@ -113,6 +114,17 @@ bool User::DeleteCharacter(int _index)
 		characterslot[slotcount--] = nullptr;
 		return true;
 	}
+}
+
+// 현재 케릭터에 데미지 처리
+bool User::CurCharacter_HP_Down(int _damage)
+{
+	if (GetCurCharacter()->Character_HP_Down(_damage) == false)
+	{
+		SetCurCharacter_Dead();
+		return false;
+	}
+	return true;
 }
 
 void User::SetState(UserState * _state)

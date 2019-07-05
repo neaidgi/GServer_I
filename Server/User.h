@@ -58,6 +58,7 @@ private:
 	bool is_slotload;
 	bool is_callback;
 	bool is_dungeon;
+	bool is_Characterlive;
 public:
 	User(SOCKET _sock, SOCKADDR_IN _addr);
 	~User();
@@ -78,6 +79,10 @@ public:
 	void SetCurCharacter(Character* _player);
 	Character* GetCurCharacter() { return current_character; }
 	bool DeleteCharacter(int _index);
+	bool CurCharacter_HP_Down(int _damage);
+	void SetCurCharacter_Live() { is_Characterlive = true; }
+	void SetCurCharacter_Dead() { is_Characterlive = false; }
+	bool GetCurCharacter_IsLive() {	return is_Characterlive; }
 
 	// ΩΩ∑‘∞¸∑√(ΩΩ∑‘π¯»£,ΩΩ∑‘¡§∫∏,ΩΩ∑‘√ ±‚»≠)
 	bool SetSlot(SlotData* _slotdata);

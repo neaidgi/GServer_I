@@ -183,6 +183,7 @@
     <ClInclude Include="CharacterVerification.h" />
     <ClInclude Include="CharacterState.h" />
     <ClInclude Include="CloseState.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="CriticalSectionManager.h" />
     <ClInclude Include="DBManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -220,6 +221,9 @@
     <ClInclude Include="UserState.h" />
     <ClInclude Include="UUIDManager.h" />
     <ClInclude Include="Vector3.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

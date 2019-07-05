@@ -188,7 +188,7 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	MsgManager::GetInstance()->DisplayMsg("로그인", tempbuf);
 	protocol = user->BitPackProtocol(protocol, PROTOCOL_TITLE, PROTOCOL_LOGIN, PROTOCOL_LOGIN_RESULT);
 	user->Quepack(protocol, &result, sizeof(bool));
-	
+
 	return result;
 }
 
@@ -225,6 +225,8 @@ RESULT LoginManager::loginProcess(User * _user)
 RESULT LoginManager::TitleProcess(User * _user)
 {
 	UINT64 protocol = 0;
+	UINT64 compartrprotocol = 0;
+	UINT64 tempprotocol = 0;
 	char buf[BUFSIZE];
 	char msg[BUFSIZE];
 	bool check = false;
@@ -233,16 +235,22 @@ RESULT LoginManager::TitleProcess(User * _user)
 	memset(buf, 0, sizeof(buf));
 	memset(msg, 0, sizeof(msg));
 
-	_user->BitunPack(protocol,&buf);
+	_user->BitunPack(protocol, &buf);
 
 	RESULT result = RT_DEFAULT;
 
-	// 프로토콜 중간틀 타이틀이면
-	if ((protocol&PROTOCOL_LOGIN) == PROTOCOL_LOGIN)
+	compartrprotocol = PROTOCOL_LOGIN;
+
+	tempprotocol = 0;
+
+	tempprotocol = protocol & compartrprotocol;
+	switch (tempprotocol)
 	{
-		// 로그인 요청
-		if ((protocol&PROTOCOL_REQ_LOGIN) == PROTOCOL_REQ_LOGIN)
+	case PROTOCOL_LOGIN: // 중간틀 로그인이면
+		tempprotocol = protocol & PROTOCOL_CLIENT_LOGIN_MENU_COMPART;
+		switch (tempprotocol)
 		{
+		case PROTOCOL_REQ_LOGIN: // 로그인 요청
 			sprintf(msg, "%s : 로그인 요청", _user->getID());
 			MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 			check = reqLogin(_user, buf);
@@ -251,21 +259,23 @@ RESULT LoginManager::TitleProcess(User * _user)
 				result = RT_LOGINFAIL;
 			}
 			result = RT_LOGIN;
-		}
-		// 가입 요청
-		else if ((protocol&PROTOCOL_REQ_JOIN) == PROTOCOL_REQ_JOIN)
-		{
+			break;
+		case PROTOCOL_REQ_JOIN: // 가입 요청
 			sprintf(msg, "%s : 가입 요청", _user->getID());
 			MsgManager::GetInstance()->DisplayMsg("로그인", msg);
 			reqJoin(_user, buf);
 			result = RT_JOIN;
-		}
-		// 아이디 중복확인
-		else if ((protocol&PROTOCOL_REQ_ID_OVERLAP_CHECK) == PROTOCOL_REQ_ID_OVERLAP_CHECK)
-		{
+			break;
+		case PROTOCOL_REQ_ID_OVERLAP_CHECK:	// 아이디 중복확인
 			reqIdOverlapCheck(_user, buf);
 			result = RT_ID_OVERLAP;
+			break;
+		default:
+			break;
 		}
+		break;
+	default:
+		break;
 	}
 
 	return result;

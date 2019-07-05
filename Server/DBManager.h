@@ -45,6 +45,10 @@ public:
 	bool Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, char* _code);
 	// 몬스터 설계도 요청
 	bool Character_Req_MonsterInfo(Monster* _monster_out[]);
+	// 캐릭터 공격(기본공격 및 스킬) 정보 요청
+	bool Character_Req_AttackInfo(Character* _character_out[]);
+	// 몬스터 공격(기본공격 및 스킬) 정보 요청
+	bool Monster_Req_AttackInfo(Monster* _monster_out[]);
 
 	// 캐릭터 삭제
 	bool Character_Req_CharacterDelete(const char* _id, int _index);

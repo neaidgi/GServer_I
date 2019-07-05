@@ -23,8 +23,6 @@ private:
 	
 	// 몬스터 컨트롤러
 	MonsterControl* m_monster_control;
-	// 몬스터 타이머
-	MonsterTime* m_monster_timer;
 
 public:
 	PartyRoom(int _partyroomnum);
@@ -96,6 +94,8 @@ public:
 	void SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos);
 	// 몬스터 정보 삭제
 	bool RemoveMonsterInfo(int _monster_code, int _monster_num);
+	// 몬스터 체력 감소. 죽으면 false. 살아있으면 true
+	bool Monster_HP_Down(int _monster_code, int _monster_num, int _damage);
 };
 
 // 파티시스템

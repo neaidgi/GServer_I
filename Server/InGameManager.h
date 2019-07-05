@@ -20,7 +20,7 @@ private:
 	InGameManager();
 	~InGameManager();
 
-	CharacterVerification* verification;
+	CharacterVerification* m_verification;
 	ChannelSystem*	channelsystem;
 	PartySystem* m_partysystem;
 
@@ -52,7 +52,10 @@ private:
 
 	// 몬스터 이동정보 패킹(몬스터숫자,몬스터코드,몬스터번호,몬스터좌표)
 	void User_Pack_Monster_MoveInfo(User* _user, int _code, int _num, char* _data, int& _datasize);
-
+	// 몬스터 피격결과 정보 패킹(성공or실패,몬스터코드,몬스터번호,입힌피해량,죽었는지)
+	void User_Pack_MonsterAttack_Result(User* _user, bool _result, int _monstercode, int _monsternum, int _damage, bool _isdie);
+	// 유저 피격결과 정보패킹(성공실패,데미지,죽으면 false)
+	void User_Pack_Under_Attack_Result(User* _user, bool _result, int _damage, bool _state);
 
 	// **UnPack 함수**
 	// 채널 이동 요청 언팩 (채널번호)
@@ -63,8 +66,12 @@ private:
 	void User_Unpack_PartyRoom_Invite_Result(User* _user, char*_buf, bool& _result, char* _code, int& _partyroomnum);
 	// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표)
 	void User_Unpack_Monster_Move(User* _user, char* _buf, int& _code, int& _num);
-	// 유저가 특정 몬스터를 공격했다는 패킷
-	void User_Unpakc_Monster_Attack_Success(User* _user, char* _buf, int& _monstercode, int& _monsternum);
+	// 유저가 특정 몬스터를 공격했다는 패킷(몬스터 코드,몬스터 번호, 공격번호, 유저의 방향벡터)
+	void User_Unpack_User_Successfully_Attack_The_Monster(User* _user, char* _buf, int& _monstercode, int& _monsternum, int& _attacknum, Vector3& _dir);
+	// 유저가 무슨공격했는지 언팩(공격정보)
+	void User_Unpack_Attack_Info(User* _user, char* _buf, int& _attacknum);
+	// 몬스터가 무슨공격했는지 언팩(공격정보)
+	void User_Unpack_Monster_Successfully_Attack_The_User(User* _user, char* _buf, int& _monstercode, int& _monsternum, int& _attacknum, Vector3& _dir);
 
 
 	// ** 다른유저에게 줄 정보 Pack ** //
@@ -77,7 +84,7 @@ private:
 	// 파티에 속해있는 유저정보 패킹(파티번호,유저숫자,코드,직업코드,닉네임,Hp,Mp,방장인지)
 	void User_Pack_Party_CharacterInfoToOther(User* _user, char* _data, int& _datasize);
 	// 결과패킹 (bool)
-	void User_Pack_Party_InviteResultToOther(User* _user, char* _data, int& _datasize);
+	void User_Pack_Party_InviteResultToOther(User* _user, char* _data, int& _datasize, bool _result);
 	// 파티 프로토콜 패킹 (프로토콜)
 	void User_Pack_Party_Protocol(User* _user, char* _data, int& _datasize);
 	// 파티 강퇴 당한 유저 정보 패킹. (특정 유저의 코드)
@@ -90,6 +97,15 @@ private:
 	void User_Pack_Party_Dungeon_Stage_SpawnData(User* _user, char* _data, int& _datasize);
 	// 던전 스테이지 입장시 몬스터 정보.
 	void User_Pack_Dungeon_Monster_SpawnInfo(User* _user, char* _data, int& _datasize);
+	// 공격정보 패킹(유저코드,공격정보)
+	void User_Pack_AttackNum_Info(User* _user, char* _data, int& _datasize, int _attacknum);
+	// 공격정보 패킹(몬스터코드,몬스터번호,공격번호)
+	void User_Pack_Monster_AttackNum_Info(User* _user, char* _data, int& _datasize,int _code, int _num, int _attacknum);
+	// 몬스터 피격결과. 다른유저한테 정보패킹(데미지,죽었다는의미)
+	void User_Pack_MonsterAttackToOher_Result(User* _user, char* _data, int& _datasize, int _monstercode, int _monsternum, int _damage, bool _isdie);
+	// 유저 피격결과. 다른유저한테 정보패킹(캐릭터코드,데미지,죽었다는의미)
+	void User_Pack_User_UnderAttackToOher_Result(User* _user, char* _data, int& _datasize,  int _damage, bool _isdie);
+
 
 	// 현재 캐릭터 DB에 저장
 	void User_CurCharacter_Save(User* _user);

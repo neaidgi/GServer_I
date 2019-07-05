@@ -5,7 +5,6 @@
 PartyRoom::PartyRoom(int _partyroomnum)
 {
 	m_monster_control = new MonsterControl();
-	m_monster_timer = new MonsterTime();
 	partyroom_num = _partyroomnum;
 	m_dungeon_stage_num = DEFAULT_STAGE;
 }
@@ -28,11 +27,6 @@ PartyRoom::~PartyRoom()
 	if (m_monster_control != nullptr)
 	{
 		delete m_monster_control;
-	}
-
-	if (m_monster_timer != nullptr)
-	{
-		delete m_monster_timer;
 	}
 }
 
@@ -339,9 +333,16 @@ void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num, const Vector
 	m_monster_control->SetMonsterinfo(_monster_code, _monster_num, _pos);
 }
 
+// 몬스터 정보 삭제
 bool PartyRoom::RemoveMonsterInfo(int _monster_code, int _monster_num)
 {
-	return false;
+	return m_monster_control->RemoveMonsterInfo(_monster_code,_monster_num);
+}
+
+// 몬스터 체력 감소
+bool PartyRoom::Monster_HP_Down(int _monster_code, int _monster_num, int _damage)
+{
+	return m_monster_control->Monster_HP_Down(_monster_code,_monster_num,_damage);
 }
 
 

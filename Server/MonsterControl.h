@@ -4,7 +4,7 @@
 #include "GameDataManager.h"
 #include "User.h"
 #include "CriticalSectionManager.h"
-#include	"MonsterTime.h"
+#include "MonsterTime.h"
 
 // 클라로 부터 받는 몬스터 정보(몇번째정보인지,몬스터객체,활성화되어있는지아닌지)
 struct MonsterInfo
@@ -12,31 +12,15 @@ struct MonsterInfo
 private:	
 	// 몬스터 타이머
 	MonsterTime* m_monster_time;
+	// 몬스터
 	Monster* m_monster;
+	// 몬스터 번호
 	int m_monster_info_num;
+	// 몬스터가 죽었는지 살았는지. 
 	bool m_monster_activate;
 public:
-	MonsterInfo()
-	{
-		m_monster_time = nullptr;
-		m_monster = nullptr;
-		m_monster_info_num = -1;
-		m_monster_activate = false;
-	}
-	~MonsterInfo()
-	{
-		if (m_monster_time != nullptr)
-		{
-			delete m_monster_time;
-			m_monster_time = nullptr;
-		}
-
-		if (m_monster != nullptr)
-		{
-			delete m_monster;
-			m_monster = nullptr;
-		}
-	}
+	MonsterInfo();
+	~MonsterInfo();
 	// 몬스터 접근지정자
 	void SetMonster(Monster* _monster) { m_monster = _monster; }
 	Monster* GetMonster() { return m_monster; }
@@ -44,6 +28,11 @@ public:
 	// 몬스터 번호 접근지정자
 	void SetMonsterNum(int _num) { m_monster_info_num = _num; }
 	int GetMonsterNum() { return m_monster_info_num; }
+
+	// 몬스터 상태(죽었는지 살았는지) 접근지정자
+	void SetMonsterDie() { m_monster_activate = false; }
+	void SetMonsterlive() { m_monster_activate = true; }
+	bool GetMonsterActivate() { return m_monster_activate; }
 
 	// 몬스터 타이머 접근지정자
 	void SetMonsterTime(MonsterTime* _monstertime) { m_monster_time = _monstertime; }
@@ -69,7 +58,6 @@ private:
 	std::vector<MONSTER_ORIGINCODE> m_monstercode_vector;
 	std::vector<MONSTER_ORIGINCODE>::iterator m_monstercode_save;
 public:
-
 	MonsterControl();
 	~MonsterControl();
 
@@ -107,6 +95,8 @@ public:
 	bool GetMonsterList_Empty();
 	// 첫번째 스테이지 일반몹 저장
 	void SetFirstStage_NormalMonster();
+	// 몬스터 체력 감소
+	bool Monster_HP_Down(int _monster_code, int _monster_num, int _damage);
 };
 
 #endif

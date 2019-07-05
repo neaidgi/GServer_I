@@ -353,5 +353,11 @@
     <ClInclude Include="MonsterTime.h">
       <Filter>헤더 파일\Time</Filter>
     </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>헤더 파일\Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>
