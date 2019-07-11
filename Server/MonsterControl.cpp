@@ -188,7 +188,6 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num,const Ve
 	MonsterInfo* monsterinfo = nullptr;
 	GetMonsterinfo(_monster_code, _monster_num, monsterinfo);
 	monsterinfo->GetMonster()->SetPosition(_pos);
-	//monsterinfo->GetMonster()->SetRotation(_rot);
 }
 
 // 몬스터 정보 삭제
@@ -242,14 +241,28 @@ void MonsterControl::SetFirstStage_NormalMonster()
 	{
 		SetMonsterinfo(SPIDER, i);
 	}
-	// 애벌래 저장
-	//for (int i = 0; i < FIRSTSTAGE_NORMALMONSTER_1; i++)
-	//{
-	//	SetMonsterinfo(WORM, i);
-	//}
+	 //애벌래 저장
+	for (int i = 0; i < FIRSTSTAGE_NORMALMONSTER_1; i++)
+	{
+		SetMonsterinfo(WORM, i);
+	}
 
 	AddMonsterCode_vector(SPIDER);
-	//AddMonsterCode_vector(WORM);
+	AddMonsterCode_vector(WORM);
+
+	number_monster_types = m_monstercode_vector.size();
+}
+
+// 첫번째 스테이지 보스몹 저장
+void MonsterControl::SetFirstStage_BossMonster()
+{
+	// 보스 거미 저장
+	for (int i = 0; i < BOSS_MONSTER_NUM; i++)
+	{
+		SetMonsterinfo(BOSS_SPIDER, i);
+	}
+
+	AddMonsterCode_vector(BOSS_SPIDER);
 
 	number_monster_types = m_monstercode_vector.size();
 }
@@ -264,7 +277,8 @@ bool MonsterControl::Monster_HP_Down(int _monster_code, int _monster_num, int _d
 		return false;
 	}
 
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
+
 	float hp = monsterinfo->GetMonster()->GetMonster_Current_HP() - _damage;
 
 	// 죽으면 false
@@ -272,14 +286,25 @@ bool MonsterControl::Monster_HP_Down(int _monster_code, int _monster_num, int _d
 	{
 		monsterinfo->GetMonster()->SetMonster_Current_HP(0);
 		monsterinfo->SetMonsterDie();
-		CriticalSectionManager::GetInstance()->Leave();
 		return false;
 	}
 	else // 살아있으면 true
 	{
 		monsterinfo->GetMonster()->SetMonster_Current_HP(hp);
-		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 	}
+}
+
+// 임시 스테이지 일반몹 저장
+void MonsterControl::SetTestState()
+{
+	// 거미 저장
+	for (int i = 0; i < TESTSTAGE_MONSTER; i++)
+	{
+		SetMonsterinfo(BEAR, i);
+	}
+	AddMonsterCode_vector(BEAR);
+
+	number_monster_types = m_monstercode_vector.size();
 }
 

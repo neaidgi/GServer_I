@@ -12,7 +12,7 @@
 #include "ChannelSystem.h"
 #include "GameDataManager.h"
 
-class InGameManager
+class InGameManager : public CMultiThreadSync<InGameManager>
 {
 private:
 	static InGameManager* Instance;
@@ -31,8 +31,6 @@ private:
 	void User_Pack_PlayerPosData(User * _user, char* _data, int& _datasize);
 	// 이동 요청 
 	bool User_Pack_Move(User * _user, char* _buf, int& _datasize, char * _releasedata, int& _rdatasize);
-	// 이동 시작
-	bool User_Pack_MoveStart(User * _user, char * _buf, int & _datasize, char* _relesedata, int& _rdatasize);
 	//  회전 정보.  (코드,회전값(vector3))
 	void User_Pack_Rotation(User*_user, char* _data, int& _datasize);
 	// 채널 정보 전송.(채널번호,채널유저수....x6)
@@ -45,7 +43,7 @@ private:
 	void User_Pack_Party_Result(User * _user, bool _result, char* _data, int& _datasize);
 	// 파티 결과 및 코드 패킹. (결과,성공이면 코드 실패면 끝)
 	void User_Pack_Party_Result_Code(User* _user, bool _result, char* _code, char* _data, int& _datasize);
-	// 던전 입장시 스폰 지역 패킹
+	// 던전 입장시 스폰 지역 패킹(스폰좌표)
 	void User_Pack_Dungeon_SpawnData(User * _user,int _count, char* _data, int& _datasize);
 
 	// 던전 퇴장시 채널정보 패킹. 채널번호
@@ -114,12 +112,12 @@ private:
 	bool User_IsParty(char* _code);
 
 	// **Send 함수** //
-	// 다른 유저 이동정보 전송(채널에 접속해있는 유저들한테 전송)
-	void User_Send_MoveInfoToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
+	// 채널에 속해있는 유저들한테 전송
+	void User_Send_In_The_Channel(User* _user, UINT64 _p, char* _data, int& _datasize);
 	// 다른 유저 인게임에서 떠난 정보 전송
 	void User_Send_LeaveInfoToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
-	// 다른 유저 인게임에서 떠난 정보 채널에 전송
-	void User_Send_Channel_LeaveInfoToOther(User* _user, UINT64 _p, int _channelnum, char* _data, int& _datasize);
+	// 특정 채널에 속해있는 유저들한테 전송(채널이동할때 사용)
+	void User_Send_In_a_Particular_Channel(User* _user, UINT64 _p, int _channelnum, char* _data, int& _datasize);
 	// 다른 유저 인게임에서 떠난 정보 채널에 전송(파티원 제외)
 	void User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(User* _user, UINT64 _p, int _channelnum, char* _data, int& _datasize);
 	// 특정 유저(code) 파티 초대 전송

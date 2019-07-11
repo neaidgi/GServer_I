@@ -115,7 +115,6 @@ bool Packet::recvMsg()
 	return true;
 }
 
-
 bool Packet::IOCP_SendMsg()
 {
 	int retval;
@@ -154,7 +153,6 @@ bool Packet::IOCP_SendMsg()
 	}
 
 	return true;
-
 }
 
 bool Packet::IOCP_RecvMsg()
@@ -179,27 +177,25 @@ bool Packet::IOCP_RecvMsg()
 			return false;
 		}
 	}
-
 	return true;
 }
 
-
 void Packet::ClearSendQueue()
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 	while (sendQueue.empty() == false)
 	{
 		SendPacket* temp = sendQueue.front();
 		delete temp;
 		sendQueue.pop();
 	}
-	CriticalSectionManager::GetInstance()->Leave();
 }
 
 // send 큐에서 패킷 꺼내오기
 bool Packet::TakeOutSendPacket()
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
+
 	//char msg[BUFSIZE];
 	//sprintf(msg, "꺼내기 전 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
 	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
@@ -212,7 +208,6 @@ bool Packet::TakeOutSendPacket()
 		delete sendpacket;
 		sendQueue.pop();
 		sending = true;
-		CriticalSectionManager::GetInstance()->Leave();
 		//char msg[BUFSIZE];
 		//sprintf(msg, "꺼낸 후 소켓: [%d] SendQueue Size: [%d]", sock, GetSendQueueSize());
 		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
@@ -220,70 +215,14 @@ bool Packet::TakeOutSendPacket()
 	}
 	else
 	{
-		CriticalSectionManager::GetInstance()->Leave();
 		return false;
 	}
-}
-
-// Data 패킹
-void Packet::pack(PROTOCOL p, void * data, int size)
-{
-	CriticalSectionManager::GetInstance()->Enter();
-	memset(sendBuf, 0, sizeof(sendBuf));
-
-	char* ptr = sendBuf;
-	sendSize = sizeof(PROTOCOL) + size;
-
-	memcpy(ptr, &sendSize, sizeof(int));
-	ptr += sizeof(int);
-
-	memcpy(ptr, &p, sizeof(PROTOCOL));
-	ptr += sizeof(PROTOCOL);
-
-	memcpy(ptr, data, size);
-
-	sendSize += sizeof(size);			// 보낼 사이즈
-	sentSize = 0;						// 보낸 사이즈(초기화)
-
-	// 암호화
-	EncryptManager::GetInstance()->encoding(sendBuf + sizeof(PROTOCOL), sendSize);
-	CriticalSectionManager::GetInstance()->Leave();
-}
-
-// Data 패킹 Send 큐사용
-void Packet::Quepack(PROTOCOL p, void * data, int size)
-{
-	CriticalSectionManager::GetInstance()->Enter();
-
-	SendPacket* temp = new SendPacket();
-
-	char* ptr = temp->sendBuf;
-
-	temp->sendSize = sizeof(PROTOCOL) + size;
-
-	memcpy(ptr, &temp->sendSize, sizeof(int));
-	ptr += sizeof(int);
-
-	memcpy(ptr, &p, sizeof(PROTOCOL));
-	ptr += sizeof(PROTOCOL);
-
-	memcpy(ptr, data, size);
-
-	temp->sendSize += sizeof(size);		// 보낼 사이즈
-
-	// 암호화
-	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(PROTOCOL), temp->sendSize);
-	// 큐에 넣기
-
-	sendQueue.push(temp);
-
-	CriticalSectionManager::GetInstance()->Leave();
 }
 
 // Data 패킹 Send 큐사용. BitProtocol 추가
 void Packet::Quepack(UINT64 p, void * data, int size)
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 
 	SendPacket* temp = new SendPacket();
 
@@ -306,51 +245,6 @@ void Packet::Quepack(UINT64 p, void * data, int size)
 	// 큐에 넣기
 
 	sendQueue.push(temp);
-
-	CriticalSectionManager::GetInstance()->Leave();
-}
-
-void Packet::bitpack(PROTOCOL p, void * data, int size)
-{
-	memset(sendBuf, 0, sizeof(sendBuf));
-
-	char* ptr = sendBuf;
-	sendSize = sizeof(PROTOCOL) + size;
-
-	memcpy(ptr, &sendSize, sizeof(int));
-	ptr += sizeof(int);
-
-	memcpy(ptr, &p, sizeof(PROTOCOL));
-	ptr += sizeof(PROTOCOL);
-
-	memcpy(ptr, data, size);
-
-	sendSize += sizeof(size);			// 보낼 사이즈
-	sentSize = 0;						// 보낸 사이즈(초기화)
-
-	// 암호화
-	EncryptManager::GetInstance()->encoding(sendBuf + sizeof(PROTOCOL), sendSize);
-}
-
-// Data 언패킹
-void Packet::unPack(PROTOCOL * p, void * data)
-{
-	CriticalSectionManager::GetInstance()->Enter();
-
-	char* ptr = recvBuf;
-	PROTOCOL protocol;
-
-	EncryptManager::GetInstance()->decoding(recvBuf, recvSize);
-
-	memcpy(&protocol, ptr, sizeof(PROTOCOL));
-	ptr += sizeof(PROTOCOL);
-
-	memcpy(data, ptr, recvSize - sizeof(PROTOCOL));
-	*p = protocol;
-
-	IOCP_InitializeBuffer();
-
-	CriticalSectionManager::GetInstance()->Leave();
 }
 
 // 비트연산 프로토콜 pack. _existingprotocol : 기존 프로토콜, _additionalprotocol : 추가할 프로토콜
@@ -376,7 +270,7 @@ UINT64 Packet::BitPackProtocol(UINT64 _existingprotocol, UINT64 _first_additiona
 // 비트 연산 프로토콜 unpack
 void Packet::BitunPack(UINT64 & _p, void * _data)
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 
 	char* ptr = recvBuf;
 	UINT64 protocol = 0;
@@ -392,86 +286,47 @@ void Packet::BitunPack(UINT64 & _p, void * _data)
 	_p = protocol;
 
 	IOCP_InitializeBuffer();
-
-	CriticalSectionManager::GetInstance()->Leave();
 }
 
 bool Packet::isSendQueue()
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 	if (sendQueue.empty() == false)
 	{
-		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 	}
-	CriticalSectionManager::GetInstance()->Leave();
 	return false;
 }
 
 bool Packet::isSendQueueSending()
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 	if (sendQueue.empty() == false)
 	{
-		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 
 	}
-	CriticalSectionManager::GetInstance()->Leave();
 	return false;
-}
-
-// sendSize만큼 보냈는지
-bool Packet::isSendSuccess()
-{
-	//CriticalSectionManager::GetInstance()->Enter();
-	if (sendSize == sentSize)
-		return true;
-	else
-		return false;
-	//CriticalSectionManager::GetInstance()->Leave();
-}
-
-// recvSize만큼 받았는지
-bool Packet::isRecvSuccess()
-{
-	//CriticalSectionManager::GetInstance()->Enter();
-	if (recvSize == 0)
-	{
-		if (recvedSize == 0)
-			return true;
-		else
-			return false;
-	}
-	else
-	{
-		if (recvSize == recvedSize)
-			return true;
-		else
-			return false;
-	}
-	//CriticalSectionManager::GetInstance()->Leave();
 }
 
 bool Packet::IOCP_isSendSuccess(int _sentbyte)
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 	sentSize += _sentbyte;
 	if (sentSize == sendSize)
 	{
 		sentSize = 0;
 		sendSize = 0;
 		sending = false;
-		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 	}
-	CriticalSectionManager::GetInstance()->Leave();
 	return false;
 }
 
 bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
+
 	if (recvSize < sizeof(int))
 	{
 		recvedSize += _recvedSize;
@@ -491,17 +346,14 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 				//char msg[BUFSIZE];
 				//sprintf(msg, "IOCP_isRecvSuccess: sock : [%d] recvedSize : [%d]", sock, recvedSize);
 				//MsgManager::GetInstance()->DisplayMsg("[recvedSize] INFO ", msg);
-				CriticalSectionManager::GetInstance()->Leave();
 				return true;
 			}
 			else
 			{
 				if (!IOCP_RecvMsg())
 				{
-					CriticalSectionManager::GetInstance()->Leave();
 					return false;
 				}
-				CriticalSectionManager::GetInstance()->Leave();
 				return false;
 			}
 		}
@@ -509,7 +361,6 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 		{
 			if (!IOCP_RecvMsg())
 			{
-				CriticalSectionManager::GetInstance()->Leave();
 				return false;
 			}
 		}
@@ -520,24 +371,22 @@ bool Packet::IOCP_isRecvSuccess(int _recvedSize)
 	if (recvedSize >= recvSize)
 	{
 		recvedSize -= recvSize;
-		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 	}
 	else
 	{
 		if (!IOCP_RecvMsg())
 		{
-			CriticalSectionManager::GetInstance()->Leave();
 			return false;
 		}
-		CriticalSectionManager::GetInstance()->Leave();
 		return false;
 	}
 }
 
 bool Packet::IOCP_isRecvSuccess()
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
+
 	if (recvSize < sizeof(int)) // recvSize를 받아야한다면
 	{
 		// 받은크기가 받아야할 크기 보다 크면
@@ -554,19 +403,15 @@ bool Packet::IOCP_isRecvSuccess()
 			{
 				recvedSize -= recvSize;
 
-				CriticalSectionManager::GetInstance()->Leave();
-
 				return true;
 			}
 			else // 받아야할 크기보다 받은크기가 작을때
 			{
-				CriticalSectionManager::GetInstance()->Leave();
 				return false;
 			}
 		}
 		else // 받은 크기가 받아야할 크기 보다 작으면
 		{
-			CriticalSectionManager::GetInstance()->Leave();
 			return false;
 		}
 	}
@@ -577,20 +422,143 @@ bool Packet::IOCP_isRecvSuccess()
 		memcpy(&recvBuf, recvBuf, recvedSize);
 
 		recvedSize -= recvSize;
-		CriticalSectionManager::GetInstance()->Leave();
 		return true;
 	}
 	else
 	{
-		CriticalSectionManager::GetInstance()->Leave();
 		return false;
 	}
 }
 
 void Packet::IOCP_InitializeBuffer()
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 	memcpy(recvBuf, recvBuf + recvSize, recvedSize);
 	recvSize = 0;
-	CriticalSectionManager::GetInstance()->Leave();
 }
+
+
+//// Data 패킹
+//void Packet::pack(PROTOCOL p, void * data, int size)
+//{
+//	CThreadSync cs;
+//	memset(sendBuf, 0, sizeof(sendBuf));
+//
+//	char* ptr = sendBuf;
+//	sendSize = sizeof(PROTOCOL) + size;
+//
+//	memcpy(ptr, &sendSize, sizeof(int));
+//	ptr += sizeof(int);
+//
+//	memcpy(ptr, &p, sizeof(PROTOCOL));
+//	ptr += sizeof(PROTOCOL);
+//
+//	memcpy(ptr, data, size);
+//
+//	sendSize += sizeof(size);			// 보낼 사이즈
+//	sentSize = 0;						// 보낸 사이즈(초기화)
+//
+//	// 암호화
+//	EncryptManager::GetInstance()->encoding(sendBuf + sizeof(PROTOCOL), sendSize);
+//}
+
+//// Data 패킹 Send 큐사용
+//void Packet::Quepack(PROTOCOL p, void * data, int size)
+//{
+//	CThreadSync cs;
+//
+//	SendPacket* temp = new SendPacket();
+//
+//	char* ptr = temp->sendBuf;
+//
+//	temp->sendSize = sizeof(PROTOCOL) + size;
+//
+//	memcpy(ptr, &temp->sendSize, sizeof(int));
+//	ptr += sizeof(int);
+//
+//	memcpy(ptr, &p, sizeof(PROTOCOL));
+//	ptr += sizeof(PROTOCOL);
+//
+//	memcpy(ptr, data, size);
+//
+//	temp->sendSize += sizeof(size);		// 보낼 사이즈
+//
+//	// 암호화
+//	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(PROTOCOL), temp->sendSize);
+//	// 큐에 넣기
+//
+//	sendQueue.push(temp);
+//}
+
+//void Packet::bitpack(PROTOCOL p, void * data, int size)
+//{
+//	memset(sendBuf, 0, sizeof(sendBuf));
+//
+//	char* ptr = sendBuf;
+//	sendSize = sizeof(PROTOCOL) + size;
+//
+//	memcpy(ptr, &sendSize, sizeof(int));
+//	ptr += sizeof(int);
+//
+//	memcpy(ptr, &p, sizeof(PROTOCOL));
+//	ptr += sizeof(PROTOCOL);
+//
+//	memcpy(ptr, data, size);
+//
+//	sendSize += sizeof(size);			// 보낼 사이즈
+//	sentSize = 0;						// 보낸 사이즈(초기화)
+//
+//	// 암호화
+//	EncryptManager::GetInstance()->encoding(sendBuf + sizeof(PROTOCOL), sendSize);
+//}
+
+//// Data 언패킹
+//void Packet::unPack(PROTOCOL * p, void * data)
+//{
+//	CThreadSync cs;
+//
+//	char* ptr = recvBuf;
+//	PROTOCOL protocol;
+//
+//	EncryptManager::GetInstance()->decoding(recvBuf, recvSize);
+//
+//	memcpy(&protocol, ptr, sizeof(PROTOCOL));
+//	ptr += sizeof(PROTOCOL);
+//
+//	memcpy(data, ptr, recvSize - sizeof(PROTOCOL));
+//	*p = protocol;
+//
+//	IOCP_InitializeBuffer();
+//}
+
+//// sendSize만큼 보냈는지
+//bool Packet::isSendSuccess()
+//{
+//	// Enter();
+//	if (sendSize == sentSize)
+//		return true;
+//	else
+//		return false;
+//	// Leave();
+//}
+
+//// recvSize만큼 받았는지
+//bool Packet::isRecvSuccess()
+//{
+//	// Enter();
+//	if (recvSize == 0)
+//	{
+//		if (recvedSize == 0)
+//			return true;
+//		else
+//			return false;
+//	}
+//	else
+//	{
+//		if (recvSize == recvedSize)
+//			return true;
+//		else
+//			return false;
+//	}
+//	// Leave();
+//}

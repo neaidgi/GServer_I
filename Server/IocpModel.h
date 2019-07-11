@@ -8,7 +8,7 @@
 
 //using namespace std;
 
-class IocpModel
+class IocpModel : public CMultiThreadSync<IocpModel>
 {
 protected:
 	HANDLE hcp;

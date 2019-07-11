@@ -357,7 +357,10 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 
 		sql_row = mysql_fetch_row(sql_result);
 
+		Vector3 character_scale;
+
 		// 1번
+		character_scale = _character_out[0]->GetScale();
 		_character_out[0]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[0]->SetCharacter_JobName(sql_row[1]);
 		_character_out[0]->SetCharacter_STR(atoi(sql_row[2]));
@@ -374,10 +377,15 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[0]->SetCharacter_GrowINT(atoi(sql_row[12]));
 		_character_out[0]->SetCharacter_GrowHealth(atoi(sql_row[13]));
 		_character_out[0]->SetCharacter_GrowMana(atoi(sql_row[14]));
+		character_scale.x = atoi(sql_row[15]);
+		character_scale.y = atoi(sql_row[16]);
+		character_scale.z = atoi(sql_row[17]);
+		_character_out[0]->SetScale(character_scale);
 
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 2번
+		character_scale = _character_out[1]->GetScale();
 		_character_out[1]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[1]->SetCharacter_JobName(sql_row[1]);
 		_character_out[1]->SetCharacter_STR(atoi(sql_row[2]));
@@ -394,10 +402,15 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[1]->SetCharacter_GrowINT(atoi(sql_row[12]));
 		_character_out[1]->SetCharacter_GrowHealth(atoi(sql_row[13]));
 		_character_out[1]->SetCharacter_GrowMana(atoi(sql_row[14]));
+		character_scale.x = atoi(sql_row[15]);
+		character_scale.y = atoi(sql_row[16]);
+		character_scale.z = atoi(sql_row[17]);
+		_character_out[1]->SetScale(character_scale);
 
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 3번
+		character_scale = _character_out[2]->GetScale();
 		_character_out[2]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[2]->SetCharacter_JobName(sql_row[1]);
 		_character_out[2]->SetCharacter_STR(atoi(sql_row[2]));
@@ -414,10 +427,15 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[2]->SetCharacter_GrowINT(atoi(sql_row[12]));
 		_character_out[2]->SetCharacter_GrowHealth(atoi(sql_row[13]));
 		_character_out[2]->SetCharacter_GrowMana(atoi(sql_row[14]));
+		character_scale.x = atoi(sql_row[15]);
+		character_scale.y = atoi(sql_row[16]);
+		character_scale.z = atoi(sql_row[17]);
+		_character_out[2]->SetScale(character_scale);
 
 		sql_row = mysql_fetch_row(sql_result);
 
 		// 4번
+		character_scale = _character_out[3]->GetScale();
 		_character_out[3]->SetCharacter_JobCode(atoi(sql_row[0]));
 		_character_out[3]->SetCharacter_JobName(sql_row[1]);
 		_character_out[3]->SetCharacter_STR(atoi(sql_row[2]));
@@ -434,6 +452,10 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 		_character_out[3]->SetCharacter_GrowINT(atoi(sql_row[12]));
 		_character_out[3]->SetCharacter_GrowHealth(atoi(sql_row[13]));
 		_character_out[3]->SetCharacter_GrowMana(atoi(sql_row[14]));
+		character_scale.x = atoi(sql_row[15]);
+		character_scale.y = atoi(sql_row[16]);
+		character_scale.z = atoi(sql_row[17]);
+		_character_out[3]->SetScale(character_scale);
 
 		/*
 		* result 지시자와 관련된 점유 메모리를 해제한다.

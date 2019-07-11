@@ -9,7 +9,7 @@
 #include "InGameManager.h"
 #include "UUIDManager.h"
 
-class CharacterManager 
+class CharacterManager : public CMultiThreadSync<CharacterManager>
 {
 private:
 	static CharacterManager* Instance;											  

@@ -241,6 +241,9 @@ void PartyRoom::RiseStage()
 	switch (m_dungeon_stage_num)
 	{
 	case DEFAULT_STAGE:
+		m_dungeon_stage_num = DUNGEON_STAGE_TEST;
+		break;
+	case DUNGEON_STAGE_TEST:
 		m_dungeon_stage_num = DUNGEON_STAGE_NORMAL_1;
 		break;
 	case DUNGEON_STAGE_NORMAL_1:
@@ -277,6 +280,9 @@ void PartyRoom::SetDungeonMonsterinfo()
 
 	switch (m_dungeon_stage_num)
 	{
+	case DUNGEON_STAGE_TEST:
+		m_monster_control->SetTestState();
+		break;
 	case DUNGEON_STAGE_NORMAL_1:
 		m_monster_control->SetFirstStage_NormalMonster();
 		break;

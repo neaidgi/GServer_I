@@ -46,7 +46,7 @@ public:
 };
 
 // 몬스터 객체를 컨트롤할 클래스
-class MonsterControl
+class MonsterControl : public CMultiThreadSync<MonsterControl>
 {
 private:
 	// 몬스터 정보
@@ -95,8 +95,13 @@ public:
 	bool GetMonsterList_Empty();
 	// 첫번째 스테이지 일반몹 저장
 	void SetFirstStage_NormalMonster();
+	// 첫번째 스테이지 보스몹 저장
+	void SetFirstStage_BossMonster();
 	// 몬스터 체력 감소
 	bool Monster_HP_Down(int _monster_code, int _monster_num, int _damage);
+
+	// 임시 스테이지 일반몹 저장
+	void SetTestState();
 };
 
 #endif

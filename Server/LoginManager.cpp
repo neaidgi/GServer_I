@@ -192,35 +192,6 @@ bool LoginManager::reqLogin(User* user, char* _buf)
 	return result;
 }
 
-// 회원가입 화면
-RESULT LoginManager::loginProcess(User * _user)
-{
-	PROTOCOL protocol;
-	char buf[BUFSIZE];
-	char msg[BUFSIZE];
-	bool check;
-	_user->unPack(&protocol, &buf);
-
-	RESULT result = RT_DEFAULT;
-	switch (protocol)
-	{
-	case CLIENT_REQ_ID_OVERLAP_CHECK:
-		reqIdOverlapCheck(_user, buf);
-		result = RT_ID_OVERLAP;
-		break;
-	case CLIENT_REQ_JOIN:
-		sprintf(msg, "%s : 가입 요청", _user->getID());
-		MsgManager::GetInstance()->DisplayMsg("로그인", msg);
-		reqJoin(_user, buf);
-		result = RT_JOIN;
-		break;
-	case CLIENT_REQ_EXIT_JOIN:
-		_user->Quepack(SERVER_EXIT_JOIN, 0, 0);
-		result = RT_EXIT_JOIN;
-	}
-	return result;
-}
-
 // 타이틀
 RESULT LoginManager::TitleProcess(User * _user)
 {
@@ -281,43 +252,73 @@ RESULT LoginManager::TitleProcess(User * _user)
 	return result;
 }
 
-// 타이틀 화면
-RESULT LoginManager::logoutMenuChoice(User* _user)
-{
-	PROTOCOL protocol;
-	char buf[BUFSIZE];
-	char msg[BUFSIZE];
-	bool check;
-	int choice;
 
-	_user->unPack(&protocol, &buf);
+//// 회원가입 화면
+//RESULT LoginManager::loginProcess(User * _user)
+//{
+//	PROTOCOL protocol;
+//	char buf[BUFSIZE];
+//	char msg[BUFSIZE];
+//	bool check;
+//	_user->unPack(&protocol, &buf);
+//
+//	RESULT result = RT_DEFAULT;
+//	switch (protocol)
+//	{
+//	case CLIENT_REQ_ID_OVERLAP_CHECK:
+//		reqIdOverlapCheck(_user, buf);
+//		result = RT_ID_OVERLAP;
+//		break;
+//	case CLIENT_REQ_JOIN:
+//		sprintf(msg, "%s : 가입 요청", _user->getID());
+//		MsgManager::GetInstance()->DisplayMsg("로그인", msg);
+//		reqJoin(_user, buf);
+//		result = RT_JOIN;
+//		break;
+//	case CLIENT_REQ_EXIT_JOIN:
+//		_user->Quepack(SERVER_EXIT_JOIN, 0, 0);
+//		result = RT_EXIT_JOIN;
+//	}
+//	return result;
+//}
 
-	PROTOCOL sendprotocol;
-
-	RESULT result = RT_DEFAULT;
-
-	// 수정했음
-	switch (protocol)
-	{
-	case CLIENT_REQ_LOGIN: // 로그인 요청
-		sprintf(msg, "%s : 로그인 요청", _user->getID());
-		MsgManager::GetInstance()->DisplayMsg("로그인", msg);
-		check = reqLogin(_user, buf);
-		if (check == false)
-		{
-			result = RT_LOGINFAIL;
-			break;
-		}
-		result = RT_LOGIN;
-		break;
-	case CLIENT_JOIN_MENU_CHOICE: // 회원가입 매뉴 버튼 누름
-		sendprotocol = SERVER_JOIN;
-		_user->Quepack(sendprotocol, buf, 0);
-		result = RT_JOINMENU;
-		break;
-	default:
-		break;
-	}
-
-	return result;
-}
+//// 타이틀 화면
+//RESULT LoginManager::logoutMenuChoice(User* _user)
+//{
+//	PROTOCOL protocol;
+//	char buf[BUFSIZE];
+//	char msg[BUFSIZE];
+//	bool check;
+//	int choice;
+//
+//	_user->unPack(&protocol, &buf);
+//
+//	PROTOCOL sendprotocol;
+//
+//	RESULT result = RT_DEFAULT;
+//
+//	// 수정했음
+//	switch (protocol)
+//	{
+//	case CLIENT_REQ_LOGIN: // 로그인 요청
+//		sprintf(msg, "%s : 로그인 요청", _user->getID());
+//		MsgManager::GetInstance()->DisplayMsg("로그인", msg);
+//		check = reqLogin(_user, buf);
+//		if (check == false)
+//		{
+//			result = RT_LOGINFAIL;
+//			break;
+//		}
+//		result = RT_LOGIN;
+//		break;
+//	case CLIENT_JOIN_MENU_CHOICE: // 회원가입 매뉴 버튼 누름
+//		sendprotocol = SERVER_JOIN;
+//		_user->Quepack(sendprotocol, buf, 0);
+//		result = RT_JOINMENU;
+//		break;
+//	default:
+//		break;
+//	}
+//
+//	return result;
+//}

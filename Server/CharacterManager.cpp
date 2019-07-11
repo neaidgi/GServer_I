@@ -390,6 +390,7 @@ Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, 
 	player->SetCharacter_Code(_slotdata->code);
 	player->SetBasicAttack(origin->GetBasicAttack());
 	player->SetSecondAttack(origin->GetSecondAttack());
+	player->SetScale(origin->GetScale());
 
 	return player;
 }

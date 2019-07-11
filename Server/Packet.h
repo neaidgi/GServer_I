@@ -37,6 +37,7 @@ private:
 	bool sending;
 	WSABUF sendwsabuf;
 	WSABUF recvwsabuf;
+
 public:
 	Packet();
 	Packet(SOCKET _socket, SOCKADDR_IN _addr);
@@ -56,13 +57,8 @@ public:
 	void ClearSendQueue();
 	bool TakeOutSendPacket();
 
-	void Quepack(PROTOCOL p, void *data, int size);
 	void Quepack(UINT64 p, void *data, int size);
-	void pack(PROTOCOL p, void *data, int size);
-	void bitpack(PROTOCOL p, void *data, int size);
-	void unPack(PROTOCOL *p, void *data);
-	bool isSendSuccess();
-	bool isRecvSuccess();
+
 	// 비트연산 프로토콜 pack. _existingprotocol : 기존 프로토콜, _additionalprotocol : 추가할 프로토콜
 	UINT64 BitPackProtocol(UINT64 _existingprotocol, UINT64 _additionalprotocol); 
 	// 비트연산 프로토콜 pack. 기존프로토콜, 큰틀프로토콜, 중간틀프로토콜, 세부프로토콜
@@ -81,6 +77,13 @@ public:
 	bool IOCP_isRecvSuccess(int _sentbyte);
 	bool IOCP_isRecvSuccess();
 	void IOCP_InitializeBuffer();
+
+	//void pack(PROTOCOL p, void *data, int size);
+	//void bitpack(PROTOCOL p, void *data, int size);
+	//void unPack(PROTOCOL *p, void *data);
+	//bool isSendSuccess();
+	//bool isRecvSuccess();
+	//void Quepack(PROTOCOL p, void *data, int size);
 };
 
 #endif

@@ -4,13 +4,14 @@
 #include "User.h"
 #include "CriticalSectionManager.h"
 
-class UserManager
+class UserManager : public CMultiThreadSync<UserManager>
 {
 private:
 	//User * list[CLIENTCOUNT];				// std 리스트로 교체 예정
 	std::list<User*> ConnectUserlist;		// 접속한 유저 리스트
 	std::list<User*>::iterator save;		// 검색용 유저 저장할 변수
 	static UserManager* Instance;
+
 
 	UserManager();
 	~UserManager();

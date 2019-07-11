@@ -94,15 +94,13 @@ void UUIDManager::UUID_CharacterUniqCode(User* _user,char * _codebuf,int _jobcod
 
 int UUIDManager::UUID_PartyRoomNum()
 {
-	CriticalSectionManager::GetInstance()->Enter();
+	CThreadSync cs;
 	int num = 0;
 
 	// 비어있으면
 	if (partyroomnum.empty() == true)
 	{
 		partyroomnum.push_back(num);
-
-		CriticalSectionManager::GetInstance()->Leave();
 		return num;
 	}
 
@@ -111,7 +109,5 @@ int UUIDManager::UUID_PartyRoomNum()
 	num++;
 
 	partyroomnum.push_back(num);
-
-	CriticalSectionManager::GetInstance()->Leave();
 	return num;
 }

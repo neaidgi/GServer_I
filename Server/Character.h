@@ -96,7 +96,7 @@ public:
 
 	const Vector3 GetPosition() { return Position; }
 	const Vector3 GetRotation() { return Rotation; }
-	const Vector3 GetScale() { return Scale; }
+	const Vector3 GetScale() const { return Scale; }
 
 	const AttackInfo GetAttackInfo(int _attack_num)
 	{

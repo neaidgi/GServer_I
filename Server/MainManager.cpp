@@ -22,7 +22,6 @@ void MainManager::CreateInstance()
 	if (Instance == nullptr)
 	{
 		Instance = new MainManager();
-		CriticalSectionManager::CreateInstance();
 		MsgManager::CreateInstance();
 		LogManager::CreateInstance();
 		ErrorManager::CreateInstance();
@@ -59,7 +58,6 @@ void MainManager::DestroyInstance()
 		EncryptManager::DestroyInstance();
 		GameManager::DestroyInstance();
 		DBManager::DestroyInstance();
-		CriticalSectionManager::DestroyInstance();
 		LogManager::DestroyInstance();
 		ErrorManager::DestroyInstance();
 		MsgManager::DestroyInstance();
@@ -153,8 +151,6 @@ bool MainManager::MangerInitialize()
 	LogManager::GetInstance()->InitializeManager();
 	ErrorManager::GetInstance()->InitializeManager();
 
-	CriticalSectionManager::GetInstance()->InitializeManager();
-
 	UUIDManager::GetInstance()->InitializeManager();
 
 	MsgManager::GetInstance()->DisplayMsg("메인","데이터베이스 초기화중");
@@ -211,7 +207,6 @@ void MainManager::EndManager()
 	GameManager::GetInstance()->EndManager();
 	// DB 연결 해제
 	DBManager::GetInstance()->EndManager();
-	CriticalSectionManager::GetInstance()->EndManager();
 	MsgManager::GetInstance()->EndManager();
 	UUIDManager::GetInstance()->EndManager();
 

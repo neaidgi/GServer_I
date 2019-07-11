@@ -2,8 +2,9 @@
 #define SOCKET_H
 
 #include "Global.h"
+#include "CriticalSectionManager.h"
 
-class Socket
+class Socket : public CMultiThreadSync<Socket>
 {
 protected:
 	SOCKET sock;

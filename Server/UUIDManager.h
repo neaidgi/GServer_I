@@ -5,7 +5,7 @@
 #include "CriticalSectionManager.h"
 #include <list>
 
-class UUIDManager
+class UUIDManager : public CMultiThreadSync<UUIDManager>
 {
 private:
 	static UUIDManager* Instance;
