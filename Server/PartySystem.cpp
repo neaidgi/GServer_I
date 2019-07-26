@@ -5,6 +5,7 @@
 PartyRoom::PartyRoom(int _partyroomnum)
 {
 	m_monster_control = new MonsterControl();
+	m_stage_info = new StageInfo();
 	partyroom_num = _partyroomnum;
 	m_dungeon_stage_num = DEFAULT_STAGE;
 }
@@ -238,31 +239,42 @@ bool PartyRoom::SearchMonsterinfo(MonsterInfo *& _monsterinfo)
 // 스테이지 상승
 void PartyRoom::RiseStage()
 {
-	switch (m_dungeon_stage_num)
+	const StageInfo* stageinfo = nullptr;
+	int code[STAGE_MONSTER_NUM];
+	int num[STAGE_MONSTER_NUM];
+
+	switch (m_stage_info->GetStage_Num())
 	{
 	case DEFAULT_STAGE:
-		m_dungeon_stage_num = DUNGEON_STAGE_TEST;
-		break;
-	case DUNGEON_STAGE_TEST:
-		m_dungeon_stage_num = DUNGEON_STAGE_NORMAL_1;
+		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_1, stageinfo);
+		m_stage_info->SetStage_Num(stageinfo->GetStage_Num());
+		stageinfo->GetStage_NormalMonster(code);
+		stageinfo->GetStage_NormalMonster_Num(num);
+		m_stage_info->SetStage_NormalMonster_Code(code);
+		m_stage_info->SetStage_NormalMonster_Num(num);
+		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
 		break;
 	case DUNGEON_STAGE_NORMAL_1:
-		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_1;
-		break;
-	case DUNGEON_STAGE_BOSS_1:
-		m_dungeon_stage_num = DUNGEON_STAGE_NORMAL_2;
+		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_2, stageinfo);
+		m_stage_info->SetStage_Num(stageinfo->GetStage_Num());
+		stageinfo->GetStage_NormalMonster(code);
+		stageinfo->GetStage_NormalMonster_Num(num);
+		m_stage_info->SetStage_NormalMonster_Code(code);
+		m_stage_info->SetStage_NormalMonster_Num(num);
+		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
 		break;
 	case DUNGEON_STAGE_NORMAL_2:
-		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_2;
-		break;
-	case DUNGEON_STAGE_BOSS_2:
-		m_dungeon_stage_num = DUNGEON_STAGE_NORMAL_3;
+		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_1;
+		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_3, stageinfo);
+		m_stage_info->SetStage_Num(stageinfo->GetStage_Num());
+		stageinfo->GetStage_NormalMonster(code);
+		stageinfo->GetStage_NormalMonster_Num(num);
+		m_stage_info->SetStage_NormalMonster_Code(code);
+		m_stage_info->SetStage_NormalMonster_Num(num);
+		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
 		break;
 	case DUNGEON_STAGE_NORMAL_3:
-		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_3;
-		break;
-	case DUNGEON_STAGE_BOSS_3:
-		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_4;
+	
 		break;
 	default:
 		break;
@@ -277,30 +289,13 @@ void PartyRoom::SetDungeonMonsterinfo()
 	{
 		m_monster_control->ResetMonsterInfo();
 	}
+	int code[2];
+	int num[2];
 
-	switch (m_dungeon_stage_num)
-	{
-	case DUNGEON_STAGE_TEST:
-		m_monster_control->SetTestState();
-		break;
-	case DUNGEON_STAGE_NORMAL_1:
-		m_monster_control->SetFirstStage_NormalMonster();
-		break;
-	case DUNGEON_STAGE_BOSS_1:
-		break;
-	case DUNGEON_STAGE_NORMAL_2:
-		break;
-	case DUNGEON_STAGE_BOSS_2:
-		break;
-	case DUNGEON_STAGE_NORMAL_3:
-		break;
-	case DUNGEON_STAGE_BOSS_3:
-		break;
-	case DUNGEON_STAGE_BOSS_4:
-		break;
-	default:
-		break;
-	}
+	m_stage_info->GetStage_NormalMonster(code);
+	m_stage_info->GetStage_NormalMonster_Num(num);
+
+	m_monster_control->Stage_SetMonster(code, num);
 }
 
 // 몬스터 시간 초기화

@@ -6,6 +6,7 @@
 #include "Global.h"
 #include "Character.h"
 #include "Monster.h"
+#include "StageData.h"
 #include <mysql.h>
 
 class DBManager
@@ -49,6 +50,10 @@ public:
 	bool Character_Req_AttackInfo(Character* _character_out[]);
 	// 몬스터 공격(기본공격 및 스킬) 정보 요청
 	bool Monster_Req_AttackInfo(Monster* _monster_out[]);
+	// 스테이지 정보 요청
+	bool Stage_Req_StageInfo(StageInfo* _stage_out[]);
+	// 스테이지 몬스터 정보 요청
+	bool Stage_Req_StageMonsterInfo(StageInfo* _stage_out[]);
 
 	// 캐릭터 삭제
 	bool Character_Req_CharacterDelete(const char* _id, int _index);
@@ -74,6 +79,7 @@ public:
 	bool Charactor_Req_DungeonStageSpawnPos(Vector3 * _pos, int& _count);
 	// 몬스터 스폰위치 요청
 	bool Charactor_Req_MonsterSpawnPos(Vector3 * _pos, int& _count);
+	
 };
 
 #endif

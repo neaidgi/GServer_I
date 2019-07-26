@@ -23,6 +23,8 @@ private:
 	
 	// 몬스터 컨트롤러
 	MonsterControl* m_monster_control;
+	// 스테이지 정보
+	StageInfo* m_stage_info;
 
 public:
 	PartyRoom(int _partyroomnum);
@@ -66,9 +68,9 @@ public:
 
 
 	// 스테이지 변경
-	void SetDungeonStage(DUNGEON_STAGE _stage_num) { m_dungeon_stage_num = _stage_num; }
+	void SetDungeonStage(DUNGEON_STAGE _stage_num) { m_stage_info->SetStage_Num(_stage_num); }
 	// 지금 몇번째 스테이지인지
-	int GetDungeonStage() { return m_dungeon_stage_num; }
+	int GetDungeonStage() { return m_stage_info->GetStage_Num(); }
 	// 몬스터 종류는 몇마리인지
 	int GetMonsterTypes() { return m_monster_control->GetMonsterTypes(); }
 

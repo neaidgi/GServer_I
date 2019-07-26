@@ -182,9 +182,6 @@ public:
 	// 던전 채널 나가기
 	void User_LeaveInDun_Channel(User* _user);
 
-	// 몬스터가 피격이 가능한가
-	//bool Monster_Attack_Is_
-
 };
 
 #endif

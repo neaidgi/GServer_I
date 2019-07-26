@@ -42,7 +42,6 @@ bool CharacterVerification::AttackVerificate(Vector3 _AttackerPos, Vector3 _atta
 	{
 		/*sprintf(msg, "[공격 판정 : 원과의 거리에서 충돌하지않음]");
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);*/
-
 		return false;
 	}
 

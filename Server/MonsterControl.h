@@ -54,9 +54,9 @@ private:
 	std::list<MonsterInfo*>::iterator m_monsterinfo_save;
 
 	// 몬스터 종류 갯수
-	int number_monster_types;
-	std::vector<MONSTER_ORIGINCODE> m_monstercode_vector;
-	std::vector<MONSTER_ORIGINCODE>::iterator m_monstercode_save;
+	int monster_types_num;
+	std::vector<int> m_monstercode_vector;
+	std::vector<int>::iterator m_monstercode_save;
 public:
 	MonsterControl();
 	~MonsterControl();
@@ -67,9 +67,9 @@ public:
 	int GetMonsterTypes() {	return m_monstercode_vector.size(); }
 	
 	// 몬스터 코드 추가
-	void AddMonsterCode_vector(MONSTER_ORIGINCODE _code);
+	void AddMonsterCode_vector(int _code);
 	// 몬스터 코드 반환
-	MONSTER_ORIGINCODE GetMonsterCode_vector(int _count);
+	int GetMonsterCode_vector(int _count);
 
 	// 몬스터 실제 조립
 	Monster* MonsterSelect(int _monster_code);
@@ -93,6 +93,8 @@ public:
 	void ResetMonsterInfo();
 	// 리스트 비어있는지(비어있으면 true 아니면 false)
 	bool GetMonsterList_Empty();
+	// 스테이지 몬스터 저장
+	void Stage_SetMonster(int _code[],int _num[]);
 	// 첫번째 스테이지 일반몹 저장
 	void SetFirstStage_NormalMonster();
 	// 첫번째 스테이지 보스몹 저장

@@ -11,6 +11,7 @@ GameDataManager::GameDataManager()
 	characterdata = new CharacterData();
 	m_monsterdata = new MonsterData();
 	m_monster_spawndata = new MonsterSpawnData();
+	m_stagedata = new StageData();
 }
 GameDataManager::~GameDataManager()
 {
@@ -19,6 +20,7 @@ GameDataManager::~GameDataManager()
 	delete m_monster_spawndata;
 	delete characterdata;
 	delete m_monsterdata;
+	delete m_stagedata;
 }
 
 void GameDataManager::CreateInstance()
@@ -59,7 +61,6 @@ bool GameDataManager::InitializeManager()
 	// 캐릭터 설계도 초기화
 	if (Init_Character_Data() == false)
 	{
-		// 로그
 		return false;
 	}
 	// 몬스터 설계도 초기화
@@ -67,7 +68,13 @@ bool GameDataManager::InitializeManager()
 	{
 		return false;
 	}
+	// 몬스터 스폰정보 초기화
 	if (Init_Monster_Spawn_Data() == false)
+	{
+		return false;
+	}
+	// 스테이지 설계도 초기화
+	if (Init_Stage_Data() == false)
 	{
 		return false;
 	}
@@ -218,6 +225,30 @@ bool GameDataManager::Init_Monster_Spawn_Data()
 	}
 }
 
+// 스테이지 정보 초기화
+bool GameDataManager::Init_Stage_Data()
+{
+	// 캐릭터 정보 가져오기
+	StageInfo * origin[STAGE_COUNT];
+	for (int i = 0; i < STAGE_COUNT; i++)
+	{
+		origin[i] = new StageInfo();
+	}
+	MsgManager::GetInstance()->DisplayMsg("메인", "스테이지설계도 로드중");
+	if (DBManager::GetInstance()->Stage_Req_StageInfo(origin) == false)
+	{
+		return false;
+	}
+	if (DBManager::GetInstance()->Stage_Req_StageMonsterInfo(origin) == false)
+	{
+		return false;
+	}
+
+	m_stagedata->SetStageDataOrigin(origin);
+	MsgManager::GetInstance()->DisplayMsg("메인", "스테이지설계도 로드완료");
+	return true;
+}
+
 // 플레이어 스폰위치 배열
 void GameDataManager::Character_SpawnPos_Vector(Vector3 * _pos)
 {
@@ -277,6 +308,45 @@ void GameDataManager::Monster_Origin_Data(int _monstercode, const Monster *& _mo
 		break;
 	case BOSS_SPIDER:
 		_monster = m_monsterdata->GetBossSpider();
+		break;
+	case DOG:
+		_monster = m_monsterdata->GetDog();
+		break;
+	case ORCCANNONSOLDIER:
+		_monster = m_monsterdata->GetOrcCannonSoldier();
+		break;
+	case KING_OF_THEAXE:
+		_monster = m_monsterdata->GetKingOfTheAxe();
+		break;
+	case BEAR:
+		_monster = m_monsterdata->GetBear();
+		break;
+	case DINOSAUR:
+		_monster = m_monsterdata->GetDinosaur();
+		break;
+	case DRAGON:
+		_monster = m_monsterdata->GetDragon();
+		break;
+	}
+}
+
+// 스테이지 번호 따라 설계도 가져옴
+void GameDataManager::Stage_Origin_Data(int _stage_num, const StageInfo *& _stage)
+{
+	switch (_stage_num)
+	{
+	case DUNGEON_STAGE_NORMAL_1:
+		_stage = m_stagedata->GetFirstStage();
+		break;
+	case DUNGEON_STAGE_NORMAL_2:
+		_stage = m_stagedata->GetSecondStage();
+		break;
+	case DUNGEON_STAGE_NORMAL_3:
+		_stage = m_stagedata->GetThirdStage();
+		break;
+	case DUNGEON_STAGE_BOSS_4:
+		break;
+	default:
 		break;
 	}
 }

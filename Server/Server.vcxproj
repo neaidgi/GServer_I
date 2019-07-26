@@ -168,6 +168,7 @@
     <ClCompile Include="PartySystem.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="SpawnData.cpp" />
+    <ClCompile Include="StageData.cpp" />
     <ClCompile Include="TCPClient.cpp" />
     <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
@@ -213,6 +214,8 @@
     <ClInclude Include="PartySystem.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="SpawnData.h" />
+    <ClInclude Include="StageData.h" />
+    <ClInclude Include="StageInfo.h" />
     <ClInclude Include="TCPClient.h" />
     <ClInclude Include="TCPServer.h" />
     <ClInclude Include="ThreadManager.h" />

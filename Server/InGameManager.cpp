@@ -1374,6 +1374,9 @@ void InGameManager::User_Unpack_Monster_Move(User * _user, char * _buf, int& _co
 		return;
 	}
 
+	// 이동검증
+
+
 	// 몬스터 정보 저장
 	partyroom->SetMonsterinfo(monster_code, monster_num, curPos);
 
@@ -1798,18 +1801,18 @@ void InGameManager::User_Send_LeaveInfoToOther(User * _user, UINT64 _p, char * _
 	// 파티에 속해있으며 파티방장이 아니면 그냥 파티원들한테 보낸다
 	if (_user->isParty() && _user->isPartyLeader() == false)
 	{
-		User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_LEAVE_RESULT, _data, _datasize);
+		User_Send_Party_ToOther(_user, PROTOCOL_PARTY_USER_LEAVE_INFO, _data, _datasize);
 	}// 파티에 속해있으며 파티방장이면 파티방 터트린다.
 	else if (_user->isParty() && _user->isPartyLeader())
 	{
-		User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_ROOM_REMOVE_RESULT, buf, datasize);
+		User_Send_Party_ToOther(_user, PROTOCOL_PARTY_ROOM_REMOVE_RESULT, buf, datasize);
 
 		// 파티없앤다
 		User_Remove_PartyRoom(_user);
 	}
 }
 
-// 채널이동해서 떠났을때 그전에 채널에있는 유저들한테 전송
+// 특정 채널에 속해있는 유저들한테 전송(채널이동할때 사용)
 void InGameManager::User_Send_In_a_Particular_Channel(User * _user, UINT64 _p, int _channelnum, char * _data, int & _datasize)
 {
 	User* user = nullptr;
@@ -1917,22 +1920,25 @@ void InGameManager::User_Send_Party_ToOther(User * _user, UINT64 _p, char * _dat
 
 	while (partyroom->SearchPartyRoom(user))
 	{
-		if (user->isIngame() && user->getSocket() != _user->getSocket())
+		if (user != nullptr)
 		{
-			user->Quepack(_p, _data, _datasize);
-			if (user->isSending() == false)
+			if (user->isIngame() && user->getSocket() != _user->getSocket())
 			{
-				if (user->TakeOutSendPacket())
+				user->Quepack(_p, _data, _datasize);
+				if (user->isSending() == false)
 				{
-					user->IOCP_SendMsg();
+					if (user->TakeOutSendPacket())
+					{
+						user->IOCP_SendMsg();
+					}
 				}
+				// 메세지
+				//char msg[BUFSIZE];
+				//memset(msg, 0, sizeof(msg));
+				//sprintf(msg, "User_Send_Party_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+				//	_p, _datasize, user->GetSendQueueSize());
+				//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 			}
-			// 메세지
-			//char msg[BUFSIZE];
-			//memset(msg, 0, sizeof(msg));
-			//sprintf(msg, "User_Send_Party_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-			//	_p, _datasize, user->GetSendQueueSize());
-			//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 	}
 }
@@ -2322,6 +2328,15 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					break;
 				}
 
+				// 유저가 죽어있다면
+				if (_user->GetCurCharacter_IsLive() == false)
+				{
+					User_Pack_Under_Attack_Result(_user, false, 0, flag);
+
+					result = RT_INGAME_ATTACK_RESULT;
+					break;
+				}
+
 				// 몬스터가 없으면
 				if (partyroom->GetMonsterinfo(monstercode, monsternum, monster) == false)
 				{
@@ -2337,7 +2352,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				}
 
 				// 몬스터가 이미 죽었으면
-				if (monster->GetMonsterActivate() == false)
+				if (monster->GetMonsterActivate() == false )
 				{
 					// 메세지
 					//memset(msg, 0, sizeof(msg));
@@ -2517,7 +2532,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 						// 파티원들 한테는 나갔다라는 코드만 알려주기
 						User_Pack_Party_KickInfo(_user, rdata, rdatasize, charactercode);
 						sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_KICK_INFO);
-						User_Send_Party_ToOther(_user, SERVER_INGAME_PARTY_USER_KICK_INFO, rdata, rdatasize);
+						User_Send_Party_ToOther(_user, sendprotocol, rdata, rdatasize);
 
 						// 파티리더(현재유저)에게는 파티강퇴 실패여부를 알려준다. 그리고 강퇴당한 친구 코드를 넣어준다.
 						User_Pack_Party_Result_Code(_user, true, charactercode, buf, datasize);

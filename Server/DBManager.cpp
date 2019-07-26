@@ -832,6 +832,180 @@ bool DBManager::Monster_Req_AttackInfo(Monster * _monster_out[])
 	}
 }
 
+// 스테이지 정보 요청
+bool DBManager::Stage_Req_StageInfo(StageInfo * _stage_out[])
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT *";
+	int state = 0;
+	int count = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	{
+		sprintf(query, "%s FROM stageinfo", base_query);
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		while (1)
+		{
+			sql_row = mysql_fetch_row(sql_result);
+
+			if (sql_row == nullptr)
+			{
+				break;
+			}
+
+			count = atoi(sql_row[1]);
+
+			switch (count)
+			{
+			case 1:
+				_stage_out[0]->SetStage_Num(atoi(sql_row[1]));
+				break;
+			case 2:
+				_stage_out[1]->SetStage_Num(atoi(sql_row[1]));
+				break;
+			case 3:
+				_stage_out[2]->SetStage_Num(atoi(sql_row[1]));
+				break;
+			default:
+				break;
+			}
+		}
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Monster_Req_AttackInfo error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
+// 스테이지 몬스터 정보 요청
+bool DBManager::Stage_Req_StageMonsterInfo(StageInfo * _stage_out[])
+{
+	MYSQL_RES *sql_result;  // the results
+	MYSQL_ROW sql_row;      // the results row (line by line)
+
+	char* base_query = "SELECT *";
+	int state = 0;
+	int id = 0;
+
+	char query[255];
+	memset(query, 0, sizeof(query));
+
+	/*
+	*	쿼리문 만들기
+	*/
+
+	// 쿼리 입력 // code, jobname, nick, level
+	{
+		sprintf(query, "%s FROM stagemonsterinfo", base_query);
+	}
+
+	/*
+	*	끝
+	*/
+
+	// 쿼리 날리기
+	state = mysql_query(mysql, query);
+
+	// 성공
+	if (state == 0)
+	{
+		sql_result = mysql_store_result(mysql);
+
+		while (1)
+		{
+			sql_row = mysql_fetch_row(sql_result);
+
+			if (sql_row == nullptr)
+			{
+				break;
+			}
+
+			id = atoi(sql_row[0]);
+
+			switch (id)
+			{
+			case 10:
+				_stage_out[0]->SetStage_NormalFisrtMonster_Code(atoi(sql_row[1]));
+				_stage_out[0]->SetStage_NormalFisrtMonster_Num(atoi(sql_row[2]));
+				break;
+			case 11:
+				_stage_out[0]->SetStage_NormalSecondMonster_Code(atoi(sql_row[1]));
+				_stage_out[0]->SetStage_NormalSecondMonster_Num(atoi(sql_row[2]));
+				break;
+			case 12:
+				_stage_out[0]->SetStage_BossMonster_Code(atoi(sql_row[1]));
+				break;
+			case 20:
+				_stage_out[1]->SetStage_NormalFisrtMonster_Code(atoi(sql_row[1]));
+				_stage_out[1]->SetStage_NormalFisrtMonster_Num(atoi(sql_row[2]));
+				break;
+			case 21:
+				_stage_out[1]->SetStage_NormalSecondMonster_Code(atoi(sql_row[1]));
+				_stage_out[1]->SetStage_NormalSecondMonster_Num(atoi(sql_row[2]));
+				break;
+			case 22:
+				_stage_out[1]->SetStage_BossMonster_Code(atoi(sql_row[1]));
+				break;
+			case 30:
+				_stage_out[2]->SetStage_NormalFisrtMonster_Code(atoi(sql_row[1]));
+				_stage_out[2]->SetStage_NormalFisrtMonster_Num(atoi(sql_row[2]));
+				break;
+			case 31:
+				_stage_out[2]->SetStage_NormalSecondMonster_Code(atoi(sql_row[1]));
+				_stage_out[2]->SetStage_NormalSecondMonster_Num(atoi(sql_row[2]));
+				break;
+			case 32:
+				_stage_out[2]->SetStage_BossMonster_Code(atoi(sql_row[1]));
+				break;
+			default:
+				break;
+			}
+		}
+
+		/*
+		* result 지시자와 관련된 점유 메모리를 해제한다.
+		*/
+		mysql_free_result(sql_result);
+
+		return true;
+	}
+	else
+	{
+		fprintf(stderr, "Mysql Monster_Req_AttackInfo error : %s \n", mysql_error(mysql));
+		return false;
+	}
+}
+
 // 캐릭터 삭제
 bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 {

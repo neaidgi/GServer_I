@@ -382,6 +382,8 @@ Character* CharacterManager::CharacterSelect(User* _user, SlotData*& _slotdata, 
 	player->SetCharacter_INT(origin->GetCharacter_INT());
 	player->SetCharacter_HP(origin->GetCharacter_HP());
 	player->SetCharacter_MP(origin->GetCharacter_MP());
+	player->SetCharacter_Current_HP(origin->GetCharacter_HP());
+	player->SetCharacter_Current_MP(origin->GetCharacter_MP());
 	player->SetCharacter_AttackPoint(origin->GetCharacter_AttackPoint());
 	player->SetCharacter_DefensePoint(origin->GetCharacter_DefensePoint());
 	player->SetCharacter_Speed(origin->GetCharacter_Speed());
@@ -574,7 +576,6 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 // 캐릭터 삭제
 bool CharacterManager::DeleateCharacter(User * _user, char * _buf)
 {
-	PROTOCOL sendprotocol;
 	int index = 0;
 	int size = 0;
 	bool enter = true;

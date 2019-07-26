@@ -225,6 +225,9 @@
     <ClCompile Include="MonsterTime.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="StageData.cpp">
+      <Filter>소스 파일\GameData</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Packet.h">
@@ -355,6 +358,12 @@
     </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>헤더 파일\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="StageData.h">
+      <Filter>헤더 파일\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="StageInfo.h">
+      <Filter>헤더 파일\GameData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
