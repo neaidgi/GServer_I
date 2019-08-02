@@ -9,8 +9,21 @@ void CharacterVerification::Initialize(float _CommuTime, float _Move_MarginofErr
 }
 
 // 이동 검증 함수
-bool CharacterVerification::CharacterMoveVerificate(Vector3 _curPos, Vector3 _prePos, float _speed)
+bool CharacterVerification::CharacterMoveVerificate(Vector3 _curPos, Vector3 _prePos, int _distance)
 {
+	char msg[BUFSIZE];
+	memset(msg, 0, sizeof(msg));
+
+	int range = m_collision->Distance(_curPos, _prePos);
+
+	if (m_collision->Distance(_curPos, _prePos) > _distance)
+	{
+		sprintf(msg, "[이동 판정 : 이동 실패]");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		return false;
+	}
+	sprintf(msg, "[이동 판정 : 이동 성공]");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	return true;
 }
 

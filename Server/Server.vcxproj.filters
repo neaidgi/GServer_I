@@ -109,6 +109,9 @@
     <Filter Include="헤더 파일\Time">
       <UniqueIdentifier>{828143f8-4c0f-4972-9cdb-33c55a96edfe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Math">
+      <UniqueIdentifier>{320e0bce-42cb-474c-baa6-d34616cb1dfb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainManager.cpp">
@@ -227,6 +230,9 @@
     </ClCompile>
     <ClCompile Include="StageData.cpp">
       <Filter>소스 파일\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="RandomNumberManager.cpp">
+      <Filter>소스 파일\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -364,6 +370,9 @@
     </ClInclude>
     <ClInclude Include="StageInfo.h">
       <Filter>헤더 파일\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomNumberManager.h">
+      <Filter>헤더 파일\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

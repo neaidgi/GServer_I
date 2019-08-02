@@ -81,6 +81,12 @@ DWORD ThreadManager::CommunicationProcess(LPVOID arg)
 	return 1;
 }
 
+//DWORD ThreadManager::MonsterSpawnTimerProcess(LPVOID arg)
+//{
+//	// 몬스터 타이머 함수 만들기
+//	return 1;
+//}
+
 void* ThreadManager::getData(DWORD threadID)
 {
 	ThreadData* data;

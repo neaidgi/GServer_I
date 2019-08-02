@@ -9,7 +9,7 @@ double MonsterTime::End_Time()
 {
 	end = clock();
 
-	result = (double)(end - start) / CLOCKS_PER_SEC;;
+	result = (double)(end - start) / CLOCKS_PER_SEC;
 
 	return 	result; ;
 }

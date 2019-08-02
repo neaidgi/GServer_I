@@ -10,7 +10,6 @@ private:
 	clock_t start, end;
 	double result;
 
-
 public:
 	MonsterTime() { result = 0; }
 	~MonsterTime() {}

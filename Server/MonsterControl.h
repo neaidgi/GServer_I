@@ -95,15 +95,12 @@ public:
 	bool GetMonsterList_Empty();
 	// 스테이지 몬스터 저장
 	void Stage_SetMonster(int _code[],int _num[]);
-	// 첫번째 스테이지 일반몹 저장
-	void SetFirstStage_NormalMonster();
-	// 첫번째 스테이지 보스몹 저장
-	void SetFirstStage_BossMonster();
+	// 스테이지 보스 몬스터 저장
+	void Stage_SetBossMonster(int _code, int _num);
+	// 몬스터 몇마리인지
+	int GetMonsterNum(int _code);
 	// 몬스터 체력 감소
 	bool Monster_HP_Down(int _monster_code, int _monster_num, int _damage);
-
-	// 임시 스테이지 일반몹 저장
-	void SetTestState();
 };
 
 #endif

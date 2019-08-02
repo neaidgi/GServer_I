@@ -15,8 +15,6 @@ class PartyRoom
 private:
 	// 파티 번호
 	int partyroom_num;			
-	// 던전 스테이지 번호
-	DUNGEON_STAGE m_dungeon_stage_num;
 	// 파티 유저 리스트
 	std::list<User*> m_partyuser;	
 	std::list<User*>::iterator save;
@@ -27,6 +25,7 @@ private:
 	StageInfo* m_stage_info;
 
 public:
+	PartyRoom();
 	PartyRoom(int _partyroomnum);
 	~PartyRoom();
 
@@ -68,11 +67,13 @@ public:
 
 
 	// 스테이지 변경
-	void SetDungeonStage(DUNGEON_STAGE _stage_num) { m_stage_info->SetStage_Num(_stage_num); }
+	void SetDungeonStage(int _stage_num) { m_stage_info->SetStage_Num(_stage_num); }
 	// 지금 몇번째 스테이지인지
 	int GetDungeonStage() { return m_stage_info->GetStage_Num(); }
 	// 몬스터 종류는 몇마리인지
 	int GetMonsterTypes() { return m_monster_control->GetMonsterTypes(); }
+	// 지금 보스 스테이지인지
+	bool GetIsBossStage() { return m_stage_info->GetStage_Is_Boss_Stage(); }
 
 	// 몬스터 검색 초기화
 	void StartSearchMonsterinfo();
@@ -87,7 +88,9 @@ public:
 	// 몬스터 시간 지났는지 확인
 	bool End_MonsterTimer(int _code, int _num);
 	// 몬스터 코드 반환
-	int GetMonsterCode(int _count);
+	int GetMonsterCode(int _code);
+	// 특정 몬스커 몇마리 인지
+	int GetMonsterNum(int _code);
 	// 몬스터 정보 요청
 	bool GetMonsterinfo(int _monster_code, int _monster_num, MonsterInfo*& _monsterinfo);
 	// 몬스터 저장(몬스터코드,몬스터번호) - 새롭게 저장할때

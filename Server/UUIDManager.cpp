@@ -29,7 +29,11 @@ UUIDManager * UUIDManager::GetInstance()
 
 void UUIDManager::DestroyInstance()
 {
-	delete Instance;
+	if (Instance != nullptr)
+	{
+		delete Instance;
+		Instance = nullptr;
+	}
 }
 
 bool UUIDManager::InitializeManager()

@@ -15,6 +15,8 @@ private:
 	int m_normal_monster_code[STAGE_MONSTER_NUM];
 	// 보스몹 코드
 	int m_boss_monster_code;
+	// 일반스테이지인지 보스 인지
+	bool m_is_boss_stage;
 
 public:
 
@@ -32,6 +34,7 @@ public:
 	}
 	int GetStage_BossMonster() const { return m_boss_monster_code; }
 
+	bool GetStage_Is_Boss_Stage() const { return m_is_boss_stage; }
 
 	void SetStage_Num(int _stage_num) { m_stage_num = _stage_num; }
 	void SetStage_NormalMonster_Num(int _normalmonster_num[])
@@ -68,6 +71,8 @@ public:
 
 	void SetStage_BossMonster_Code(const int& _bossmonster_code) { m_boss_monster_code = _bossmonster_code; }
 
+	void SetStage_Normal() { m_is_boss_stage = false; }
+	void SetStage_Boss() { m_is_boss_stage = true; }
 
 	StageInfo()
 	{
@@ -76,6 +81,7 @@ public:
 		m_normal_monster_num[1] = 0;
 		m_normal_monster_code[0] = 0;
 		m_normal_monster_code[1] = 0;
+		m_is_boss_stage = false;
 	}
 	~StageInfo()
 	{
@@ -90,6 +96,7 @@ public:
 		m_normal_monster_code[0] = rhs.m_normal_monster_code[0];
 		m_normal_monster_code[1] = rhs.m_normal_monster_code[1];
 		m_boss_monster_code = rhs.m_boss_monster_code;
+		m_is_boss_stage = rhs.m_is_boss_stage;
 		return *this;
 	}
 

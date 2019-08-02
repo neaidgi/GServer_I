@@ -2,12 +2,18 @@
 
 // Class PartyRoom
 
+PartyRoom::PartyRoom()
+{
+	partyroom_num = 0;
+	m_monster_control = nullptr;
+	m_stage_info = nullptr;
+}
+
 PartyRoom::PartyRoom(int _partyroomnum)
 {
 	m_monster_control = new MonsterControl();
 	m_stage_info = new StageInfo();
 	partyroom_num = _partyroomnum;
-	m_dungeon_stage_num = DEFAULT_STAGE;
 }
 
 PartyRoom::~PartyRoom()
@@ -247,34 +253,47 @@ void PartyRoom::RiseStage()
 	{
 	case DEFAULT_STAGE:
 		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_1, stageinfo);
-		m_stage_info->SetStage_Num(stageinfo->GetStage_Num());
+		m_stage_info->SetStage_Num(DUNGEON_STAGE_NORMAL_1);
 		stageinfo->GetStage_NormalMonster(code);
 		stageinfo->GetStage_NormalMonster_Num(num);
 		m_stage_info->SetStage_NormalMonster_Code(code);
 		m_stage_info->SetStage_NormalMonster_Num(num);
-		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
+		m_stage_info->SetStage_Normal();
 		break;
 	case DUNGEON_STAGE_NORMAL_1:
+		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_1, stageinfo);
+		m_stage_info->SetStage_Num(DUNGEON_STAGE_BOSS_1);
+		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
+		m_stage_info->SetStage_Boss();
+		break;
+	case DUNGEON_STAGE_BOSS_1:
 		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_2, stageinfo);
-		m_stage_info->SetStage_Num(stageinfo->GetStage_Num());
+		m_stage_info->SetStage_Num(DUNGEON_STAGE_NORMAL_2);
 		stageinfo->GetStage_NormalMonster(code);
 		stageinfo->GetStage_NormalMonster_Num(num);
 		m_stage_info->SetStage_NormalMonster_Code(code);
 		m_stage_info->SetStage_NormalMonster_Num(num);
-		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
+		m_stage_info->SetStage_Normal();
 		break;
 	case DUNGEON_STAGE_NORMAL_2:
-		m_dungeon_stage_num = DUNGEON_STAGE_BOSS_1;
+		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_2, stageinfo);
+		m_stage_info->SetStage_Num(DUNGEON_STAGE_BOSS_2);
+		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
+		m_stage_info->SetStage_Boss();
+		break;
+	case DUNGEON_STAGE_BOSS_2:
 		GameDataManager::GetInstance()->Stage_Origin_Data(DUNGEON_STAGE_NORMAL_3, stageinfo);
-		m_stage_info->SetStage_Num(stageinfo->GetStage_Num());
+		m_stage_info->SetStage_Num(DUNGEON_STAGE_NORMAL_3);
 		stageinfo->GetStage_NormalMonster(code);
 		stageinfo->GetStage_NormalMonster_Num(num);
 		m_stage_info->SetStage_NormalMonster_Code(code);
 		m_stage_info->SetStage_NormalMonster_Num(num);
-		m_stage_info->SetStage_BossMonster_Code(stageinfo->GetStage_BossMonster());
+		m_stage_info->SetStage_Normal();
 		break;
 	case DUNGEON_STAGE_NORMAL_3:
 	
+		break;
+	case DUNGEON_STAGE_BOSS_3:
 		break;
 	default:
 		break;
@@ -289,13 +308,25 @@ void PartyRoom::SetDungeonMonsterinfo()
 	{
 		m_monster_control->ResetMonsterInfo();
 	}
-	int code[2];
-	int num[2];
 
-	m_stage_info->GetStage_NormalMonster(code);
-	m_stage_info->GetStage_NormalMonster_Num(num);
+	// 일반 스테이지면
+	if (m_stage_info->GetStage_Is_Boss_Stage() == false)
+	{
+		int code[2];
+		int num[2];
+		
+		m_stage_info->GetStage_NormalMonster(code);
+		m_stage_info->GetStage_NormalMonster_Num(num);
+		m_monster_control->Stage_SetMonster(code, num);
+	}
+	else // 보스 스테이지이면
+	{
+		int bosscode = 0;
+		int bossnum = 0;
 
-	m_monster_control->Stage_SetMonster(code, num);
+		bosscode = m_stage_info->GetStage_BossMonster();
+		m_monster_control->Stage_SetBossMonster(bosscode, bossnum);
+	}
 }
 
 // 몬스터 시간 초기화
@@ -311,9 +342,15 @@ bool PartyRoom::End_MonsterTimer(int _code, int _num)
 }
 
 // 몬스터 코드 반환
-int PartyRoom::GetMonsterCode(int _count)
+int PartyRoom::GetMonsterCode(int _code)
 {
-	return m_monster_control->GetMonsterCode_vector(_count);
+	return m_monster_control->GetMonsterCode_vector(_code);
+}
+
+// 특정 몬스커 몇마리 인지
+int PartyRoom::GetMonsterNum(int _code)
+{
+	return m_monster_control->GetMonsterNum(_code);
 }
 
 // 몬스터 정보 요청
@@ -345,8 +382,6 @@ bool PartyRoom::Monster_HP_Down(int _monster_code, int _monster_num, int _damage
 {
 	return m_monster_control->Monster_HP_Down(_monster_code,_monster_num,_damage);
 }
-
-
 
 
 

@@ -33,7 +33,7 @@ void MonsterInfo::InitMonsterTime()
 bool MonsterInfo::Is_End_MonsterTime()
 {
 	double time = m_monster_time->End_Time();
-	
+
 	// 메세지
 	//char msg[BUFSIZE];
 	//memset(msg, 0, sizeof(msg));
@@ -106,7 +106,7 @@ Monster * MonsterControl::MonsterSelect(int _monster_code)
 	Monster* monster = new Monster();
 	const Monster* origin_monster = nullptr;
 	GameDataManager::GetInstance()->Monster_Origin_Data(_monster_code, origin_monster);
-	 
+
 	monster->SetMonster_AttackPoint(origin_monster->GetMonster_AttackPoint());
 	monster->SetMonster_Code(origin_monster->GetMonster_Code());
 	monster->SetMonster_DefensePoint(origin_monster->GetMonster_DefensePoint());
@@ -145,7 +145,10 @@ void MonsterControl::InitMonsterTime(int _code, int _num)
 bool MonsterControl::Is_End_MonsterTime(int _code, int _num)
 {
 	MonsterInfo* monsterinfo = nullptr;
-	GetMonsterinfo(_code, _num, monsterinfo);
+	if (GetMonsterinfo(_code, _num, monsterinfo) == false)
+	{
+		return false;
+	}
 
 	return 	monsterinfo->Is_End_MonsterTime();
 }
@@ -154,6 +157,8 @@ bool MonsterControl::Is_End_MonsterTime(int _code, int _num)
 bool MonsterControl::GetMonsterinfo(int _monster_code, int _monster_num, MonsterInfo *& _monsterinfo)
 {
 	MonsterInfo* monsterinfo = nullptr;
+
+	CThreadSync cs;
 
 	StartSearchMonsterinfo();
 	while (SearchMonsterinfo(monsterinfo))
@@ -164,7 +169,6 @@ bool MonsterControl::GetMonsterinfo(int _monster_code, int _monster_num, Monster
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -183,7 +187,7 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num)
 }
 
 // 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
-void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num,const Vector3 _pos)
+void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos)
 {
 	MonsterInfo* monsterinfo = nullptr;
 	GetMonsterinfo(_monster_code, _monster_num, monsterinfo);
@@ -194,6 +198,8 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num,const Ve
 bool MonsterControl::RemoveMonsterInfo(int _monster_code, int _monster_num)
 {
 	MonsterInfo* monsterinfo = nullptr;
+
+	CThreadSync cs;
 
 	StartSearchMonsterinfo();
 	while (SearchMonsterinfo(monsterinfo))
@@ -216,9 +222,9 @@ void MonsterControl::ResetMonsterInfo()
 	MonsterInfo* target = nullptr;
 	MONSTER_ORIGINCODE code;
 
-	for (m_monsterinfo_save = m_monsterinfo_list.begin(); m_monsterinfo_save != m_monsterinfo_list.end(); ++m_monsterinfo_save)
+	for (list<MonsterInfo*>::iterator monsterinfo_save = m_monsterinfo_list.begin(); monsterinfo_save != m_monsterinfo_list.end(); ++monsterinfo_save)
 	{
-		target = (*m_monsterinfo_save);
+		target = (*monsterinfo_save);
 		m_monsterinfo_list.remove(target);
 		delete target;
 	}
@@ -244,40 +250,32 @@ void MonsterControl::Stage_SetMonster(int _code[], int _num[])
 		}
 		AddMonsterCode_vector(_code[i]);
 	}
-}
-
-// 첫번째 스테이지 일반몹 저장
-void MonsterControl::SetFirstStage_NormalMonster()
-{
-	// 거미 저장
-	for (int i = 0; i < FIRSTSTAGE_NORMALMONSTER_1; i++)
-	{
-		SetMonsterinfo(SPIDER, i);
-	}
-	//애벌래 저장
-	for (int i = 0; i < FIRSTSTAGE_NORMALMONSTER_1; i++)
-	{
-		SetMonsterinfo(WORM, i);
-	}
-
-	AddMonsterCode_vector(SPIDER);
-	AddMonsterCode_vector(WORM);
-
 	monster_types_num = m_monstercode_vector.size();
 }
 
-// 첫번째 스테이지 보스몹 저장
-void MonsterControl::SetFirstStage_BossMonster()
+// 스테이지 보스 몬스터 저장
+void MonsterControl::Stage_SetBossMonster(int _code, int _num)
 {
-	// 보스 거미 저장
-	for (int i = 0; i < 1; i++)
-	{
-		SetMonsterinfo(BOSS_SPIDER, i);
-	}
-
-	AddMonsterCode_vector(BOSS_SPIDER);
-
+	SetMonsterinfo(_code, _num);
+	AddMonsterCode_vector(_code);
 	monster_types_num = m_monstercode_vector.size();
+}
+
+// 몬스터 몇마리인지
+int MonsterControl::GetMonsterNum(int _code)
+{
+	CThreadSync cs;
+	MonsterInfo* target = nullptr;
+	int count = 0;
+	for (m_monsterinfo_save = m_monsterinfo_list.begin(); m_monsterinfo_save != m_monsterinfo_list.end(); ++m_monsterinfo_save)
+	{
+		target = (*m_monsterinfo_save);
+		if (target->GetMonster()->GetMonster_Code() == _code)
+		{
+			target++;
+		}	
+	}
+	return count;
 }
 
 // 몬스터 체력 감소
@@ -307,17 +305,3 @@ bool MonsterControl::Monster_HP_Down(int _monster_code, int _monster_num, int _d
 		return true;
 	}
 }
-
-// 임시 스테이지 일반몹 저장
-void MonsterControl::SetTestState()
-{
-	// 임시 곰 저장
-	for (int i = 0; i < TESTSTAGE_MONSTER; i++)
-	{
-		SetMonsterinfo(SPIDER, i);
-	}
-	AddMonsterCode_vector(SPIDER);
-
-	monster_types_num = m_monstercode_vector.size();
-}
-

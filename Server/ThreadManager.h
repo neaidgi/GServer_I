@@ -35,6 +35,7 @@ public:
 	static DWORD WINAPI ThreadProcess(LPVOID arg);
 	//static DWORD WINAPI TenderProcess(LPVOID arg);
 	static DWORD WINAPI CommunicationProcess(LPVOID arg);
+	//static DWORD WINAPI MonsterSpawnTimerProcess(LPVOID arg);
 	void* getData(DWORD threadID);
 	void startSearch();
 	bool searchData(ThreadData*& data);

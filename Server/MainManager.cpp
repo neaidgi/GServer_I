@@ -5,6 +5,7 @@
 #include "GameManager.h"
 #include "InGameManager.h"
 #include "UUIDManager.h"
+#include "RandomNumberManager.h"
 
 MainManager* MainManager::Instance = nullptr;
 
@@ -35,6 +36,7 @@ void MainManager::CreateInstance()
 		EncryptManager::CreateInstance(ENCRYPT_KEY);
 		InGameManager::CreateInstance();
 		UUIDManager::CreateInstance();
+		RandomNumberManager::CreateInstance();
 	}
 }
 MainManager* MainManager::GetInstance()
@@ -48,6 +50,7 @@ void MainManager::DestroyInstance()
 		delete Instance;
 		Instance = nullptr;
 
+		RandomNumberManager::DestroyInstance();
 		UUIDManager::DestroyInstance();
 		InGameManager::DestroyInstance();
 		GameDataManager::DestroyInstance();
@@ -152,7 +155,8 @@ bool MainManager::MangerInitialize()
 	ErrorManager::GetInstance()->InitializeManager();
 
 	UUIDManager::GetInstance()->InitializeManager();
-
+	RandomNumberManager::GetInstance()->InitializeManager();
+	
 	MsgManager::GetInstance()->DisplayMsg("메인","데이터베이스 초기화중");
 	// DB 연동
 	if (DBManager::GetInstance()->InitializeDB() == false)
@@ -209,7 +213,7 @@ void MainManager::EndManager()
 	DBManager::GetInstance()->EndManager();
 	MsgManager::GetInstance()->EndManager();
 	UUIDManager::GetInstance()->EndManager();
-
+	RandomNumberManager::GetInstance()->EndManager();
 	// 윈속 종료
 	WSACleanup();	// 소켓 DLL 메모리 해제
 }

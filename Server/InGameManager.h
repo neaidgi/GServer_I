@@ -11,6 +11,8 @@
 #include "CriticalSectionManager.h"
 #include "ChannelSystem.h"
 #include "GameDataManager.h"
+#include "ThreadManager.h"
+#include "RandomNumberManager.h"
 
 class InGameManager : public CMultiThreadSync<InGameManager>
 {
@@ -95,6 +97,8 @@ private:
 	void User_Pack_Party_Dungeon_Stage_SpawnData(User* _user, char* _data, int& _datasize);
 	// 던전 스테이지 입장시 몬스터 정보.
 	void User_Pack_Dungeon_Monster_SpawnInfo(User* _user, char* _data, int& _datasize);
+	// 던전 스테이지 입장시 몬스터 정보.(몬스터코드,몬스터숫자,스폰될좌표)
+	void User_Pack_Dungeon_Monster_SpawnInfo(User* _user, char* _data, int& _datasize, int _code, int _num, Vector3 _pos);
 	// 공격정보 패킹(유저코드,공격정보)
 	void User_Pack_AttackNum_Info(User* _user, char* _data, int& _datasize, int _attacknum);
 	// 공격정보 패킹(몬스터코드,몬스터번호,공격번호)
@@ -138,6 +142,10 @@ private:
 	// 해당 유저의 파티의 몬스터 시간이 정해둔 시간을 지났는가.
 	bool User_PartyRoom_Monster_TimeOver_Check(User* _user, int _code, int _num);
 
+
+	// 스레드 함수(몬스터 스폰)
+	static DWORD WINAPI MonsterSpawnTimerProcess(LPVOID _user);
+
 public:
 	static void CreateInstance();
 	static InGameManager* GetInstance();
@@ -157,7 +165,6 @@ public:
 	void User_Leave_Channel(User* _user);
 	// 특정 채널 나가기
 	bool User_Leave_Channel(User* _user, int _channelnum);
-
 
 	// 파티방 생성
 	bool User_Create_PartyRoom(User* _user);
@@ -182,6 +189,9 @@ public:
 	// 던전 채널 나가기
 	void User_LeaveInDun_Channel(User* _user);
 
+	// 파티방 전달
+	PartyRoom* GetPartyRoomSearch(User* _user);
+	
 };
 
 #endif

@@ -16,6 +16,84 @@ InGameManager::~InGameManager()
 	delete m_partysystem;
 }
 
+// 스레드 함수(몬스터 스폰)
+DWORD __stdcall InGameManager::MonsterSpawnTimerProcess(LPVOID _user)
+{
+	User* user = (User*)_user;
+
+	char buf[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	char* ptr = buf;
+
+	UINT64 sendprotocol = 0;
+	// 타이머
+	MonsterTime monster_timer;
+	int time = 0;
+	int datasize = 0;
+
+	int monstercode = 0;
+	int monsternum = 0;
+	int monster_typecount = 0;
+	int monster_maxnum = 0;
+	int spawnposcount = 0;
+	int spawnpos_maxcount = 2;
+	Vector3 pos[MONSTER_SPAWNPOS_MAXCOUNT];
+	GameDataManager::GetInstance()->Dungeon_Monster_SpawnPos_Vector(pos);
+
+	PartyRoom* partyroom = InGameManager::GetInstance()->GetPartyRoomSearch(user);
+
+	if (partyroom == nullptr)
+	{
+		return 1;
+	}
+
+	monster_typecount = partyroom->GetMonsterTypes();
+
+	// 타이머 시작
+	monster_timer.Start_Time();
+
+	for (int i = 0; i < monster_typecount; i++)
+	{
+		monstercode = partyroom->GetMonsterCode(i);
+		monster_maxnum = partyroom->GetMonsterNum(monstercode);
+
+		for (int d = 0; d < monster_maxnum; d++)
+		{
+
+			// 타이머 확인
+			if (monster_timer.End_Time() < 1)
+			{
+				continue;
+			}
+
+			// 초기화
+			sendprotocol = 0;
+			memset(buf, 0, sizeof(buf));
+			ptr = buf;
+			datasize = 0;
+
+			if (partyroom->GetIsBossStage())
+			{
+				spawnposcount = BOSS_MONSTER_SPWANPOS_NUM;
+			}
+			else
+			{
+				spawnposcount = RandomNumberManager::GetInstance()->GetRandomNumber(NORMAL_MONSTER_SPAWNPOS_COUNT);
+			}
+
+			InGameManager::GetInstance()->User_Pack_Dungeon_Monster_SpawnInfo(user, buf, datasize, monstercode, d, pos[spawnposcount]);
+			sendprotocol = user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_MONSTER_INFO);
+			InGameManager::GetInstance()->User_Send_Party_ToOther(user, sendprotocol, buf, datasize);
+			user->Quepack(sendprotocol, buf, datasize);
+
+		}
+	}
+
+	monster_timer.Start_Time();
+
+
+	return 1;
+}
 
 void InGameManager::CreateInstance()
 {
@@ -46,7 +124,7 @@ bool InGameManager::MangerInitialize()
 	channelsystem = new ChannelSystem();
 	m_partysystem = new PartySystem();
 
-	m_verification->Initialize(0,0);
+	m_verification->Initialize(0, 0);
 	channelsystem->InitializeChannel();
 	m_partysystem->InitializePartySystem();
 	return true;
@@ -256,6 +334,7 @@ bool InGameManager::User_Pack_Move(User * _user, char* _buf, int& _datasize, cha
 
 	// 이동검증
 	//
+	//lesult = m_verification->CharacterMoveVerificate(curPos, prePos, _user->GetCurCharacter()->GetCharacter_Speed());
 	//
 	lesult = true;
 
@@ -331,7 +410,6 @@ void InGameManager::User_Pack_Rotation(User * _user, char * _data, int & _datasi
 	//sprintf(msg, "회전 데이터 :: 아이디: [%s] 회전: [%f] [%f] [%f]", _user->getID(), curRot.x, curRot.y,
 	//	curRot.z);
 	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
 }
 
 // 유저 코드 패킹
@@ -862,7 +940,7 @@ void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char * _da
 	Vector3 spawnpos[MONSTER_SPAWNPOS_MAXCOUNT];
 
 	GameDataManager::GetInstance()->Dungeon_Monster_SpawnPos_Vector(spawnpos);
-	
+
 	// 동기화
 	CThreadSync cs;
 
@@ -897,7 +975,7 @@ void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char * _da
 		size += sizeof(int);
 
 		// 몬스터 등장 좌표
-		memcpy(ptr, &spawnpos[i], sizeof(Vector3));
+		memcpy(ptr, &spawnpos[2], sizeof(Vector3));
 		ptr += sizeof(Vector3);
 		size += sizeof(Vector3);
 
@@ -907,6 +985,37 @@ void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char * _da
 			spawnpos[i].z);
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
+
+	_datasize = size;
+}
+
+// 던전 스테이지 입장시 몬스터 정보.(몬스터코드,몬스터숫자,스폰될좌표)
+void InGameManager::User_Pack_Dungeon_Monster_SpawnInfo(User * _user, char* _data, int& _datasize,  int _code, int _num, Vector3 _pos)
+{
+	char* ptr = _data;
+	int size = 0;
+	char msg[BUFSIZE];
+
+	// 몬스터 코드
+	memcpy(ptr, &_code, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	// 몬스터 숫자
+	memcpy(ptr, &_num, sizeof(int));
+	ptr += sizeof(int);
+	size += sizeof(int);
+
+	// 몬스터 등장 좌표
+	memcpy(ptr, &_pos, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+	size += sizeof(Vector3);
+
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "몬스터 스폰 좌표 :: 몬스터 코드: [%d] 몬스터 숫자: [%d] 위치: [%f] [%f] [%f]", _code, _num, _pos.x, _pos.y,
+		_pos.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = size;
 }
@@ -938,7 +1047,7 @@ void InGameManager::User_Pack_AttackNum_Info(User * _user, char * _data, int & _
 
 	// 메세지
 	memset(msg, 0, sizeof(msg));
-	sprintf(msg, "User_Pack_Attack_Info :: 유저의 코드 패킹 : [%s] 유저의 공격번호 : [%d] ", curcharacter->GetCharacter_Code(),_attacknum);
+	sprintf(msg, "User_Pack_Attack_Info :: 유저의 코드 패킹 : [%s] 유저의 공격번호 : [%d] ", curcharacter->GetCharacter_Code(), _attacknum);
 	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 	_datasize = datasize;
@@ -1280,7 +1389,7 @@ void InGameManager::User_Pack_Under_Attack_Result(User * _user, bool _result, in
 		datasize += sizeof(bool);
 
 		memset(msg, 0, sizeof(msg));
-		sprintf(msg, "유저 피격 정보. 코드 : [%s] 입힌 피해량 : [%d]", _user->GetCurCharacter()->GetCharacter_Code(),  _damage);
+		sprintf(msg, "유저 피격 정보. 코드 : [%s] 입힌 피해량 : [%d]", _user->GetCurCharacter()->GetCharacter_Code(), _damage);
 		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 	}
 
@@ -1733,6 +1842,12 @@ void InGameManager::User_LeaveInDun_Channel(User * _user)
 	}
 }
 
+PartyRoom * InGameManager::GetPartyRoomSearch(User * _user)
+{
+	return m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+}
+
+
 // 스테이지 상승 및 몬스터정보 셋팅
 void InGameManager::User_Dungeon_Stage_Rise(User * _user)
 {
@@ -1913,6 +2028,11 @@ void InGameManager::User_Send_Party_ToOther(User * _user, UINT64 _p, char * _dat
 
 	// 동기화
 	CThreadSync cs;
+	
+	if (_user->isParty() == false)
+	{
+		return;
+	}
 
 	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
 
@@ -2189,7 +2309,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				{
 					// 메세지
 					memset(msg, 0, sizeof(msg));
-					sprintf(msg, "공격 피격 판정 : 몬스터가 존재하지않습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode,monsternum);
+					sprintf(msg, "공격 피격 판정 : 몬스터가 존재하지않습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
 					MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_ATTACK_RESULT);
@@ -2217,7 +2337,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 
 				// -- 피격판정 --
 				// 몬스터와 거리가 가까우면
-				if (m_verification->AttackVerificate(user_character->GetPosition(),dir,user_attackinfo.attack_range,user_attackinfo.attack_angle,monster->GetMonster()->GetPosition(),monster->GetMonster()->GetMonsterRange()) == false)
+				if (m_verification->AttackVerificate(user_character->GetPosition(), dir, user_attackinfo.attack_range, user_attackinfo.attack_angle, monster->GetMonster()->GetPosition(), monster->GetMonster()->GetMonsterRange()) == false)
 				{
 					// 메세지
 					//memset(msg, 0, sizeof(msg));
@@ -2306,7 +2426,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				monsternum = 0;
 				attacknum = 0;
 				// 몬스터 공격정보
-				User_Unpack_Monster_Successfully_Attack_The_User(_user,buf,monstercode,monsternum,attacknum, dir);
+				User_Unpack_Monster_Successfully_Attack_The_User(_user, buf, monstercode, monsternum, attacknum, dir);
 
 				// 유저 캐릭터 및 스킬정보 셋팅
 				Character* user_character = _user->GetCurCharacter();
@@ -2352,7 +2472,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				}
 
 				// 몬스터가 이미 죽었으면
-				if (monster->GetMonsterActivate() == false )
+				if (monster->GetMonsterActivate() == false)
 				{
 					// 메세지
 					//memset(msg, 0, sizeof(msg));
@@ -2386,14 +2506,14 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				// -- 데미지 처리 -- 
 				// 피격성공 데미지를 주고 체력이 0이되면 ....
 				flag = _user->CurCharacter_HP_Down(10);
-	
+
 				User_Pack_Under_Attack_Result(_user, true, 10, flag);
 
 				// 다른 유저 패킷처리
 				User_Pack_User_UnderAttackToOher_Result(_user, rdata, rdatasize, 10, flag);
-			
+
 				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_MONSTER_OTHER_ATTACK_RESULT);
-			
+
 				if (_user->isDungeon())
 				{
 					User_Send_Party_ToOther(_user, othersendprotocol, rdata, rdatasize);
@@ -2654,6 +2774,10 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				// 임시로 사용중 스테이지 입장시 몬스터 정보 주는용
 				User_Dungeon_Stage_Rise(_user);
 
+				// 몬스터 스폰 정보를 보내주는 스레드 추가
+				//HANDLE hThread = ThreadManager::GetInstance()->addThread(MonsterSpawnTimerProcess, 0, _user);
+				//CloseHandle(hThread);
+
 				sendprotocol = 0;
 				User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_MONSTER_INFO);
@@ -2867,3 +2991,4 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 
 	return false;
 }
+
