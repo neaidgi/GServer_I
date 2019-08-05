@@ -49,45 +49,60 @@ DWORD __stdcall InGameManager::MonsterSpawnTimerProcess(LPVOID _user)
 
 	monster_typecount = partyroom->GetMonsterTypes();
 
-	// 타이머 시작
-	monster_timer.Start_Time();
-
 	for (int i = 0; i < monster_typecount; i++)
 	{
+		// 파티룸이 없어지면
+		if (partyroom == nullptr)
+		{
+			return 1;
+		}
+
 		monstercode = partyroom->GetMonsterCode(i);
 		monster_maxnum = partyroom->GetMonsterNum(monstercode);
 
 		for (int d = 0; d < monster_maxnum; d++)
 		{
+			// 타이머 시작
+			monster_timer.Start_Time();
 
-			// 타이머 확인
-			if (monster_timer.End_Time() < 1)
+			while (1)
 			{
-				continue;
-			}
+				// 타이머 확인
+				if (monster_timer.End_Time() < 1)
+				{
+					continue;
+				}
 
-			// 초기화
-			sendprotocol = 0;
-			memset(buf, 0, sizeof(buf));
-			ptr = buf;
-			datasize = 0;
+				// 초기화
+				sendprotocol = 0;
+				memset(buf, 0, sizeof(buf));
+				ptr = buf;
+				datasize = 0;
 
-			if (partyroom->GetIsBossStage())
-			{
-				spawnposcount = BOSS_MONSTER_SPWANPOS_NUM;
-			}
-			else
-			{
-				spawnposcount = RandomNumberManager::GetInstance()->GetRandomNumber(NORMAL_MONSTER_SPAWNPOS_COUNT);
-			}
+				// 파티룸이 없어지면
+				if (partyroom == nullptr)
+				{
+					return 1;
+				}
 
-			InGameManager::GetInstance()->User_Pack_Dungeon_Monster_SpawnInfo(user, buf, datasize, monstercode, d, pos[spawnposcount]);
-			sendprotocol = user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_MONSTER_INFO);
-			InGameManager::GetInstance()->User_Send_Party_ToOther(user, sendprotocol, buf, datasize);
-			user->Quepack(sendprotocol, buf, datasize);
+				if (partyroom->GetIsBossStage())
+				{
+					spawnposcount = BOSS_MONSTER_SPWANPOS_NUM;
+				}
+				else
+				{
+					spawnposcount = RandomNumberManager::GetInstance()->GetRandomNumber(NORMAL_MONSTER_SPAWNPOS_COUNT);
+				}
 
-		}
-	}
+				InGameManager::GetInstance()->User_Pack_Dungeon_Monster_SpawnInfo(user, buf, datasize, monstercode, d, pos[spawnposcount]);
+				sendprotocol = user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_MONSTER_INFO);
+				InGameManager::GetInstance()->User_Send_Party_ToOther(user, sendprotocol, buf, datasize);
+				user->Quepack(sendprotocol, buf, datasize);
+
+				break;
+			} // while end
+		} // for(d < monster_maxnum) end
+	} // for ( i < monster_typecount) end
 
 	monster_timer.Start_Time();
 
@@ -1708,6 +1723,7 @@ bool InGameManager::User_Create_PartyRoom(User * _user)
 // 파티방 삭제
 bool InGameManager::User_Remove_PartyRoom(User * _user)
 {
+	CThreadSync cs;
 	return m_partysystem->Party_Remove(_user);
 }
 
@@ -1718,6 +1734,7 @@ bool InGameManager::User_Remove_PartyRoom(char * _code)
 
 	user = UserManager::GetInstance()->getUser(_code);
 
+	CThreadSync cs;
 	return m_partysystem->Party_Remove(user);
 }
 
@@ -1757,6 +1774,7 @@ bool InGameManager::User_PartyRoom_User_Kick(User * _user, char * _code)
 // 파티 유저 탈퇴
 bool InGameManager::User_PartRoom_User_Leave(User * _user)
 {
+	CThreadSync cs;
 	return m_partysystem->Party_User_Leave(_user);;
 }
 
@@ -1792,9 +1810,12 @@ void InGameManager::User_LeaveInDun_Channel(User * _user)
 	int datasize = 0;
 	int rdatasize = 0;
 
+	// 동기화
+	CThreadSync cs;
+
 	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
 
-	if (channelsystem->DungeonLeave(_user->GetPartyNum()) == false)
+	if (partyroom == nullptr || channelsystem->DungeonLeave(_user->GetPartyNum()) == false)
 	{
 		// 던전 채널 나가기 실패. 그런 파티가없읍니다.
 		return;
@@ -2775,14 +2796,14 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				User_Dungeon_Stage_Rise(_user);
 
 				// 몬스터 스폰 정보를 보내주는 스레드 추가
-				//HANDLE hThread = ThreadManager::GetInstance()->addThread(MonsterSpawnTimerProcess, 0, _user);
-				//CloseHandle(hThread);
+				HANDLE hThread = ThreadManager::GetInstance()->addThread(MonsterSpawnTimerProcess, 0, _user);
+				CloseHandle(hThread);
 
-				sendprotocol = 0;
+			/*	sendprotocol = 0;
 				User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_MONSTER_INFO);
 				User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
-				_user->Quepack(sendprotocol, buf, datasize);
+				_user->Quepack(sendprotocol, buf, datasize);*/
 
 				result = RT_INGAME_DUNGEON_STAGE_IN_RESULT;
 				break;

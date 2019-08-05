@@ -272,7 +272,7 @@ int MonsterControl::GetMonsterNum(int _code)
 		target = (*m_monsterinfo_save);
 		if (target->GetMonster()->GetMonster_Code() == _code)
 		{
-			target++;
+			count++;
 		}	
 	}
 	return count;

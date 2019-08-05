@@ -27,7 +27,7 @@ bool CharacterVerification::CharacterMoveVerificate(Vector3 _curPos, Vector3 _pr
 	return true;
 }
 
-// 공격 판정(공격한자 위치, 공격범위, 타겟 위치, 타겟 크기)
+// 공격 판정(공격한자 위치, 공격범위, 타겟 위치, 타겟 크기) - 타입3(폭발형)
 bool CharacterVerification::AttackVerificate(Vector3 _AttackerPos, float _attackerRange, Vector3 _targetPos, float _targetRange)
 {
 	char msg[BUFSIZE];
@@ -44,7 +44,7 @@ bool CharacterVerification::AttackVerificate(Vector3 _AttackerPos, float _attack
 	return true;
 }
 
-// 공격 판정(공격하는자 위치, 공격 방향, 공격범위, 공격 범위 각도, 타겟 위치,타겟 크기)
+// 공격 판정(공격하는자 위치, 공격 방향, 공격범위, 공격 범위 각도, 타겟 위치,타겟 크기) - 타입 1(근접공격형)
 bool CharacterVerification::AttackVerificate(Vector3 _AttackerPos, Vector3 _attackerDir, float _attackerRange, int _attackerAngle, Vector3 _targetPos, float _targetRange)
 {
 	char msg[BUFSIZE];
