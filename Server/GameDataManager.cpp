@@ -142,7 +142,7 @@ bool GameDataManager::Init_Character_Data()
 // 몬스터 설계도 초기화
 bool GameDataManager::Init_Monster_Data()
 {
-	// 캐릭터 정보 가져오기
+	// 몬스터 정보 가져오기
 	Monster * origin[MAXMONSTERORIGIN];
 	for (int i = 0; i < MAXMONSTERORIGIN; i++)
 	{

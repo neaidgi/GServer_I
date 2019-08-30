@@ -591,6 +591,7 @@ bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
 			monster_scale.y = atoi(sql_row[7]);
 			monster_scale.z = atoi(sql_row[8]);
 			_monster_out[i]->SetScale(monster_scale);
+			_monster_out[i]->SetMonster_Is_Boss((char)atoi(sql_row[9]));
 		}
 
 		/*
@@ -701,7 +702,7 @@ bool DBManager::Monster_Req_AttackInfo(Monster * _monster_out[])
 
 	char* base_query = "SELECT *";
 	int state = 0;
-	int count = 0;
+	int code = 0;
 
 	char query[255];
 	memset(query, 0, sizeof(query));
@@ -737,81 +738,42 @@ bool DBManager::Monster_Req_AttackInfo(Monster * _monster_out[])
 				break;
 			}
 
-			count = atoi(sql_row[0]);
+			code = atoi(sql_row[1]);
 
-			switch (count)
+			attackinfo.attack_code = atoi(sql_row[0]);
+			attackinfo.attack_angle = atoi(sql_row[2]);
+			attackinfo.attack_range = atoi(sql_row[3]);
+			attackinfo.attack_ratio = atoi(sql_row[4]);
+			attackinfo.attack_type = atoi(sql_row[5]);
+
+			switch (code)
 			{
-			case SPIDER_FIRST_ATTACK:
-				attackinfo = _monster_out[0]->GetFirstAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[0]->SetFirstAttack(attackinfo);
+			case SPIDER:
+				_monster_out[0]->AddAttackInfo(attackinfo);
 				break;
-			case SPIDER_SECOND_ATTACK:
-				attackinfo = _monster_out[0]->GetSecondAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[0]->SetSecondAttack(attackinfo);
+			case WORM:
+				_monster_out[1]->AddAttackInfo(attackinfo);
 				break;
-			case WORM_FIRST_ATTACK:
-				attackinfo = _monster_out[1]->GetFirstAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[1]->SetFirstAttack(attackinfo);
+			case BOSS_SPIDER:
+				_monster_out[2]->AddAttackInfo(attackinfo);
 				break;
-			case BOSS_SPIDER_FIRST_ATTACK:
-				attackinfo = _monster_out[2]->GetFirstAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[2]->SetFirstAttack(attackinfo);
+			case DOG:
+				_monster_out[3]->AddAttackInfo(attackinfo);
 				break;
-			case DOG_FIRST_ATTACK:
-				attackinfo = _monster_out[3]->GetFirstAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[3]->SetFirstAttack(attackinfo);
+			case ORCCANNONSOLDIER:
+				_monster_out[4]->AddAttackInfo(attackinfo);
 				break;
-			case ORCCANNONSOLDIER_FIRST_ATTACK:
-				attackinfo = _monster_out[4]->GetFirstAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[4]->SetFirstAttack(attackinfo);
+			case KING_OF_THEAXE:
+				_monster_out[5]->AddAttackInfo(attackinfo);
 				break;
-			case BEAR_FIRST_ATTACK:
-				attackinfo = _monster_out[6]->GetFirstAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[6]->SetFirstAttack(attackinfo);
+			case BEAR:
+				_monster_out[6]->AddAttackInfo(attackinfo);
 				break;
-			case DINOSAUR_FIRST_ATTACK:
-				attackinfo = _monster_out[7]->GetFirstAttack();
-				attackinfo.attack_code = atoi(sql_row[0]);
-				attackinfo.attack_angle = atoi(sql_row[2]);
-				attackinfo.attack_range = atoi(sql_row[3]);
-				attackinfo.attack_ratio = atoi(sql_row[4]);
-				attackinfo.attack_type = atoi(sql_row[5]);
-				_monster_out[7]->SetFirstAttack(attackinfo);
+			case DINOSAUR:
+				_monster_out[7]->AddAttackInfo(attackinfo);
+				break;
+			case DRAGON:
+				_monster_out[8]->AddAttackInfo(attackinfo);
 				break;
 			default:
 				break;

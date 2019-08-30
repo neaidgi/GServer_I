@@ -14,6 +14,7 @@
 #include "ThreadManager.h"
 #include "RandomNumberManager.h"
 
+
 class InGameManager : public CMultiThreadSync<InGameManager>
 {
 private:
@@ -66,6 +67,8 @@ private:
 	void User_Unpack_PartyRoom_Invite_Result(User* _user, char*_buf, bool& _result, char* _code, int& _partyroomnum);
 	// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표)
 	void User_Unpack_Monster_Move(User* _user, char* _buf, int& _code, int& _num);
+	// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표,방향)
+	void User_Unpack_BossMonster_Move(User* _user, char* _buf, int& _code, int& _num);
 	// 유저가 특정 몬스터를 공격했다는 패킷(몬스터 코드,몬스터 번호, 공격번호, 유저의 방향벡터)
 	void User_Unpack_User_Successfully_Attack_The_Monster(User* _user, char* _buf, int& _monstercode, int& _monsternum, int& _attacknum, Vector3& _dir);
 	// 유저가 무슨공격했는지 언팩(공격정보)
@@ -109,17 +112,19 @@ private:
 	void User_Pack_User_UnderAttackToOher_Result(User* _user, char* _data, int& _datasize,  int _damage, bool _isdie);
 
 
+	// ** 유저 캐릭터 관련 ** //
 	// 현재 캐릭터 DB에 저장
 	void User_CurCharacter_Save(User* _user);
-
 	// 해당 유저가 파티에 속해있는지
 	bool User_IsParty(char* _code);
+	// 유저 공격시 피격 판정
+	bool User_Attack_Result(User* _user, char* _buf);
 
 	// **Send 함수** //
+	// 다른 유저들한테 보내는 send함수 통합(enum문으로 타입을 정해서 만들자)
+	void User_Send_ToOther(User* _user, UINT64 _p, SEND_TYPE _type, char* _data, int _datasize, int _channelnum, char* _code);
 	// 채널에 속해있는 유저들한테 전송
 	void User_Send_In_The_Channel(User* _user, UINT64 _p, char* _data, int& _datasize);
-	// 다른 유저 인게임에서 떠난 정보 전송
-	void User_Send_LeaveInfoToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
 	// 특정 채널에 속해있는 유저들한테 전송(채널이동할때 사용)
 	void User_Send_In_a_Particular_Channel(User* _user, UINT64 _p, int _channelnum, char* _data, int& _datasize);
 	// 다른 유저 인게임에서 떠난 정보 채널에 전송(파티원 제외)
@@ -128,20 +133,29 @@ private:
 	void User_Send_Party_InviteToOther(User* _user, UINT64 _p, char* _data, int& _datasize, char* _code);
 	// 파티원에게 전송
 	void User_Send_Party_ToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
+
+	// 다른 유저 인게임에서 떠난 정보 전송
+	void User_Send_LeaveInfoToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
 	// 던전에 들어갔을때 채널에 속해있는 유저들한테 전송
-	void User_Send_Party_Eneter_Dungeon(User* _user, UINT64 _p);
+	void User_Send_Party_Enter_Dungeon(User* _user);
 	// 던전에 나갔을때 채널에 속해있는 유저들한테 전송
-	void User_Send_Party_Leave_Dungeon(User* _user, UINT64 _p);
+	void User_Send_Party_Leave_Dungeon(User* _user);
 
 
+	//  **몬스터 관련** //
+
+	// 몬스터 공격시 피격 판정
+	bool User_Under_Attack(User* _user, char* _buf);
 	// 스테이지 상승 및 몬스터정보 셋팅
 	void User_Dungeon_Stage_Rise(User* _user);
-
 	// 몬스터 시간 초기화
 	void User_PartyRoom_Monster_Time_ReSet(User* _user, int _code, int _num);
 	// 해당 유저의 파티의 몬스터 시간이 정해둔 시간을 지났는가.
 	bool User_PartyRoom_Monster_TimeOver_Check(User* _user, int _code, int _num);
-
+	// 이몬스터는 보스몬스터인가
+	bool Is_BossMonster(User* _user, int _code);
+	// 몬스터 정보 가져오기
+	bool GetMonsterInfo(User* _user, int _code, int _num, MonsterInfo*& _info);
 
 	// 스레드 함수(몬스터 스폰)
 	static DWORD WINAPI MonsterSpawnTimerProcess(LPVOID _user);

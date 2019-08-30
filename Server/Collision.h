@@ -8,7 +8,7 @@ class Collision
 public:
 
 	// 두 벡터 사이의 거리 구하기
-	float Distance(const Vector3& _a, const Vector3& _b)
+	float Distance(const Vector3 _a, const Vector3 _b)
 	{
 		return sqrt(pow(_a.x - _b.x, 2) + pow(_a.y - _b.y, 2) + pow(_a.z - _b.z, 2));
 	}

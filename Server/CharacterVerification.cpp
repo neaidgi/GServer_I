@@ -62,7 +62,7 @@ bool CharacterVerification::AttackVerificate(Vector3 _AttackerPos, Vector3 _atta
 	//, _AttackerPos.x, _AttackerPos.y, _AttackerPos.z, _attackerDir.x, _attackerDir.y, _attackerDir.z, _targetPos.x, _targetPos.y, _targetPos.z);
 	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
-	// 공격자에서 타겟의 방향 벡터 구하기
+	// 벡터를 2차원으로 변환
 	Vector3 attackerPos = Vector3(_AttackerPos.x, _AttackerPos.y, 0);
 	Vector3 targetPos = Vector3(_targetPos.x, _targetPos.y,0);
 	Vector3 attackerDir = Vector3(_attackerDir.x, _attackerDir.y, 0);
@@ -89,3 +89,59 @@ bool CharacterVerification::AttackVerificate(Vector3 _AttackerPos, Vector3 _atta
 
 	return true;
 }
+
+// 공격 가능한 거리인가
+bool CharacterVerification::Is_Attackable_Distance(Vector3 _a, Vector3 _b, float _length)
+{
+	Vector3 a = Vector3(_a.x, _a.y, 0);
+	Vector3 b = Vector3(_b.x, _b.y, 0);
+
+	if (_length >= m_collision->Distance(a, b))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+// 가장 가까운 캐릭터는 누구인가
+float CharacterVerification::Is_Nearest_Chracter(PartyRoom* _partyroom, MonsterInfo* _monster, Character *& _character)
+{
+	User* user;
+	Vector3 monsterpos;
+	float curlength = 0;	// 계산해서 나온 현재 거리
+	float shortlength = 0;	// 현재 최단 거리
+	Character* character = nullptr;
+	PartyRoom* partyroom = _partyroom;
+
+	if (partyroom == nullptr)
+	{
+		return 0;
+	}
+
+	monsterpos = _monster->GetMonster()->GetPosition();
+
+	partyroom->StartSearchPartyRoom();
+
+	while (partyroom->SearchPartyRoom(user))
+	{
+		curlength = monsterpos.Distance(user->GetCurCharacter()->GetPosition());
+		if (shortlength == 0 || curlength < shortlength)
+		{
+			shortlength = curlength;
+			character = user->GetCurCharacter();
+		}
+	}
+	_character = character;
+	return shortlength;
+}
+
+//// 방향 벡터로 전환(바라보는 방향,케릭터위치)
+//Vector3 CharacterVerification::Change_Direction_Vector(Vector3 _a, Vector3 _b)
+//{
+//	Vector3 dir = Vector3(_a.x - _b.x, _a.y - _b.y, _a.z - _b.z);
+//	dir.nomalize();
+//	return dir;
+//}

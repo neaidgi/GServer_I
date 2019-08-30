@@ -3,6 +3,8 @@
 
 #include "Global.h"
 
+using namespace std;
+
 // DB에서 가져온 정보 저장할 몬스터 공격정보
 struct MonsterAttackInfo
 {
@@ -58,6 +60,10 @@ private:
 	int	m_monster_attackpoint;		// 공격력
 	int	m_monster_defensepoint;		// 방어력
 	int	m_monster_speed;			// 이속
+	bool m_monster_is_boss;					// 보스몬스터인가
+
+	// 공격 정보
+	vector<MonsterAttackInfo> m_monster_attack_vector;
 
 	MonsterAttackInfo first_attack;		// 1번공격
 	MonsterAttackInfo second_attack;	// 2번공격
@@ -75,23 +81,31 @@ public:
 	int GetMonster_AttackPoint() const { return m_monster_attackpoint; }
 	int GetMonster_DefensePoint() const { return m_monster_defensepoint; }
 	int GetMonster_Speed() const { return m_monster_speed; }
+	bool GetMonster_Is_Boss() const { return m_monster_is_boss; }
 
 	const Vector3 GetPosition() const { return m_position; }
 	const Vector3 GetRotation() const { return m_rotation; }
 	const Vector3 GetScale() const { return m_scale; }
 	
-	const MonsterAttackInfo GetAttackInfo(int _attack_num)
+	const vector<MonsterAttackInfo> GetAttackInfo() const
 	{
-		switch (_attack_num)
+		return m_monster_attack_vector;
+	}
+
+	const MonsterAttackInfo GetAttackInfo(int _attack_code)
+	{
+		for (int i = 0; i < m_monster_attack_vector.size(); i++)
 		{
-		case 1:
-			return first_attack;
-		case 2:
-			return second_attack;
-		default:
-			break;
+			MonsterAttackInfo info = m_monster_attack_vector.at(i);
+			if (info.attack_code == _attack_code)
+			{
+				return info;
+			}
 		}
 	}
+
+	int GetAttackInfoSize() const { return m_monster_attack_vector.size(); }
+
 	MonsterAttackInfo GetFirstAttack() const { return first_attack; }
 	MonsterAttackInfo GetSecondAttack() const { return second_attack; }
 
@@ -122,10 +136,16 @@ public:
 	void SetMonster_AttackPoint(int _monster_attackpoint) { m_monster_attackpoint = _monster_attackpoint; }
 	void SetMonster_DefensePoint(int _monster_defensepoint) { m_monster_defensepoint = _monster_defensepoint; }
 	void SetMonster_Speed(int _monster_speed) { m_monster_speed = _monster_speed; }
+	void SetMonster_Is_Boss(bool _monster_is_boss) { m_monster_is_boss = _monster_is_boss; }
 
 	void SetPosition(const Vector3& _position) { m_position = _position; }
 	void SetRotation(const Vector3& _rotation) { m_rotation = _rotation; }
 	void SetScale(const Vector3& _scale) { m_scale = _scale; }
+
+	void AddAttackInfo(const MonsterAttackInfo _attack_info) 
+	{
+		m_monster_attack_vector.push_back(_attack_info);
+	}
 
 	void SetFirstAttack(const MonsterAttackInfo _first_attack) { first_attack = _first_attack; }
 	void SetSecondAttack(const MonsterAttackInfo _second_attack) { second_attack = _second_attack; }
@@ -142,11 +162,14 @@ public:
 		m_monster_attackpoint = 0;
 		m_monster_defensepoint = 0;
 		m_monster_speed = 0;
+		m_monster_is_boss = false;
 	}
 	~Monster()
 	{
 		if (m_monster_name != nullptr)
 			delete[] m_monster_name;
+
+		m_monster_attack_vector.clear();
 	}
 
 	Monster & Monster::operator=(const Monster & rhs)
@@ -163,10 +186,13 @@ public:
 		m_monster_attackpoint = rhs.m_monster_attackpoint;
 		m_monster_defensepoint = rhs.m_monster_defensepoint;
 		m_monster_speed = rhs.m_monster_speed;
+		m_monster_is_boss = rhs.m_monster_is_boss;
+
 		first_attack = rhs.first_attack;
 		second_attack = rhs.second_attack;
 		return *this;
 	}
+
 
 };
 

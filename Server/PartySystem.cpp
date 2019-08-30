@@ -206,6 +206,8 @@ User* PartyRoom::WhopartyLeader()
 	}
 }
 
+
+
 // 던전 입장
 void PartyRoom::DungeonEnter_PartyRoom()
 {
@@ -353,6 +355,16 @@ int PartyRoom::GetMonsterNum(int _code)
 	return m_monster_control->GetMonsterNum(_code);
 }
 
+bool PartyRoom::Is_BossMonster(int _code)
+{
+	return m_monster_control->Is_BossMonster(_code);
+}
+
+void PartyRoom::SetBossMonsterAttackInfo(int _attacknum, int _attacktime)
+{
+	m_monster_control->SetBossMonsterAttackInfo(_attacknum, _attacktime);
+}
+
 // 몬스터 정보 요청
 bool PartyRoom::GetMonsterinfo(int _monster_code, int _monster_num, MonsterInfo *& _monsterinfo)
 {
@@ -365,10 +377,16 @@ void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num)
 	m_monster_control->SetMonsterinfo(_monster_code, _monster_num);
 }
 
-// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
+// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표) - 기본정보에서 수정할때
 void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos)
 {
 	m_monster_control->SetMonsterinfo(_monster_code, _monster_num, _pos);
+}
+
+// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터방향) - 기본정보에서 수정할때
+void PartyRoom::SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos, const Vector3 _dir)
+{
+	m_monster_control->SetMonsterinfo(_monster_code, _monster_num, _pos,_dir);
 }
 
 // 몬스터 정보 삭제

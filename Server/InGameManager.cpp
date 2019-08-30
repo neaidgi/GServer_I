@@ -1325,7 +1325,7 @@ void InGameManager::User_Pack_Monster_MoveInfo(User * _user, int _code, int _num
 void InGameManager::User_Pack_MonsterAttack_Result(User * _user, bool _result, int _monstercode, int _monsternum, int _damage, bool _isdie)
 {
 	UINT64 sendprotocol = 0;
-	char buf[512];
+	char buf[BUFSIZE];
 	memset(buf, 0, sizeof(buf));
 	int size = 0;
 	char* ptr = buf;
@@ -1366,8 +1366,6 @@ void InGameManager::User_Pack_MonsterAttack_Result(User * _user, bool _result, i
 
 	sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_ATTACK_RESULT);
 	_user->Quepack(sendprotocol, buf, size);
-
-
 }
 
 // 유저 피격결과 정보패킹(성공실패,데미지,죽으면 false)
@@ -1507,9 +1505,69 @@ void InGameManager::User_Unpack_Monster_Move(User * _user, char * _buf, int& _co
 	_code = monster_code;
 	_num = monster_num;
 	// 메세지
-	//memset(msg, 0, sizeof(msg));
-	//sprintf(msg, "몬스터 이동 :: 몬스터 코드: [%d]  몬스터 번호: [%d] 위치: [%f] [%f] [%f]", monster_code, monster_num, curPos.x, curPos.y, curPos.z);
-	//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "몬스터 이동 :: 몬스터 코드: [%d]  몬스터 번호: [%d] 위치: [%f] [%f] [%f]", monster_code, monster_num, curPos.x, curPos.y, curPos.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+}
+
+// 몬스터 이동 정보 언팩(몬스터코드,몬스터번호,좌표,방향)
+void InGameManager::User_Unpack_BossMonster_Move(User * _user, char * _buf, int & _code, int & _num)
+{
+	Vector3 prePos;
+	Vector3 curPos;
+	Vector3 tempDir;
+	Vector3 dir;
+	PartyRoom* partyroom = nullptr;
+	MonsterInfo* monsterinfo = nullptr;
+	float dirx, diry;
+	bool lesult;
+	int datasize = 0;
+	int len = 0;
+	int monster_code = 0;
+	int monster_num = 0;
+	char* ptr = _buf;
+	char msg[BUFSIZE];
+
+	// 몬스터 코드 복사
+	memcpy(&monster_code, ptr, sizeof(int));
+	ptr += sizeof(int);
+
+	// 몬스터 번호 복사
+	memcpy(&monster_num, ptr, sizeof(int));
+	ptr += sizeof(int);
+
+	// 위치 복사
+	memcpy(&curPos, ptr, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+
+	// 방향 복사
+	memcpy(&tempDir, ptr, sizeof(Vector3));
+	ptr += sizeof(Vector3);
+
+	dir = curPos.direction(tempDir);
+
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	if (partyroom->GetMonsterinfo(monster_code, monster_num, monsterinfo) == false)
+	{
+		memset(msg, 0, sizeof(msg));
+		sprintf(msg, "몬스터 이동 :: 좌표 받기 실패");
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+		return;
+	}
+
+	// 이동검증
+
+
+	// 몬스터 정보 저장
+	partyroom->SetMonsterinfo(monster_code, monster_num, curPos, dir);
+
+	_code = monster_code;
+	_num = monster_num;
+	// 메세지
+	memset(msg, 0, sizeof(msg));
+	sprintf(msg, "몬스터 이동 :: 몬스터 코드: [%d]  몬스터 번호: [%d] 위치: [%f] [%f] [%f]", monster_code, monster_num, curPos.x, curPos.y, curPos.z);
+	MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 }
 
 // 유저가 특정 몬스터를 공격했다는 패킷
@@ -1674,6 +1732,104 @@ bool InGameManager::User_IsParty(char * _code)
 	}
 
 	return true;
+}
+
+// 유저 공격시 피격 판정
+bool InGameManager::User_Attack_Result(User * _user, char* _buf)
+{
+	char buf[BUFSIZE];
+	char rdata[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	memset(rdata, 0, sizeof(rdata));
+	int datasize = 0;
+	int rdatasize = 0;
+	char* ptr = buf;
+
+	// 로그용
+	char msg[BUFSIZE];
+	memset(msg, 0, sizeof(msg));
+
+	UINT64 sendprotocol = 0;
+	UINT64 othersendprotocol = 0;
+
+	Vector3 dir;
+	PartyRoom* partyroom = nullptr;
+
+	bool flag = true;
+	int monstercode = 0;
+	int monsternum = 0;
+	int attacknum = 0;
+
+	// 몬스터 정보를 클라한테 받는다.
+	User_Unpack_User_Successfully_Attack_The_Monster(_user, _buf, monstercode, monsternum, attacknum, dir);
+
+	// 유저 캐릭터 및 스킬정보 셋팅
+	Character* user_character = _user->GetCurCharacter();
+	AttackInfo user_attackinfo = _user->GetCurCharacter()->GetAttackInfo(attacknum);
+
+	// 몬스터 정보 셋팅.
+	MonsterInfo* monster = nullptr;
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	// 파티방이 없거나 파티중이 아니면
+	if (partyroom == nullptr && _user->isParty() == false)
+	{
+		return false;
+	}
+
+	// 몬스터가 없거나 몬스터가 이미 죽었으면
+	if (partyroom->GetMonsterinfo(monstercode, monsternum, monster) == false)
+	{
+		// 메세지
+		memset(msg, 0, sizeof(msg));
+		sprintf(msg, "공격 피격 판정 : 몬스터가 존재하지않습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+		User_Pack_MonsterAttack_Result(_user, false, monstercode, monsternum, 0, false);
+		return false;
+	}
+
+	if (monster->GetMonsterActivate() == false)
+	{
+		// 메세지
+		memset(msg, 0, sizeof(msg));
+		sprintf(msg, "공격 피격 판정 : 몬스터가 이미 죽었습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
+		MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+		User_Pack_MonsterAttack_Result(_user, false, monstercode, monsternum, 0, false);
+		return false;
+	}
+
+	// -- 피격판정 --
+	// 몬스터와 거리가 가까우면
+	if (m_verification->AttackVerificate(user_character->GetPosition(), dir, user_attackinfo.attack_range, user_attackinfo.attack_angle, monster->GetMonster()->GetPosition(), monster->GetMonster()->GetMonsterRange()) == false)
+	{
+		// 메세지
+		//memset(msg, 0, sizeof(msg));
+		//sprintf(msg, "공격 피격 판정 : 몬스터가 피격되지않았습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
+		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+		User_Pack_MonsterAttack_Result(_user, false, monstercode, monsternum, 0, false);
+		return false;
+	}
+
+	// -- 데미지 처리 -- 
+	// 피격성공 데미지를 주고 체력이 0이되면 활성화를 풀고 죽었다고 알려주자
+	bool islive = partyroom->Monster_HP_Down(monstercode, monsternum, 10);
+
+	// 유저에게 줄 정보 pack
+	User_Pack_MonsterAttack_Result(_user, true, monstercode, monsternum, 10, islive);
+	sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_ATTACK_RESULT);
+	_user->Quepack(sendprotocol, buf, datasize);
+
+	// 다른 유저에게 줄 정보 pack
+	User_Pack_MonsterAttackToOher_Result(_user, rdata, rdatasize, monstercode, monsternum, 10, islive);
+	othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_OTHERPLAYER_ATTACK_SUCCESS);
+
+	if (_user->isDungeon())
+	{
+		User_Send_ToOther(_user, othersendprotocol, PARTY, rdata, rdatasize, 0, nullptr);
+	}
 }
 
 // 채널 들어가기
@@ -1883,6 +2039,38 @@ void InGameManager::User_Dungeon_Stage_Rise(User * _user)
 	partyroom->SetDungeonMonsterinfo();
 }
 
+// send함수 통합(enum문으로 타입을 정해서 만들자)
+void InGameManager::User_Send_ToOther(User * _user, UINT64 _p, SEND_TYPE _type, char * _data, int _datasize, int _channelnum, char* _code)
+{
+	switch (_type)
+	{
+	case CHANNEL: // 채널유저
+		User_Send_In_The_Channel(_user, _p, _data, _datasize);
+		break;
+	case PARTY: // 파티원
+		User_Send_Party_ToOther(_user, _p, _data, _datasize);
+		break;
+	case SPECIFIC_CHANNEL: // 특정 채널
+		User_Send_In_a_Particular_Channel(_user, _p, _channelnum, _data, _datasize);
+		break;
+	case SPECIFIC_USER: // 특정 유저
+		User_Send_Party_InviteToOther(_user, _p, _data, _datasize, _code);
+		break;
+	case CHANNEL_EXCLUDE_PARTY: // 채널(파티원제외)
+		User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(_user, _p, _user->GetChannelNum(), _data, _datasize);
+		break;
+	case  ENTER_DUNGEON:			// 던전에 입장시(각 유저가 해당했던 채널에 캐릭터코드를 send)
+		User_Send_Party_Enter_Dungeon(_user);
+		break;
+	case  LEAVE_DUNGEON:			// 던전에서 나갈시(각 유저가 해당한 채널에 캐릭터코드를 send)
+		User_Send_Party_Leave_Dungeon(_user);
+		break;
+	default:
+		break;
+	}
+
+}
+
 // 다른 유저 이동정보 전송(채널에 접속해있는 유저들한테 전송)
 void InGameManager::User_Send_In_The_Channel(User* _user, UINT64 _p, char * _data, int & _datasize)
 {
@@ -1922,30 +2110,39 @@ void InGameManager::User_Send_LeaveInfoToOther(User * _user, UINT64 _p, char * _
 	memset(buf, 0, sizeof(buf));
 	char* ptr = buf;
 	int datasize = 0;
-
+	UINT64 sendprotocol = 0;
 	User* user = nullptr;
+	
+	// 유저 코드 pack
+	User_Pack_UserCode(_user, buf, datasize);
 
 	// 동기화
 	CThreadSync cs;
-
-	// 채널에 속해있으면 채널에 속한 유저한테 보낸다
-	if (_user->isChannel())
-	{
-		User_Send_In_The_Channel(_user, _p, _data, _datasize);
-	}
-
+	// 파티원 먼저 정보보낸다
 	// 파티에 속해있으며 파티방장이 아니면 그냥 파티원들한테 보낸다
 	if (_user->isParty() && _user->isPartyLeader() == false)
 	{
-		User_Send_Party_ToOther(_user, PROTOCOL_PARTY_USER_LEAVE_INFO, _data, _datasize);
+		sendprotocol = _user->BitPackProtocol(sendprotocol,PROTOCOL_INGAME,PROTOCOL_INGAME_PARTY,PROTOCOL_PARTY_USER_LEAVE_INFO);
+		User_Send_ToOther(_user, sendprotocol, PARTY, buf, datasize, 0, nullptr);
 	}// 파티에 속해있으며 파티방장이면 파티방 터트린다.
 	else if (_user->isParty() && _user->isPartyLeader())
 	{
-		User_Send_Party_ToOther(_user, PROTOCOL_PARTY_ROOM_REMOVE_RESULT, buf, datasize);
+		sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_REMOVE_RESULT);
+		User_Send_ToOther(_user, sendprotocol, PARTY, buf, datasize, 0, nullptr);
 
 		// 파티없앤다
 		User_Remove_PartyRoom(_user);
 	}
+
+	// 마지막으로 채널에 보낸다
+	// 채널에 속해있으면 채널에 속한 유저한테 보낸다
+	if (_user->isChannel())
+	{
+		sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
+		User_Send_ToOther(_user, sendprotocol, CHANNEL, buf, datasize, 0, nullptr);
+	}
+
+
 }
 
 // 특정 채널에 속해있는 유저들한테 전송(채널이동할때 사용)
@@ -2061,31 +2258,28 @@ void InGameManager::User_Send_Party_ToOther(User * _user, UINT64 _p, char * _dat
 
 	while (partyroom->SearchPartyRoom(user))
 	{
-		if (user != nullptr)
+		if (user->isIngame() && user->getSocket() != _user->getSocket())
 		{
-			if (user->isIngame() && user->getSocket() != _user->getSocket())
+			user->Quepack(_p, _data, _datasize);
+			if (user->isSending() == false)
 			{
-				user->Quepack(_p, _data, _datasize);
-				if (user->isSending() == false)
+				if (user->TakeOutSendPacket())
 				{
-					if (user->TakeOutSendPacket())
-					{
-						user->IOCP_SendMsg();
-					}
+					user->IOCP_SendMsg();
 				}
-				// 메세지
-				//char msg[BUFSIZE];
-				//memset(msg, 0, sizeof(msg));
-				//sprintf(msg, "User_Send_Party_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
-				//	_p, _datasize, user->GetSendQueueSize());
-				//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 			}
+			// 메세지
+			//char msg[BUFSIZE];
+			//memset(msg, 0, sizeof(msg));
+			//sprintf(msg, "User_Send_Party_ToOther :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+			//	_p, _datasize, user->GetSendQueueSize());
+			//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 		}
 	}
 }
 
 // 던전에 들어갔을대 채널에 속해있는 유저들한테 전송
-void InGameManager::User_Send_Party_Eneter_Dungeon(User * _user, UINT64 _p)
+void InGameManager::User_Send_Party_Enter_Dungeon(User * _user)
 {
 	PartyRoom* partyroom = nullptr;
 	User* user = nullptr;
@@ -2093,11 +2287,15 @@ void InGameManager::User_Send_Party_Eneter_Dungeon(User * _user, UINT64 _p)
 	int datasize = 0;
 	memset(buf, 0, sizeof(buf));
 
+	// 프로토콜 셋팅
+	UINT64 sendprotocol = 0;
+	sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
+
+	CThreadSync cs;
 	// 유저가 속해있는 파티방을 검색해서 넣는다.
 	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
 
 	// 파티방의 각 유저들 채널에 속해있는 유저들한테 나간다고 알려준다.
-	// 파티 유저 코드 패킹
 	partyroom->StartSearchPartyRoom();
 
 	while (partyroom->SearchPartyRoom(user))
@@ -2106,12 +2304,12 @@ void InGameManager::User_Send_Party_Eneter_Dungeon(User * _user, UINT64 _p)
 		User_Pack_UserCode(user, buf, datasize);
 
 		// 파티 유저가 속한 채널에 send
-		User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(user, _p, user->GetChannelNum(), buf, datasize);
+		User_Send_Channel_LeaveInfoToOther_Exceptions_for_party_members(user, sendprotocol, user->GetChannelNum(), buf, datasize);
 	}
 }
 
 // 던전에 나갔을때 채널에 속해있는 유저들한테 전송
-void InGameManager::User_Send_Party_Leave_Dungeon(User * _user, UINT64 _p)
+void InGameManager::User_Send_Party_Leave_Dungeon(User * _user)
 {
 	PartyRoom* partyroom = nullptr;
 	User* user = nullptr;
@@ -2119,6 +2317,11 @@ void InGameManager::User_Send_Party_Leave_Dungeon(User * _user, UINT64 _p)
 	int datasize = 0;
 	memset(buf, 0, sizeof(buf));
 
+	// 프로토콜 셋팅
+	UINT64 sendprotocol = 0;
+	sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_CONNECT);
+
+	CThreadSync cs;
 	// 유저가 속해있는 파티방을 검색해서 넣는다.
 	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
 
@@ -2132,8 +2335,160 @@ void InGameManager::User_Send_Party_Leave_Dungeon(User * _user, UINT64 _p)
 		User_Pack_UserCode(user, buf, datasize);
 
 		// 파티 유저가 속한 채널에 send
-		User_Send_In_The_Channel(user, _p, buf, datasize);
+		User_Send_In_The_Channel(user, sendprotocol, buf, datasize);
 	}
+}
+
+// 몬스터 공격시 피격 판정
+bool InGameManager::User_Under_Attack(User * _user, char* _buf)
+{
+	char buf[BUFSIZE];
+	char rdata[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	memset(rdata, 0, sizeof(rdata));
+	int datasize = 0;
+	int rdatasize = 0;
+	char* ptr = buf;
+
+	// 로그용
+	char msg[BUFSIZE];
+	memset(msg, 0, sizeof(msg));
+
+	UINT64 sendprotocol = 0;
+	UINT64 othersendprotocol = 0;
+
+	Vector3 dir;
+	PartyRoom* partyroom = nullptr;
+
+	bool flag = true;
+
+	int monstercode = 0;
+	int monsternum = 0;
+	int attacknum = 0;
+	// 몬스터 공격정보
+	User_Unpack_Monster_Successfully_Attack_The_User(_user, _buf, monstercode, monsternum, attacknum, dir);
+
+	// 유저 캐릭터 셋팅
+	Character* user_character = _user->GetCurCharacter();
+
+	// 몬스터 정보 셋팅.
+	MonsterInfo* monster = nullptr;
+	MonsterAttackInfo monster_attackinfo;
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	// 파티방이 없으면 탈출
+	if (partyroom == nullptr)
+	{
+		return false;
+	}
+	if (_user->isParty() == false)
+	{
+		return false;
+	}
+
+	// 유저가 죽어있다면
+	if (_user->GetCurCharacter_IsLive() == false)
+	{
+		User_Pack_Under_Attack_Result(_user, false, 0, flag);
+
+		return false;
+	}
+
+	// 몬스터가 없으면
+	if (partyroom->GetMonsterinfo(monstercode, monsternum, monster) == false)
+	{
+		//// 메세지
+		//memset(msg, 0, sizeof(msg));
+		//sprintf(msg, "몬스터 공격 피격 판정 : 몬스터가 존재하지않습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
+		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+		User_Pack_Under_Attack_Result(_user, false, 0, flag);
+
+		return false;
+	}
+
+	// 몬스터가 이미 죽었으면
+	if (monster->GetMonsterActivate() == false)
+	{
+		// 메세지
+		//memset(msg, 0, sizeof(msg));
+		//sprintf(msg, "공격 피격 판정 : 몬스터가 이미 죽었습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
+		//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+		User_Pack_Under_Attack_Result(_user, false, 0, flag);
+
+		return false;
+	}
+
+	// 몬스터 공격정보
+	monster_attackinfo = monster->GetMonster()->GetAttackInfo(attacknum);
+
+	// -- 피격판정 -- 몬스터 공격타입에 따른 피격 판정 계산
+	switch (monster_attackinfo.attack_type)
+	{
+	case ATTACK_TYPE_MELEE: // 근접공격
+		// 유저와 거리가 가까우면
+		if (m_verification->AttackVerificate(monster->GetMonster()->GetPosition(), dir, monster_attackinfo.attack_range, monster_attackinfo.attack_angle, user_character->GetPosition(), user_character->GetCharacterRange()) == false)
+		{
+			// 메세지
+			memset(msg, 0, sizeof(msg));
+			sprintf(msg, "공격 피격 판정 : 유저가 피격되지않았습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+			User_Pack_Under_Attack_Result(_user, false, 0, flag);
+
+			return false;
+		}
+		break;
+	case ATTACK_TYPE_KNOCK_BACK_MELLE: // 근접 공격(넉백)
+		break;
+	case ATTACK_TYPE_BACK_MELEE: // 근접 공격(뒤로공격)
+		break;
+	case ATTACK_TYPE_LONG_RANGE: // 원거리 공격
+		break;
+	case ATTACK_TYPE_EXPLOSION: // 광역 공격(범위있음)
+		// 유저와 거리가 가까우면
+		if (m_verification->AttackVerificate(monster->GetMonster()->GetPosition(), monster_attackinfo.attack_range, user_character->GetPosition(), user_character->GetCharacterRange()) == false)
+		{
+			// 메세지
+			memset(msg, 0, sizeof(msg));
+			sprintf(msg, "공격 피격 판정 : 유저가 피격되지않았습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
+			MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+
+			User_Pack_Under_Attack_Result(_user, false, 0, flag);
+
+			return false;
+		}
+		break;
+	case ATTACK_TYPE_FIELD: // 광역 공격(필드전체)
+		break;
+	case ATTACK_TYPE_SUMMON_UP: // 소환 공격
+		break;
+	default: // 공격정보가 없으면
+		return false;
+	}
+
+	// -- 데미지 처리 -- 
+	// 피격성공 데미지를 주고 체력이 0이되면 ....
+	flag = _user->CurCharacter_HP_Down(monster->GetMonster()->GetMonster_AttackPoint());
+
+	User_Pack_Under_Attack_Result(_user, true, 10, flag);
+
+	// 다른 유저 패킷처리 
+	User_Pack_User_UnderAttackToOher_Result(_user, rdata, rdatasize, monster->GetMonster()->GetMonster_AttackPoint(), flag);
+
+	othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_MONSTER_OTHER_ATTACK_RESULT);
+
+	if (_user->isDungeon())
+	{
+		User_Send_Party_ToOther(_user, othersendprotocol, rdata, rdatasize);
+	}
+	else
+	{
+		//User_Send_In_The_Channel(_user, othersendprotocol, rdata, rdatasize);
+	}
+
+	return true;
 }
 
 // 몬스터 시간 초기화
@@ -2155,6 +2510,53 @@ bool InGameManager::User_PartyRoom_Monster_TimeOver_Check(User* _user, int _code
 	}
 
 	return partyroom->End_MonsterTimer(_code, _num);
+}
+
+// 이몬스터는 보스몬스터인가
+bool InGameManager::Is_BossMonster(User * _user, int _code)
+{
+	PartyRoom* partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	if (partyroom == nullptr)
+	{
+		return false;
+	}
+
+	return partyroom->Is_BossMonster(_code);
+}
+
+// 몬스터 정보 가져오기
+bool InGameManager::GetMonsterInfo(User* _user, int _code, int _num, MonsterInfo*& _info)
+{
+	PartyRoom* partyroom = nullptr;
+
+	// 몬스터 정보 셋팅.
+	MonsterInfo* monster = nullptr;
+	partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+
+	// 파티방이 없으면 탈출
+	if (partyroom == nullptr)
+	{
+		return false;
+	}
+	if (_user->isParty() == false)
+	{
+		return false;
+	}
+
+	// 몬스터가 없으면
+	if (partyroom->GetMonsterinfo(_code, _num, monster) == false)
+	{
+		return false;
+	}
+	// 몬스터가 이미 죽었으면
+	if (monster->GetMonsterActivate() == false)
+	{
+		return false;
+	}
+	_info = monster;
+
+	return true;
 }
 
 
@@ -2182,6 +2584,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 	int monstercode = 0;
 	int monsternum = 0;
 	int attacknum = 0;
+	SEND_TYPE sendtype = DEFAULT;
 
 	// 로그용
 	char msg[BUFSIZE];
@@ -2210,189 +2613,107 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				User_Pack_OtherUserPosData(_user);
 				User_Pack_PlayerPosData(_user, buf, datasize);
 				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_CONNECT);
-				User_Send_In_The_Channel(_user, othersendprotocol, buf, datasize);
+				User_Send_ToOther(_user, othersendprotocol, CHANNEL, buf, datasize, 0, nullptr);
 				result = RT_INGAME_OTHERPLAYER_LIST;
 				break;
 			case PROTOCOL_MOVE_REPORT: // 이동 정보
 				User_Pack_Move(_user, buf, datasize, rdata, rdatasize);
 
-				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_OTHERPLAYERINFO);
-				//othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_ANIMATION, PROTOCOL_CHARACER_ANIMATION);
+				// 다른 유저들한테 send
 				if (_user->isDungeon())
 				{
-					User_Send_Party_ToOther(_user, othersendprotocol, rdata, rdatasize);
+					sendtype = PARTY;
 				}
 				else
 				{
-					User_Send_In_The_Channel(_user, othersendprotocol, rdata, rdatasize);
+					sendtype = CHANNEL;
 				}
+				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_OTHERPLAYERINFO);
+				User_Send_ToOther(_user, othersendprotocol, sendtype, rdata, rdatasize, 0, nullptr);
+
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_RESULT);
 				_user->Quepack(sendprotocol, buf, datasize);
 				result = RT_INGAME_MOVE;
 				break;
 			case PROTOCOL_MOVE_ROTATION: // 회전 정보
-				User_Pack_Rotation(_user, buf, datasize);
+				// 다른 유저들한테만 send
+				User_Pack_Rotation(_user, rdata, rdatasize);
 				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_ROTATION);
-				User_Send_In_The_Channel(_user, othersendprotocol, buf, datasize);
+				User_Send_ToOther(_user, othersendprotocol, CHANNEL, rdata, rdatasize, 0, nullptr);
 				_user->SetCallback(false);
 				result = RT_INGAME_MOVE;
 				break;
 			case PROTOCOL_INGAME_MOVE_START_JUMP: // 점프 정보
+				// 캐릭터 정보 점프중이라고 저장
 				_user->GetCurCharacter()->SetCharacter_JumpState(true);
-				User_Pack_UserCode(_user, buf, datasize);
-				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_OTHERPLAYER_START_JUMP);
+				// 다른유저들한테 send
+				User_Pack_UserCode(_user, rdata, rdatasize);
 				if (_user->isDungeon())
 				{
-					User_Send_Party_ToOther(_user, othersendprotocol, buf, datasize);
+					sendtype = PARTY;
 				}
 				else
 				{
-					User_Send_In_The_Channel(_user, othersendprotocol, buf, datasize);
+					sendtype = CHANNEL;
 				}
+				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_OTHERPLAYER_START_JUMP);
+				User_Send_ToOther(_user, othersendprotocol, sendtype, rdata, rdatasize, 0, nullptr);
 
-				// 메세지
-				memset(msg, 0, sizeof(msg));
-				sprintf(msg, "유저 점프 : 유저가 점프함 [x] :%f [y] :%f [z] :%f ", _user->GetCurCharacter()->GetPosition().x,
-					_user->GetCurCharacter()->GetPosition().y, _user->GetCurCharacter()->GetPosition().z);
-				MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+				//// 메세지
+				//memset(msg, 0, sizeof(msg));
+				//sprintf(msg, "유저 점프 : 유저가 점프함 [x] :%f [y] :%f [z] :%f ", _user->GetCurCharacter()->GetPosition().x,
+				//	_user->GetCurCharacter()->GetPosition().y, _user->GetCurCharacter()->GetPosition().z);
+				//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 				result = RT_INGAME_MOVE;
 				break;
 			case PROTOCOL_INGAME_MOVE_END_JUMP: // 착지 정보
+				// 캐릭터 정보 점프끝났다고 저장
 				_user->GetCurCharacter()->SetCharacter_JumpState(false);
-				//User_Pack_UserCode(_user, buf, datasize);
-				//sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_OTHERPLAYER_END_JUMP);
-				//if (_user->isDungeon())
-				//{
-				//	User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
-				//}
-				//else
-				//{
-				//	User_Send_In_The_Channel(_user, sendprotocol, buf, datasize);
-				//}
+				// 다른유저들한테 send
+				User_Pack_UserCode(_user, rdata, rdatasize);
+				if (_user->isDungeon())
+				{
+					sendtype = PARTY;
+				}
+				else
+				{
+					sendtype = CHANNEL;
+				}
+				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_MOVE_OTHERPLAYER_END_JUMP);
+				User_Send_ToOther(_user, othersendprotocol, sendtype, rdata, rdatasize, 0, nullptr);
+
 				result = RT_INGAME_MOVE;
 				break;
 			case PROTOCOL_INGAME_ATTACK: // 공격했다는 정보
 			{
-				int attacknum = 0;
 				// 무슨공격을 했는지 알아낸다
 				User_Unpack_Attack_Info(_user, buf, attacknum);
 				// 그 공격정보를 패킹해서 보내준다.
-				User_Pack_AttackNum_Info(_user, buf, datasize, attacknum);
-				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_ATTACK);
+				User_Pack_AttackNum_Info(_user, rdata, rdatasize, attacknum);
 				if (_user->isDungeon())
 				{
-					User_Send_Party_ToOther(_user, othersendprotocol, buf, datasize);
+					sendtype = PARTY;
 				}
 				else
 				{
-					User_Send_In_The_Channel(_user, othersendprotocol, buf, datasize);
+					sendtype = CHANNEL;
 				}
+				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_ATTACK);
+				User_Send_ToOther(_user, othersendprotocol, sendtype, rdata, rdatasize, 0, nullptr);
 
 				// 메세지
-				memset(msg, 0, sizeof(msg));
-				sprintf(msg, "유저 공격 : 유저가 공격함 [x] :%f [y] :%f [z] :%f ", _user->GetCurCharacter()->GetPosition().x,
-					_user->GetCurCharacter()->GetPosition().y, _user->GetCurCharacter()->GetPosition().z);
-				MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+				//memset(msg, 0, sizeof(msg));
+				//sprintf(msg, "유저 공격 : 유저가 공격함 [x] :%f [y] :%f [z] :%f ", _user->GetCurCharacter()->GetPosition().x,
+				//	_user->GetCurCharacter()->GetPosition().y, _user->GetCurCharacter()->GetPosition().z);
+				//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
 
 				result = RT_INGAME_ATTACK;
 				break;
 			}
 			case PROTOCOL_INGAME_ATTACK_SUCCESS: // 공격 피격판정 확인요청
 			{
-				Vector3 dir;
-				PartyRoom* partyroom = nullptr;
-				// 몬스터 정보를 클라한테 받는다.
-				User_Unpack_User_Successfully_Attack_The_Monster(_user, buf, monstercode, monsternum, attacknum, dir);
-
-				// 유저 캐릭터 및 스킬정보 셋팅
-				Character* user_character = _user->GetCurCharacter();
-				AttackInfo user_attackinfo = _user->GetCurCharacter()->GetAttackInfo(attacknum);
-
-				// 몬스터 정보 셋팅.
-				MonsterInfo* monster = nullptr;
-				partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
-
-				// 파티방이 없으면 탈출
-				if (partyroom == nullptr)
-				{
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-				if (_user->isParty() == false)
-				{
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// 몬스터가 없으면
-				if (partyroom->GetMonsterinfo(monstercode, monsternum, monster) == false)
-				{
-					// 메세지
-					memset(msg, 0, sizeof(msg));
-					sprintf(msg, "공격 피격 판정 : 몬스터가 존재하지않습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
-					MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_ATTACK_RESULT);
-					User_Pack_MonsterAttack_Result(_user, false, monstercode, monsternum, 0, false);
-					_user->Quepack(sendprotocol, buf, datasize);
-
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-				// 몬스터가 이미 죽었으면
-				if (monster->GetMonsterActivate() == false)
-				{
-					// 메세지
-					memset(msg, 0, sizeof(msg));
-					sprintf(msg, "공격 피격 판정 : 몬스터가 이미 죽었습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
-					MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_ATTACK_RESULT);
-					User_Pack_MonsterAttack_Result(_user, false, monstercode, monsternum, 0, false);
-					_user->Quepack(sendprotocol, buf, datasize);
-
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// -- 피격판정 --
-				// 몬스터와 거리가 가까우면
-				if (m_verification->AttackVerificate(user_character->GetPosition(), dir, user_attackinfo.attack_range, user_attackinfo.attack_angle, monster->GetMonster()->GetPosition(), monster->GetMonster()->GetMonsterRange()) == false)
-				{
-					// 메세지
-					//memset(msg, 0, sizeof(msg));
-					//sprintf(msg, "공격 피격 판정 : 몬스터가 피격되지않았습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
-					//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_ATTACK_RESULT);
-					User_Pack_MonsterAttack_Result(_user, false, monstercode, monsternum, 0, false);
-					_user->Quepack(sendprotocol, buf, datasize);
-
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// -- 데미지 처리 -- 
-				// 피격성공 데미지를 주고 체력이 0이되면 활성화를 풀고 죽었다고 알려주자
-				bool islive = partyroom->Monster_HP_Down(monstercode, monsternum, 10);
-
-				User_Pack_MonsterAttack_Result(_user, true, monstercode, monsternum, 10, islive);
-				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_ATTACK_RESULT);
-				_user->Quepack(sendprotocol, buf, datasize);
-
-				// 다른 유저 프로토콜
-				User_Pack_MonsterAttackToOher_Result(_user, rdata, rdatasize, monstercode, monsternum, 10, islive);
-				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_OTHERPLAYER_ATTACK_SUCCESS);
-
-				if (_user->isDungeon())
-				{
-					User_Send_Party_ToOther(_user, othersendprotocol, rdata, rdatasize);
-				}
-				else
-				{
-					//User_Send_In_The_Channel(_user, othersendprotocol, rdata, rdatasize);
-				}
+				User_Attack_Result(_user, buf);
 				result = RT_INGAME_ATTACK_RESULT;
 				break;
 			}
@@ -2432,119 +2753,70 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					// 시간 초기화
 					User_PartyRoom_Monster_Time_ReSet(_user, monstercode, monsternum);
 				}
-
 				result = RT_INGMAE_MONSTER_MOVE_RESULT;
 				break;
 			}
 			case PROTOCOL_REQ_MONSTER_ATTACK:	// 몬스터가 유저를 공격했다
 			{
-				Vector3 dir;
-				PartyRoom* partyroom = nullptr;
-
-				bool flag = true;
-
-				monstercode = 0;
-				monsternum = 0;
-				attacknum = 0;
-				// 몬스터 공격정보
-				User_Unpack_Monster_Successfully_Attack_The_User(_user, buf, monstercode, monsternum, attacknum, dir);
-
-				// 유저 캐릭터 및 스킬정보 셋팅
-				Character* user_character = _user->GetCurCharacter();
-
-				// 몬스터 정보 셋팅.
-				MonsterInfo* monster = nullptr;
-				MonsterAttackInfo monster_attackinfo;
-				partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
-
-				// 파티방이 없으면 탈출
-				if (partyroom == nullptr)
+				if (User_Under_Attack(_user, buf))
 				{
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-				if (_user->isParty() == false)
-				{
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// 유저가 죽어있다면
-				if (_user->GetCurCharacter_IsLive() == false)
-				{
-					User_Pack_Under_Attack_Result(_user, false, 0, flag);
-
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// 몬스터가 없으면
-				if (partyroom->GetMonsterinfo(monstercode, monsternum, monster) == false)
-				{
-					//// 메세지
-					//memset(msg, 0, sizeof(msg));
-					//sprintf(msg, "몬스터 공격 피격 판정 : 몬스터가 존재하지않습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
-					//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-					User_Pack_Under_Attack_Result(_user, false, 0, flag);
-
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// 몬스터가 이미 죽었으면
-				if (monster->GetMonsterActivate() == false)
-				{
-					// 메세지
-					//memset(msg, 0, sizeof(msg));
-					//sprintf(msg, "공격 피격 판정 : 몬스터가 이미 죽었습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
-					//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-					User_Pack_Under_Attack_Result(_user, false, 0, flag);
-
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// 몬스터 공격정보
-				monster_attackinfo = monster->GetMonster()->GetAttackInfo(attacknum);
-
-				// -- 피격판정 --
-				// 유저와 거리가 가까우면
-				if (m_verification->AttackVerificate(monster->GetMonster()->GetPosition(), dir, monster_attackinfo.attack_range, monster_attackinfo.attack_angle, user_character->GetPosition(), user_character->GetCharacterRange()) == false)
-				{
-					// 메세지
-					memset(msg, 0, sizeof(msg));
-					sprintf(msg, "공격 피격 판정 : 유저가 피격되지않았습니다. [몬스터코드 : %d] [몬스터 번호 : %d] ", monstercode, monsternum);
-					MsgManager::GetInstance()->DisplayMsg("INFO", msg);
-
-					User_Pack_Under_Attack_Result(_user, false, 0, flag);
-
-					result = RT_INGAME_ATTACK_RESULT;
-					break;
-				}
-
-				// -- 데미지 처리 -- 
-				// 피격성공 데미지를 주고 체력이 0이되면 ....
-				flag = _user->CurCharacter_HP_Down(10);
-
-				User_Pack_Under_Attack_Result(_user, true, 10, flag);
-
-				// 다른 유저 패킷처리
-				User_Pack_User_UnderAttackToOher_Result(_user, rdata, rdatasize, 10, flag);
-
-				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_INGAME_MONSTER_OTHER_ATTACK_RESULT);
-
-				if (_user->isDungeon())
-				{
-					User_Send_Party_ToOther(_user, othersendprotocol, rdata, rdatasize);
+					result = RT_INGAME_MONSTER_ATTACK;
 				}
 				else
 				{
-					//User_Send_In_The_Channel(_user, othersendprotocol, rdata, rdatasize);
-				}
+					result = RT_INGAME_ATTACK_RESULT;
 
-				result = RT_INGAME_MONSTER_ATTACK;
+				}
+				break;
+			}
+			case PROTOCOL_BOSS_MONSTER_MOVE: // 보스 몬스터 이동
+			{
+				int monstercode = 0;
+				int monsternum = 0;
+				int attacknum = 0;
+				float length = 0;
+				Vector3 dir;
+				PartyRoom* partyroom = m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
+				Character* character = nullptr;
+
+				if (partyroom == nullptr)
+				{
+					break;
+				}
+				// unpack(코드,방향벡터)
+				User_Unpack_BossMonster_Move(_user, buf, monstercode, monsternum);
+				// 보스 몬스터이면 
+				if (partyroom->Is_BossMonster(monstercode))
+				{
+					MonsterInfo* monster = nullptr;
+					// 몬스터 검색
+					if (GetMonsterInfo(_user, monstercode, 0, monster))
+					{
+						// 공격 가능한가(컨트롤러의 보스몬스터가 공격중인지 확인한다)
+						if (partyroom->Is_BossMonster_Attackable() == false)
+						{
+							break;
+						}
+						// 제일 가까운 유저가 누구이고 거리가 얼마인가.
+						length = m_verification->Is_Nearest_Chracter(partyroom, monster, character);
+
+						//어떤 공격 가능한 거리인가(거리를 통해서 무슨 공격을 할건지 타입을 반환하자)
+						
+
+						// 공격 할것인가(타입에 따른 확률을 통해서 공격할것인지 판단하고 공격을 정하자)
+
+
+
+					}
+					// 몬스터 정보가 없으면 바로 탈출
+				}
+				break;
+			}
+			case PROTOCOL_REQ_BOSS_MONSTER_ATTACK: // 보스 몬스터가 유저를 공격했다
+			{
+				// 보스몬스터 공격 정보를 가져온다
+
+
 				break;
 			}
 			default:
@@ -2565,11 +2837,9 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				{
 					// 채널 이동 성공
 					User_Pack_UserCode(_user, rdata, rdatasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHANNEL, PROTOCOL_CHANNLE_USER_CHANGE);
-
-					User_Send_In_a_Particular_Channel(_user, sendprotocol, oldchannelnum, rdata, rdatasize);
+					othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHANNEL, PROTOCOL_CHANNLE_USER_CHANGE);
+					User_Send_ToOther(_user, othersendprotocol, SPECIFIC_CHANNEL, rdata, rdatasize, oldchannelnum, nullptr);
 				}
-				sendprotocol = 0;
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHANNEL, PROTOCOL_CHANNLE_CHANGE_RESULT);
 				_user->Quepack(sendprotocol, buf, datasize);
 				result = RT_INGAME_CHANNEL_CHANGE;
@@ -2597,9 +2867,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				if (User_IsParty(charactercode) == false)
 				{
 					User_Pack_Party_InviteToOther(_user, rdata, rdatasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_INVITE);
-
-					User_Send_Party_InviteToOther(_user, sendprotocol, rdata, rdatasize, charactercode);
+					othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_INVITE);
+					User_Send_ToOther(_user, othersendprotocol, SPECIFIC_USER, rdata, rdatasize, 0, charactercode);
 				}
 				else
 				{
@@ -2624,10 +2893,11 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					{
 						// 유저 추가 성공
 						User_Pack_Party_CharacterInfoToOther(_user, rdata, rdatasize);
-						sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_ADD_USER);
+						othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_ADD_USER);
 
-						User_Send_Party_ToOther(_user, sendprotocol, rdata, rdatasize);
-						_user->Quepack(sendprotocol, rdata, rdatasize);
+						User_Send_ToOther(_user, othersendprotocol, PARTY, rdata, rdatasize, 0, nullptr);
+						// 나포함 모든 유저들한테 보내는 send함수를 만들자
+						_user->Quepack(othersendprotocol, rdata, rdatasize);
 					}
 					else
 					{
@@ -2643,9 +2913,9 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					// 파티 초대 거절 패킹하고 보내준다.
 					User_Pack_Party_Result(_user, false, rdata, rdatasize);
 
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_INVITE_RESULT);
+					othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_INVITE_RESULT);
 
-					User_Send_Party_InviteToOther(_user, sendprotocol, rdata, rdatasize, charactercode);
+					User_Send_ToOther(_user, othersendprotocol, SPECIFIC_USER, rdata, rdatasize, 0, charactercode);
 
 					// 유저가 혼자라면 삭제한다.
 					if (User_PartyRoom_Alone(partyroomnum))
@@ -2667,13 +2937,13 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					{
 						// 강퇴당한 유저한테 알려주기
 						User_Pack_Party_Protocol(_user, buf, datasize);
-						sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_KICK);
-						User_Send_Party_InviteToOther(_user, sendprotocol, buf, datasize, charactercode);
+						othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_KICK);
+						User_Send_ToOther(_user, othersendprotocol, SPECIFIC_USER, rdata, rdatasize, 0, charactercode);
 
 						// 파티원들 한테는 나갔다라는 코드만 알려주기
 						User_Pack_Party_KickInfo(_user, rdata, rdatasize, charactercode);
-						sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_KICK_INFO);
-						User_Send_Party_ToOther(_user, sendprotocol, rdata, rdatasize);
+						othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_KICK_INFO);
+						User_Send_ToOther(_user, othersendprotocol, PARTY, rdata, rdatasize, 0, nullptr);
 
 						// 파티리더(현재유저)에게는 파티강퇴 실패여부를 알려준다. 그리고 강퇴당한 친구 코드를 넣어준다.
 						User_Pack_Party_Result_Code(_user, true, charactercode, buf, datasize);
@@ -2696,8 +2966,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				{
 					// 파티원들한테 파티방 터트렸다는 패킷을보냄
 					User_Pack_Party_Protocol(_user, rdata, rdatasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_REMOVE_RESULT);
-					User_Send_Party_ToOther(_user, sendprotocol, rdata, rdatasize);
+					othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_REMOVE_RESULT);
+					User_Send_ToOther(_user, othersendprotocol, PARTY, rdata, rdatasize, 0, nullptr);
 
 					// 파티없앤다
 					check = User_Remove_PartyRoom(_user);
@@ -2711,8 +2981,8 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				{
 					// 파티원들한테 파티원 한명 탈퇴했다고 알려준다.
 					User_Pack_UserCode(_user, rdata, rdatasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_LEAVE_INFO);
-					User_Send_Party_ToOther(_user, sendprotocol, rdata, rdatasize);
+					othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_LEAVE_INFO);
+					User_Send_ToOther(_user, othersendprotocol, PARTY, rdata, rdatasize, 0, nullptr);
 
 					// 파티에서 한명 지운다.
 					check = User_PartRoom_User_Leave(_user);
@@ -2721,7 +2991,6 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					User_Pack_Party_Result(_user, check, buf, datasize);
 					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_LEAVE_RESULT);
 					_user->Quepack(sendprotocol, buf, datasize);
-
 				}
 				result = RT_INGAME_PARTY_USER_LEAVE_RESULT;
 				break;
@@ -2735,20 +3004,21 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				{
 					// 파티장 위임 성공시 파티리더 바뀐정보를 파티원들한테 보낸다
 					User_Pack_PartyRoom_Leader_Delegate(_user, rdata, rdatasize, charactercode);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_LEADER_DELEGATE);
-					User_Send_Party_ToOther(_user, sendprotocol, rdata, rdatasize);
+					othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_LEADER_DELEGATE);
+					User_Send_ToOther(_user, othersendprotocol, PARTY, rdata, rdatasize, 0, nullptr);
+
 					// 현재 유저에게 파티장 위임 결과를 보낸다.(코드+성공실패)
 					User_Pack_Party_Result_Code(_user, true, charactercode, buf, datasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_LEADER_DELEGATE_RESULT);
-					_user->Quepack(sendprotocol, buf, datasize);
 				}
 				else
 				{
 					// 현재 유저에게 파티장 위임 결과를 보낸다.(코드+성공실패)
 					User_Pack_Party_Result_Code(_user, false, charactercode, buf, datasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_LEADER_DELEGATE_RESULT);
-					_user->Quepack(sendprotocol, buf, datasize);
 				}
+
+				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_LEADER_DELEGATE_RESULT);
+				_user->Quepack(sendprotocol, buf, datasize);
+
 				result = RT_INGAME_PARTY_LEADER_DELEGATE_RESULT;
 				break;
 			}
@@ -2764,13 +3034,13 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 			case PROTOCOL_REQ_DUNGEON_ENTER:// 던전 입장 요청
 			{
 				User_EnterInDun_Channel(_user);
-				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
-				User_Send_Party_Eneter_Dungeon(_user, sendprotocol);
+				// 각 파티원들이 채널에 속해있는 유저들한테 send한다
+				User_Send_ToOther(_user, 0, ENTER_DUNGEON, nullptr, 0, 0, nullptr);
 
 				sendprotocol = 0;
 				User_Pack_Party_Dungeon_SpawnData(_user, buf, datasize);
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_ENTER_RESULT);
-				User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
+				User_Send_ToOther(_user, sendprotocol, PARTY, buf, datasize, 0, nullptr);
 				_user->Quepack(sendprotocol, buf, datasize);
 
 				result = RT_INGAME_DUNGEON_ENTER_RESULT;
@@ -2789,17 +3059,18 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				User_Pack_Party_Dungeon_Stage_SpawnData(_user, buf, datasize);
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_IN_RESULT);
 
-				User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
+				User_Send_ToOther(_user, sendprotocol, PARTY, buf, datasize, 0, nullptr);
 				_user->Quepack(sendprotocol, buf, datasize);
 
-				// 임시로 사용중 스테이지 입장시 몬스터 정보 주는용
+				// 스테이지 입장시 몬스터 정보 셋팅
 				User_Dungeon_Stage_Rise(_user);
 
 				// 몬스터 스폰 정보를 보내주는 스레드 추가
 				HANDLE hThread = ThreadManager::GetInstance()->addThread(MonsterSpawnTimerProcess, 0, _user);
 				CloseHandle(hThread);
 
-			/*	sendprotocol = 0;
+				/*	
+				sendprotocol = 0;
 				User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_MONSTER_INFO);
 				User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
@@ -2840,14 +3111,16 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 			}
 			case PROTOCOL_MENU_REQ_LOGOUT: // 로그아웃 요청
 			{
+				// 유저 코드 패킹
 				User_Pack_UserCode(_user, buf, datasize);
-				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
-				User_Send_LeaveInfoToOther(_user, sendprotocol, buf, datasize);
+				// 다른 유저들한테 send
+				othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
+				User_Send_LeaveInfoToOther(_user, othersendprotocol, buf, datasize);
 				User_Leave_Channel(_user);
 
-				sendprotocol = 0;
 				sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MENU, PROTOCOL_MENU_RESULT_LOGOUT);
 				_user->Quepack(sendprotocol, buf, 0);
+				// 캐릭터 정보 저장
 				User_CurCharacter_Save(_user);
 
 				// 유저 정보 초기화
@@ -2936,7 +3209,7 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 			// 파티원들한테 파티방 터트렸다는 패킷을보냄
 			User_Pack_Party_Protocol(_user, buf, datasize);
 			sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_REMOVE_RESULT);
-			User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
+			User_Send_ToOther(_user, sendprotocol, PARTY, buf, datasize, 0, nullptr);
 
 			// 파티없앤다
 			User_Remove_PartyRoom(_user);
@@ -2947,7 +3220,7 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 			User_Pack_UserCode(_user, buf, datasize);
 			// 파티원, 채널에 접속한 유저들한테 send한다.
 			sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_LEAVE_INFO);
-			User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
+			User_Send_ToOther(_user, sendprotocol, PARTY, buf, datasize, 0, nullptr);
 			User_PartRoom_User_Leave(_user);
 		}
 
@@ -2964,11 +3237,12 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 		if (_user->isPartyLeader())
 		{
 			// 파티원들한테 파티방 터트렸다는 패킷을보냄
-			User_Pack_Party_Protocol(_user, buf, datasize);
 			sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_ROOM_REMOVE_RESULT);
-			protocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
-			User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
-			User_Send_In_The_Channel(_user, protocol, buf, datasize);
+			User_Send_ToOther(_user, sendprotocol, PARTY, buf, 0, 0, nullptr);
+			
+			User_Pack_UserCode(_user, buf, datasize);
+			protocol = _user->BitPackProtocol(protocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
+			User_Send_ToOther(_user, protocol, CHANNEL, buf, datasize, 0, nullptr);
 
 			// 파티없앤다
 			User_Remove_PartyRoom(_user);
@@ -2982,10 +3256,10 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 			User_Pack_UserCode(_user, buf, datasize);
 			// 파티원, 채널에 접속한 유저들한테 send한다.
 			sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_PARTY, PROTOCOL_PARTY_USER_LEAVE_INFO);
-			protocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
+			protocol = _user->BitPackProtocol(protocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
 
-			User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
-			User_Send_In_The_Channel(_user, protocol, buf, datasize);
+			User_Send_ToOther(_user, sendprotocol, PARTY, buf, datasize, 0, nullptr);
+			User_Send_ToOther(_user, protocol, CHANNEL, buf, datasize, 0, nullptr);
 			User_PartRoom_User_Leave(_user);
 
 			sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있고 던전에 들어와있지않고 채널에 들어와있는상태에 종료 : 파티원임 ");
@@ -3000,9 +3274,10 @@ bool InGameManager::User_InGame_Compulsion_Exit(User * _user)
 	} // 파티에 속해있지않고 채널에 들어와있으면
 	else if (_user->isParty() == false && _user->isChannel() == true)
 	{
+		// 나가는 유저의 정보를 패킹한다
 		User_Pack_UserCode(_user, buf, datasize);
 		sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_CHARACER, PROTOCOL_INGAME_OTHERPLAYER_LEAVE);
-		User_Send_In_The_Channel(_user, sendprotocol, buf, datasize);
+		User_Send_ToOther(_user, sendprotocol, CHANNEL, buf, datasize, 0, nullptr);
 		User_Leave_Channel(_user);
 
 		sprintf(msg, "User_InGame_Compulsion_Exit :: 파티에 속해있지않고 채널에 들어와있는상태에 종료");

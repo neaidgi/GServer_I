@@ -23,9 +23,7 @@ public:
 	int GetRandomNumber(int _maxnum)
 	{
 		int randomnum = 0;
-		srand((unsigned int)time(NULL));
 		randomnum = rand() % (_maxnum);
-
 		return randomnum;
 	}
 };

@@ -1,0 +1,480 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CharacterManager" Collapsed="true">
+    <Position X="1" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAADAOABgAAAADAACBAAAgCDAAAAABAcAAAAAAAAAA=</HashCode>
+      <FileName>CharacterManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameInitializer" Collapsed="true">
+    <Position X="28.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>GameInitializer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameManager" Collapsed="true">
+    <Position X="3.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAgAAAAAAACAACAAAAgABAAAAAAAQAAEAABQAAA=</HashCode>
+      <FileName>GameManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IocpModel" Collapsed="true">
+    <Position X="3.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAgBAgAAAAAAAAAAAAAAAAAAAACoAAAAAgEAAAABAA=</HashCode>
+      <FileName>IocpModel.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cNode&lt;Type&gt;" Collapsed="true">
+    <Position X="23.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEEAAAABEAAAAAAAAAAAAAQAEAAAABAAAAAAQAAAAAA=</HashCode>
+      <FileName>LinkedList.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cNode&lt;Type*&gt;" Collapsed="true">
+    <Position X="25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEEAAAABEAAAAAAAAAAAAAQAEAAAABAAAAAAQAAAAAA=</HashCode>
+      <FileName>LinkedList.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cLinkedList&lt;Type&gt;" Collapsed="true">
+    <Position X="21.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAEIAAAAAAAAiAACAgAAAAAFAAAAAAAAABoAAAAA=</HashCode>
+      <FileName>LinkedList.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LoginManager" Collapsed="true">
+    <Position X="16.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAABAAAAAAAAACAACAAAAgABAAAoAAARQAAABAAgEA=</HashCode>
+      <FileName>LoginManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LogManager" Collapsed="true">
+    <Position X="30.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABABBCAAAAAABACAACAAAAgABAAABAAAQAAAAAAgAAA=</HashCode>
+      <FileName>LogManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MainManager" Collapsed="true">
+    <Position X="21.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABACAAAAAAQCAACAAAAAAJAAAAAAEQAAABABAAAI=</HashCode>
+      <FileName>MainManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MsgManager" Collapsed="true">
+    <Position X="30.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAABAAAAAAAAACAACABAAgABAAAAAAEQAAAAAAAAAA=</HashCode>
+      <FileName>MsgManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Packet" Collapsed="true">
+    <Position X="10" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAUAAACAAAACQICABEBAwEDAIAAACIAAUAIgAgAgKHA=</HashCode>
+      <FileName>Packet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Socket" Collapsed="true">
+    <Position X="11.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAIABAAAAAAAAAggQACAAAAAAAAAAA=</HashCode>
+      <FileName>Socket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TCPClient" Collapsed="true">
+    <Position X="10" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIIAgAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>TCPClient.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TCPServer" Collapsed="true">
+    <Position X="12.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAEAAAAAAAAAgAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>TCPServer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ThreadManager" Collapsed="true">
+    <Position X="23.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEwBAAgAACAAACgACAAAAgABAAAAAAYUAAAABQAAAA=</HashCode>
+      <FileName>ThreadManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="User" Collapsed="true">
+    <Position X="10" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>VkjRBgAkyEEAgBCDgAAAKAVEgUCYhSYGAooIoCIA3AI=</HashCode>
+      <FileName>User.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UserManager" Collapsed="true">
+    <Position X="5.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIgBACAAACAAACAACQAAAgABAAAAQAAQAAAIBQAAAg=</HashCode>
+      <FileName>UserManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EncryptManager" Collapsed="true">
+    <Position X="21.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAACAACAEAAiCBAAAAIAAQAAAAAAAAgA=</HashCode>
+      <FileName>EnryptManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ErrorManager" Collapsed="true">
+    <Position X="23.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAACAACABAAgABAAAAAAAUAACAACAAAA=</HashCode>
+      <FileName>ErrorManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UserState" Collapsed="true">
+    <Position X="3.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAABAAAAAAAgAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>UserState.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LoginState" Collapsed="true">
+    <Position X="2.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAQAAAAgAAAAAAAEAAAAAAEAAAA=</HashCode>
+      <FileName>LoginState.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CloseState" Collapsed="true">
+    <Position X="5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAgAAAAACAAAAAgBAAAAAAAQAAAAIEAAAA=</HashCode>
+      <FileName>CloseState.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CharacterState" Collapsed="true">
+    <Position X="7.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAIAAAgAAAAAAAEAAAAAAEAAAA=</HashCode>
+      <FileName>CharacterState.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InGameState" Collapsed="true">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAgACAAAAAEAAAAAAEAAAA=</HashCode>
+      <FileName>InGameState.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DBManager" Collapsed="true">
+    <Position X="28.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAFBIABAAAIQCASSAokAAIBUAAAgACWMAAAEiBgAE=</HashCode>
+      <FileName>DBManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Collision" Collapsed="true">
+    <Position X="26.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAABAAAAAAAACAAA=</HashCode>
+      <FileName>Collision.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RandomNumberManager" Collapsed="true">
+    <Position X="26.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABABAAAAAQACAACAAAAgABAAAAAAAQAAAAACAAAA=</HashCode>
+      <FileName>RandomNumberManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Vector3" Collapsed="true">
+    <Position X="25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAIAAIACAAEAAAQAAAAAAAABAAABgAUAQAAA=</HashCode>
+      <FileName>Vector3.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameDataManager" Collapsed="true">
+    <Position X="26.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAEBAIAAAAAGACgIKQQAgkgBBDMBAAASAAAAAgAABA=</HashCode>
+      <FileName>GameDataManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpawnData" Collapsed="true">
+    <Position X="28.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABIgAIAIAAAAAAAAAAAAAAACAACA=</HashCode>
+      <FileName>SpawnData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DungeonSpawnData" Collapsed="true">
+    <Position X="30.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAgAAAAAgAAAIAAACAACASAAAAAAAAAEAABAAAUAAA=</HashCode>
+      <FileName>SpawnData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MonsterSpawnData" Collapsed="true">
+    <Position X="26.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIAAAAAAAAAABAAAACAAAAAAAAQAAAAAIAAQAAAAAAA=</HashCode>
+      <FileName>SpawnData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StageData" Collapsed="true">
+    <Position X="30.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAACAAAQAAAAAQQAAABQAAIAAAAAAAAA=</HashCode>
+      <FileName>StageData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StageInfo" Collapsed="true">
+    <Position X="21.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gwAAABAAACBAgCAAAAAAAAQQAAIAABAAQQAoAAQCAAA=</HashCode>
+      <FileName>StageInfo.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Character" Collapsed="true">
+    <Position X="26.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>yIAEDEOYACCoAYQhQJsgKCIEBEgCqwiYsCLjI5QEqB0=</HashCode>
+      <FileName>Character.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CharacterData" Collapsed="true">
+    <Position X="28.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAIAAgQEAgAAAACAEAAAAABAA=</HashCode>
+      <FileName>CharacterData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Monster" Collapsed="true">
+    <Position X="23.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIARIAADjCAChACCGGCC4AwIBAghgIIlB1AgMEAAA=</HashCode>
+      <FileName>Monster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MonsterControl" Collapsed="true">
+    <Position X="19" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAxCQUACwgBBOACgHgCAAgCCCEAIAAQIAkAAAAAA=</HashCode>
+      <FileName>MonsterControl.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MonsterData" Collapsed="true">
+    <Position X="25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hAAAAAAIBAEAAAAAAAAAAAiAQAAAAgAQEQAAQBAAAAA=</HashCode>
+      <FileName>MonsterData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ChannelList" Collapsed="true">
+    <Position X="23.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAIACAAAAAAQAIAAAAABAABgAEAAAAAAEQAAAgIA=</HashCode>
+      <FileName>ChannelSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ChannelSystem" Collapsed="true">
+    <Position X="25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAQAAAAAAAAAAIAAACABAAAAAEAAAAAIEAIAAAIA=</HashCode>
+      <FileName>ChannelSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CharacterVerification" Collapsed="true">
+    <Position X="30.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAEAAAAAQAAACAQAAQAAAABAAAAAACAAAAAAAE=</HashCode>
+      <FileName>CharacterVerification.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InGameManager" Collapsed="true">
+    <Position X="14.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>oJAShLgCjAB6xGSAACBQqEBgBj4MVO4VaACIRFAAUKI=</HashCode>
+      <FileName>InGameManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PartyRoom" Collapsed="true">
+    <Position X="23.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEiUAAiW8AASAWAngAAAgCAUEQEMAgIAgAMAIAA=</HashCode>
+      <FileName>PartySystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PartySystem" Collapsed="true">
+    <Position X="25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAAAAAABCAEAAACAAAoAAAAAAAAAgEAAAAYAABIAA=</HashCode>
+      <FileName>PartySystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FileSystem" Collapsed="true">
+    <Position X="25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAiAAAAAAAAAACIAAAAAAAAAAAAAAQIAAAAAAAA=</HashCode>
+      <FileName>FileSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetworkDataManager" Collapsed="true">
+    <Position X="21.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAABACAACAAAAgABAAAAAAIQAAAAAAAAAA=</HashCode>
+      <FileName>NetworkDataManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCriticalSection" Collapsed="true">
+    <Position X="21.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAEEgAAAAQAAAAAAAAA=</HashCode>
+      <FileName>CriticalSectionManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMultiThreadSync&lt;T&gt;" Collapsed="true">
+    <Position X="10" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Class Name="CMultiThreadSync&lt;T&gt;::CThreadSync" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CriticalSectionManager.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CriticalSectionManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UUIDManager" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAACoAACAACAAgAgABAAIAAAAQAAAAACACBA=</HashCode>
+      <FileName>UUIDManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MonsterTime" Collapsed="true">
+    <Position X="28.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAASAAAAIAAgBAACAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MonsterTime.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="WSAOVERLAPPEDEx" Collapsed="true">
+    <Position X="23.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAABAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="UserInfo" Collapsed="true">
+    <Position X="21.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAgA=</HashCode>
+      <FileName>LoginManager.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SendPacket" Collapsed="true">
+    <Position X="26.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAABABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Packet.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ThreadData" Collapsed="true">
+    <Position X="30.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>ThreadManager.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SlotData" Collapsed="true">
+    <Position X="28.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAIAEAAAAwAAAEAAAAAEA=</HashCode>
+      <FileName>User.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="AttackInfo" Collapsed="true">
+    <Position X="21.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAACBgEAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Character.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="MonsterAttackInfo" Collapsed="true">
+    <Position X="23.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAABgEAAAAAAAAAAAQAAAAAAAAAAAAAgAgAAAAA=</HashCode>
+      <FileName>Monster.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="MonsterInfo" Collapsed="true">
+    <Position X="25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABACYBAEBACAAACAAhAQAAIAAAgAAQAAAAIAAAAA=</HashCode>
+      <FileName>MonsterControl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="STATE" Collapsed="true">
+    <Position X="21.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMAACAAAA4AAQECBIAAgEAICUIQIEAQCIgAQAAIIsAA=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="RESULT" Collapsed="true">
+    <Position X="30.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAgBABEECEIDgDAASIAAoIgTBgASHBAAAAIAEBACI=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CHARACTER_JOB" Collapsed="true">
+    <Position X="21.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAACAAgAAAAgAAAACAA=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MONSTER_ORIGINCODE" Collapsed="true">
+    <Position X="28.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAACEAwAAAAAAAAIgAAAAAAAAAAAAACAAAAIAA=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MONSTER_ATTACK_CODE" Collapsed="true">
+    <Position X="26.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAMAAAAAAAEAAAEAAEAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="IOTYPE" Collapsed="true">
+    <Position X="25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAABAAAgAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DUNGEON_STAGE" Collapsed="true">
+    <Position X="23.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAABAAgAAAAAAAAAAAAAAHCAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Global.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>

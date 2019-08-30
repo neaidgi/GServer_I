@@ -37,6 +37,8 @@ void RandomNumberManager::DestroyInstance()
 
 bool RandomNumberManager::InitializeManager()
 {
+	// seed 값 초기화
+	srand((unsigned int)time(NULL));
 	return true;
 }
 

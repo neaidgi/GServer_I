@@ -83,9 +83,17 @@ public:
 	}
 
 	// 두 벡터 사이의 거리 구하기
-	float Distance(const Vector3& _a, const Vector3& _b)
+	float Distance(const Vector3& _a)
 	{
-		return sqrt(pow(_a.x - _b.x, 2) + pow(_a.y - _b.y, 2) + pow(_a.z - _b.z, 2));
+		return sqrt(pow(_a.x - x, 2) + pow(_a.y - y, 2) + pow(_a.z - z, 2));
+	}
+
+	// 단위벡터
+	Vector3 direction(Vector3 _a)
+	{
+		Vector3 dir = Vector3(_a.x - x, _a.y - y, _a.z - z);
+		dir.nomalize();
+		return dir;
 	}
 };
 

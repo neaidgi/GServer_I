@@ -6,6 +6,7 @@ MonsterInfo::MonsterInfo()
 	m_monster = nullptr;
 	m_monster_info_num = -1;
 	m_monster_activate = true;
+
 }
 
 MonsterInfo::~MonsterInfo()
@@ -23,8 +24,14 @@ MonsterInfo::~MonsterInfo()
 	}
 }
 
-// 몬스터 타이머 시간초기화
-void MonsterInfo::InitMonsterTime()
+// 몬스터 타이머 초기화
+void MonsterInfo::CreateMonsterTimer()
+{
+	m_monster_time = new MonsterTime();
+}
+
+// 몬스터 타이머 시간 초기화
+void MonsterInfo::ResetMonsterTime()
 {
 	m_monster_time->Start_Time();
 }
@@ -50,10 +57,19 @@ bool MonsterInfo::Is_End_MonsterTime()
 	}
 }
 
+// 이몬스터는 보스몬스터인가
+bool MonsterInfo::Is_BossMonster()
+{
+	return m_monster->GetMonster_Is_Boss();
+}
+
 // MonsterControl
 MonsterControl::MonsterControl()
 {
 	monster_types_num = 0;
+	m_boss_on_the_attack = false;
+	m_boss_attack_num = 0;
+	m_boss_attack_max_time = 0;
 }
 
 MonsterControl::~MonsterControl()
@@ -107,6 +123,7 @@ Monster * MonsterControl::MonsterSelect(int _monster_code)
 	const Monster* origin_monster = nullptr;
 	GameDataManager::GetInstance()->Monster_Origin_Data(_monster_code, origin_monster);
 
+	// 몬스터 기본정보
 	monster->SetMonster_AttackPoint(origin_monster->GetMonster_AttackPoint());
 	monster->SetMonster_Code(origin_monster->GetMonster_Code());
 	monster->SetMonster_DefensePoint(origin_monster->GetMonster_DefensePoint());
@@ -120,16 +137,13 @@ Monster * MonsterControl::MonsterSelect(int _monster_code)
 	monster->SetPosition(origin_monster->GetPosition());
 	monster->SetRotation(origin_monster->GetRotation());
 	monster->SetScale(origin_monster->GetScale());
-	monster->SetFirstAttack(origin_monster->GetFirstAttack());
-	monster->SetSecondAttack(origin_monster->GetSecondAttack());
-	return monster;
-}
 
-// 몬스터 타이머 추가
-MonsterTime* MonsterControl::AddMonsterTimer()
-{
-	MonsterTime* monstertime = new MonsterTime();
-	return monstertime;
+	// 공격정보
+	for (int i = 0; i < origin_monster->GetAttackInfoSize(); i++)
+	{
+		monster->AddAttackInfo(origin_monster->GetAttackInfo().at(i));
+	}
+	return monster;
 }
 
 // 몬스터 타이머 시간초기화
@@ -138,7 +152,7 @@ void MonsterControl::InitMonsterTime(int _code, int _num)
 	MonsterInfo* monsterinfo = nullptr;
 	GetMonsterinfo(_code, _num, monsterinfo);
 
-	monsterinfo->InitMonsterTime();
+	monsterinfo->ResetMonsterTime();
 }
 
 // 몬스터 시간이 지났는지
@@ -179,19 +193,27 @@ void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num)
 
 	monsterinfo->SetMonster(MonsterSelect(_monster_code));
 	monsterinfo->SetMonsterNum(_monster_num);
-	monsterinfo->SetMonsterTime(AddMonsterTimer());
-
-	monsterinfo->InitMonsterTime();
+	monsterinfo->CreateMonsterTimer();
+	monsterinfo->ResetMonsterTime();
 
 	m_monsterinfo_list.push_back(monsterinfo);
 }
 
-// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터회전값) - 기본정보에서 수정할때
+// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표) - 기본정보에서 수정할때
 void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos)
 {
 	MonsterInfo* monsterinfo = nullptr;
 	GetMonsterinfo(_monster_code, _monster_num, monsterinfo);
 	monsterinfo->GetMonster()->SetPosition(_pos);
+}
+
+// 몬스터 정보 저장(몬스터코드,몬스터번호,몬스터좌표,몬스터방향) - 기본정보에서 수정할때
+void MonsterControl::SetMonsterinfo(int _monster_code, int _monster_num, const Vector3 _pos, const Vector3 _dir)
+{
+	MonsterInfo* monsterinfo = nullptr;
+	GetMonsterinfo(_monster_code, _monster_num, monsterinfo);
+	monsterinfo->GetMonster()->SetPosition(_pos);
+	monsterinfo->GetMonster()->SetRotation(_dir);
 }
 
 // 몬스터 정보 삭제
@@ -256,6 +278,11 @@ void MonsterControl::Stage_SetMonster(int _code[], int _num[])
 // 스테이지 보스 몬스터 저장
 void MonsterControl::Stage_SetBossMonster(int _code, int _num)
 {
+	// 변수 초기화
+	m_boss_on_the_attack = false;
+	m_boss_attack_num = 0;
+	m_boss_attack_max_time = 0;
+	// 정보 저장
 	SetMonsterinfo(_code, _num);
 	AddMonsterCode_vector(_code);
 	monster_types_num = m_monstercode_vector.size();
@@ -276,6 +303,45 @@ int MonsterControl::GetMonsterNum(int _code)
 		}	
 	}
 	return count;
+}
+
+// 이몬스터는 보스몬스터인가
+bool MonsterControl::Is_BossMonster(int _code)
+{
+	MonsterInfo* monsterinfo = nullptr;
+	if (GetMonsterinfo(_code, 0, monsterinfo) == false)
+	{
+		return false;
+	}
+
+	return monsterinfo->Is_BossMonster();
+}
+
+// 보스 몬스터 타이머 시작
+void MonsterControl::StartBossMonsterTimer()
+{
+	m_boss_monster_timer.Start_Time();
+}
+
+// 보스 몬스터 타이머 종료
+bool MonsterControl::Is_End_BossMonsterTimer()
+{
+	double time = m_boss_monster_timer.End_Time();
+	if (time < m_boss_attack_max_time)
+	{
+		return false;
+	}
+	return true;
+}
+
+// 보스 몬스터 현재 공격했을때 공격 정보 저장(공격 번호,공격 시간)
+void MonsterControl::SetBossMonsterAttackInfo(int _attacknum, int _attacktime)
+{
+	m_boss_on_the_attack = true;
+	m_boss_attack_num = _attacknum;
+	m_boss_attack_max_time = _attacktime;
+	// 타이머 시작
+	StartBossMonsterTimer();
 }
 
 // 몬스터 체력 감소
