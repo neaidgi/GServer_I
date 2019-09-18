@@ -26,6 +26,8 @@ public:
 		randomnum = rand() % (_maxnum);
 		return randomnum;
 	}
+
+	// °¡ÁßÄ¡ ·£´ý
 };
 
 #endif

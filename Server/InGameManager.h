@@ -57,6 +57,8 @@ private:
 	void User_Pack_MonsterAttack_Result(User* _user, bool _result, int _monstercode, int _monsternum, int _damage, bool _isdie);
 	// 유저 피격결과 정보패킹(성공실패,데미지,죽으면 false)
 	void User_Pack_Under_Attack_Result(User* _user, bool _result, int _damage, bool _state);
+	// 몬스터 타겟 정보패킹(몬스터코드,몬스터번호,케릭터코드)
+	void User_Pack_Nearset_Character(User* _user, int _monstercode, int _monsternum, Character* _character);
 
 	// **UnPack 함수**
 	// 채널 이동 요청 언팩 (채널번호)
@@ -156,6 +158,8 @@ private:
 	bool Is_BossMonster(User* _user, int _code);
 	// 몬스터 정보 가져오기
 	bool GetMonsterInfo(User* _user, int _code, int _num, MonsterInfo*& _info);
+	// 가장 가까운 유저는 누구인가
+	bool GetNearestChracter(User* _user, int _monstercode, int _monsternum, float& _length, Character*& _character);
 
 	// 스레드 함수(몬스터 스폰)
 	static DWORD WINAPI MonsterSpawnTimerProcess(LPVOID _user);

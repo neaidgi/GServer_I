@@ -7,9 +7,10 @@
 #include "Character.h"
 #include "Monster.h"
 #include "StageData.h"
+#include "CriticalSectionManager.h"
 #include <mysql.h>
 
-class DBManager
+class DBManager : public CMultiThreadSync<DBManager>
 {
 private:
 	static DBManager* Instance;

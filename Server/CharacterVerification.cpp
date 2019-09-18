@@ -127,6 +127,11 @@ float CharacterVerification::Is_Nearest_Chracter(PartyRoom* _partyroom, MonsterI
 
 	while (partyroom->SearchPartyRoom(user))
 	{
+		if (user->GetCurCharacter_IsLive() == false)
+		{
+			continue;
+		}
+
 		curlength = monsterpos.Distance(user->GetCurCharacter()->GetPosition());
 		if (shortlength == 0 || curlength < shortlength)
 		{

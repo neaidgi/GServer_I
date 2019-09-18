@@ -79,6 +79,7 @@ bool DBManager::SelectDB(char * _dbname)
 // ID 중복체크
 bool DBManager::Login_CheckID(char * _id)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -132,6 +133,7 @@ bool DBManager::Login_CheckID(char * _id)
 // 회원가입 
 bool DBManager::Login_Req_Join(char * _id, char * _pw)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -170,6 +172,7 @@ bool DBManager::Login_Req_Join(char * _id, char * _pw)
 // 로그인
 bool DBManager::Login_Req_Login(char * _id, char * _pw)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -215,6 +218,7 @@ bool DBManager::Login_Req_Login(char * _id, char * _pw)
 // 회원탈퇴
 bool DBManager::Login_Req_Leave(char * _id)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -248,6 +252,7 @@ bool DBManager::Login_Req_Leave(char * _id)
 // 슬롯 개수 요청
 bool DBManager::Character_Req_CharacterSlotCount(const char * _id, int& _count)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -285,6 +290,7 @@ bool DBManager::Character_Req_CharacterSlotCount(const char * _id, int& _count)
 // 실제 생성한 유저 캐릭터 저장
 bool DBManager::Character_CharacterSlotAdd(const char* _id, char* _code, int  _jobcode, const char* _jobname, char* _nick, int _level, int _num)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -325,6 +331,7 @@ bool DBManager::Character_CharacterSlotAdd(const char* _id, char* _code, int  _j
 // 수정 >> 배열 받아서 모든 캐릭터 정보 output으로 전달 
 bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -474,6 +481,7 @@ bool DBManager::Character_Req_CharacterInfo(Character * _character_out[])
 // 캐릭터 슬롯 요청 (번호 받아서 해당 레코드 가져옴)
 bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _jobcode, char * _jobname, char * _nick, int& _level, char * _code)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -544,6 +552,7 @@ bool DBManager::Character_Req_CharacterSlot(const char* _id, int _index, int& _j
 // 몬스터 설계도 요청
 bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -613,6 +622,7 @@ bool DBManager::Character_Req_MonsterInfo(Monster * _monster_out[])
 // 캐릭터 공격(기본공격 및 스킬) 정보 요청
 bool DBManager::Character_Req_AttackInfo(Character * _character_out[])
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -697,6 +707,7 @@ bool DBManager::Character_Req_AttackInfo(Character * _character_out[])
 // 몬스터 공격(기본공격 및 스킬) 정보 요청
 bool DBManager::Monster_Req_AttackInfo(Monster * _monster_out[])
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -797,6 +808,7 @@ bool DBManager::Monster_Req_AttackInfo(Monster * _monster_out[])
 // 스테이지 정보 요청
 bool DBManager::Stage_Req_StageInfo(StageInfo * _stage_out[])
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -872,6 +884,7 @@ bool DBManager::Stage_Req_StageInfo(StageInfo * _stage_out[])
 // 스테이지 몬스터 정보 요청
 bool DBManager::Stage_Req_StageMonsterInfo(StageInfo * _stage_out[])
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -971,6 +984,7 @@ bool DBManager::Stage_Req_StageMonsterInfo(StageInfo * _stage_out[])
 // 캐릭터 삭제
 bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1010,6 +1024,7 @@ bool DBManager::Character_Req_CharacterDelete(const char * _id, int _index)
 // 캐릭터 닉네임 중복확인
 bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1063,6 +1078,7 @@ bool DBManager::Character_Req_CharacterCheckName(const char * _nick)
 // 
 bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* _nick)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1117,6 +1133,7 @@ bool DBManager::Character_Req_CharacterName(const char * _id, int _index, char* 
 // 캐릭터 위치 요청
 bool DBManager::Character_Req_CharacterPos(char* _code, Vector3& _pos)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1180,6 +1197,7 @@ bool DBManager::Character_Req_CharacterPos(char* _code, Vector3& _pos)
 // 캐릭터 위치 추가
 bool DBManager::Charactor_CharacterPosAdd(int _code)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1218,6 +1236,7 @@ bool DBManager::Charactor_CharacterPosAdd(int _code)
 // 삭제한 유저캐릭터 슬롯 뒤에 슬롯이 몇개있는지
 bool DBManager::Character_Req_SlotCount(const char * _id, int _slotnum, int& _index)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1274,6 +1293,7 @@ bool DBManager::Character_Req_SlotCount(const char * _id, int _slotnum, int& _in
 // 슬롯 당기기
 bool DBManager::Character_Slot_Pull(const char * _id, int _afterslot, int _beforeslot)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1312,6 +1332,7 @@ bool DBManager::Character_Slot_Pull(const char * _id, int _afterslot, int _befor
 
 bool DBManager::Character_Save(const char* _id, Character* _character)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1345,6 +1366,7 @@ bool DBManager::Character_Save(const char* _id, Character* _character)
 // 캐릭터 스폰위치 요청
 bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1398,6 +1420,7 @@ bool DBManager::Charactor_Req_CharacterSpawnPos(Vector3 * _pos, int& _count)
 // 던전 캐릭터 스폰위치 요청
 bool DBManager::Charactor_Req_DungeonSpawnPos(Vector3 * _pos, int & _count)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1451,6 +1474,7 @@ bool DBManager::Charactor_Req_DungeonSpawnPos(Vector3 * _pos, int & _count)
 // 던전 스테이지 스폰위치 요청
 bool DBManager::Charactor_Req_DungeonStageSpawnPos(Vector3 * _pos, int & _count)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 
@@ -1504,6 +1528,7 @@ bool DBManager::Charactor_Req_DungeonStageSpawnPos(Vector3 * _pos, int & _count)
 // 몬스터 스폰위치 요청
 bool DBManager::Charactor_Req_MonsterSpawnPos(Vector3 * _pos, int & _count)
 {
+	CThreadSync cs;
 	MYSQL_RES *sql_result;  // the results
 	MYSQL_ROW sql_row;      // the results row (line by line)
 

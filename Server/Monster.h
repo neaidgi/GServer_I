@@ -5,6 +5,28 @@
 
 using namespace std;
 
+// 현재 공격가능한 공격정보
+struct MonsterNowAttackInfo
+{
+	// 가중치
+	int weight;
+	// 공격 코드
+	int attack_code;
+
+	MonsterNowAttackInfo()
+	{
+		weight = 0;
+		attack_code = 0;
+	}
+
+	MonsterNowAttackInfo(int _weight, int _code)
+	{
+		weight = _weight;
+		attack_code = _code;
+	}
+};
+
+
 // DB에서 가져온 정보 저장할 몬스터 공격정보
 struct MonsterAttackInfo
 {
@@ -65,9 +87,6 @@ private:
 	// 공격 정보
 	vector<MonsterAttackInfo> m_monster_attack_vector;
 
-	MonsterAttackInfo first_attack;		// 1번공격
-	MonsterAttackInfo second_attack;	// 2번공격
-
 	// 몬스터 타입 추가예정(원거리냐 근접이냐,일반몹이냐 보스몹이냐)
 public:
 
@@ -87,27 +106,27 @@ public:
 	const Vector3 GetRotation() const { return m_rotation; }
 	const Vector3 GetScale() const { return m_scale; }
 	
+
 	const vector<MonsterAttackInfo> GetAttackInfo() const
 	{
 		return m_monster_attack_vector;
 	}
 
-	const MonsterAttackInfo GetAttackInfo(int _attack_code)
+	const bool GetAttackInfo(int _attack_code, MonsterAttackInfo& _info)
 	{
 		for (int i = 0; i < m_monster_attack_vector.size(); i++)
 		{
 			MonsterAttackInfo info = m_monster_attack_vector.at(i);
 			if (info.attack_code == _attack_code)
 			{
-				return info;
+				_info = info;
+				return true;
 			}
 		}
+		return false;
 	}
 
 	int GetAttackInfoSize() const { return m_monster_attack_vector.size(); }
-
-	MonsterAttackInfo GetFirstAttack() const { return first_attack; }
-	MonsterAttackInfo GetSecondAttack() const { return second_attack; }
 
 	// 몬스터의 크기를 반환(z는 높이라서 제외)
 	int GetMonsterRange() const
@@ -147,9 +166,6 @@ public:
 		m_monster_attack_vector.push_back(_attack_info);
 	}
 
-	void SetFirstAttack(const MonsterAttackInfo _first_attack) { first_attack = _first_attack; }
-	void SetSecondAttack(const MonsterAttackInfo _second_attack) { second_attack = _second_attack; }
-
 	Monster()
 	{
 		m_monster_name = nullptr;
@@ -187,13 +203,8 @@ public:
 		m_monster_defensepoint = rhs.m_monster_defensepoint;
 		m_monster_speed = rhs.m_monster_speed;
 		m_monster_is_boss = rhs.m_monster_is_boss;
-
-		first_attack = rhs.first_attack;
-		second_attack = rhs.second_attack;
 		return *this;
 	}
-
-
 };
 
 #endif

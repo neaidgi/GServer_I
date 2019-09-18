@@ -344,6 +344,32 @@ void MonsterControl::SetBossMonsterAttackInfo(int _attacknum, int _attacktime)
 	StartBossMonsterTimer();
 }
 
+// 보스 몬스터는 무슨 공격을 할것인가(몬스터코드,길이,[아웃풋]공격번호)
+bool MonsterControl::Is_BossMonster_What_Attack(MonsterInfo* _monster, float _length, int & _attacknum)
+{
+	int count = 0;
+	int attacknum = 0;
+
+	MonsterAttackInfo attackinfo;
+	MonsterNowAttackInfo temp;
+	std::vector<MonsterNowAttackInfo> random_attackinfo;
+	// 공격정보를 하나씩 가져온다
+	for(int i = 0; i < _monster->GetMonster()->GetAttackInfo().size(); i++)
+	{
+		attackinfo = _monster->GetMonster()->GetAttackInfo().at(i);
+
+		// 공격 가능한 거리라면
+		if (_length >= attackinfo.attack_range)
+		{
+			temp.attack_code = attackinfo.attack_code;
+			// 자료를 어디에 넣어두고 이중에서 랜덤을 돌릴까
+
+		}
+	}
+
+	return true;
+}
+
 // 몬스터 체력 감소
 bool MonsterControl::Monster_HP_Down(int _monster_code, int _monster_num, int _damage)
 {

@@ -4,6 +4,7 @@
 #include "GameDataManager.h"
 #include "User.h"
 #include "CriticalSectionManager.h"
+#include "RandomNumberManager.h"
 #include "MonsterTime.h"
 
 // 클라로 부터 받는 몬스터 정보(몇번째정보인지,몬스터객체,활성화되어있는지아닌지)
@@ -135,6 +136,9 @@ public:
 	int GetBossMonsterAttackNum() {	return m_boss_attack_num; }
 	// 보스 몬스터가 공격 가능한가
 	bool Is_BossMonster_Attackable() { return Is_End_BossMonsterTimer(); }
+	// 보스 몬스터는 무슨 공격을 할것인가(몬스터코드,길이,[아웃풋]공격번호)
+	bool Is_BossMonster_What_Attack(MonsterInfo* _monster, float _length, int& _attacknum);
+
 
 	// 보스몬스터 변수 초기화, 공격코드 getset,공격중인지, 공격 시간 getset
 };
