@@ -160,6 +160,8 @@ private:
 	bool GetMonsterInfo(User* _user, int _code, int _num, MonsterInfo*& _info);
 	// 가장 가까운 유저는 누구인가
 	bool GetNearestChracter(User* _user, int _monstercode, int _monsternum, float& _length, Character*& _character);
+	// 보스 몬스터 이동 정보 및 공격 판단
+	bool BossMonster_Req_Move(User* _user, char* _buf);
 
 	// 스레드 함수(몬스터 스폰)
 	static DWORD WINAPI MonsterSpawnTimerProcess(LPVOID _user);
