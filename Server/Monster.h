@@ -12,17 +12,21 @@ struct MonsterNowAttackInfo
 	int weight;
 	// 공격 코드
 	int attack_code;
+	// 공격 시간
+	float attack_time;
 
 	MonsterNowAttackInfo()
 	{
 		weight = 0;
 		attack_code = 0;
+		attack_time = 0;
 	}
 
-	MonsterNowAttackInfo(int _weight, int _code)
+	MonsterNowAttackInfo(int _weight, int _code, float _time)
 	{
 		weight = _weight;
 		attack_code = _code;
+		attack_time = _time;
 	}
 };
 
@@ -40,6 +44,8 @@ struct MonsterAttackInfo
 	int attack_range;
 	// 공격타입
 	int attack_type;
+	// 공격 시간
+	float attack_time;
 
 	MonsterAttackInfo()
 	{
@@ -47,21 +53,23 @@ struct MonsterAttackInfo
 		attack_ratio = 0;
 		attack_angle = 0;
 		attack_range = 0;
+		attack_time = 0;
 	}
 
-	MonsterAttackInfo(int _code, float _ratio, float _range, int _angle, int _type)
+	MonsterAttackInfo(int _code, float _ratio, float _range, int _angle, int _type, float _time)
 	{
 		attack_code = _code;
 		attack_ratio = _ratio;
 		attack_angle = _angle;
 		attack_range = _range;
 		attack_type = _type;
+		attack_time - _time;
 	}
 
 	// = 대입
 	MonsterAttackInfo operator=(const MonsterAttackInfo& _attackinfo)
 	{
-		return MonsterAttackInfo(attack_code = _attackinfo.attack_code, attack_ratio = _attackinfo.attack_ratio, attack_range = _attackinfo.attack_range, attack_angle = _attackinfo.attack_angle, attack_type = _attackinfo.attack_type);
+		return MonsterAttackInfo(attack_code = _attackinfo.attack_code, attack_ratio = _attackinfo.attack_ratio, attack_range = _attackinfo.attack_range, attack_angle = _attackinfo.attack_angle, attack_type = _attackinfo.attack_type, attack_time = _attackinfo.attack_time);
 	}
 };
 
@@ -106,12 +114,13 @@ public:
 	const Vector3 GetRotation() const { return m_rotation; }
 	const Vector3 GetScale() const { return m_scale; }
 	
-
+	// vector 자체를 반환
 	const vector<MonsterAttackInfo> GetAttackInfo() const
 	{
 		return m_monster_attack_vector;
 	}
 
+	// 공격 코드에 맞는 정보를 반환
 	const bool GetAttackInfo(int _attack_code, MonsterAttackInfo& _info)
 	{
 		for (int i = 0; i < m_monster_attack_vector.size(); i++)

@@ -52,13 +52,13 @@ private:
 	// 던전 퇴장시 채널정보 패킹. 채널번호
 
 	// 몬스터 이동정보 패킹(몬스터숫자,몬스터코드,몬스터번호,몬스터좌표)
-	void User_Pack_Monster_MoveInfo(User* _user, int _code, int _num, char* _data, int& _datasize);
+	void User_Pack_Monster_MoveInfo(User* _user, int _code, int _num, char*& _data, int& _datasize, UINT64& _sendprotocol);
 	// 몬스터 피격결과 정보 패킹(성공or실패,몬스터코드,몬스터번호,입힌피해량,죽었는지)
 	void User_Pack_MonsterAttack_Result(User* _user, bool _result, int _monstercode, int _monsternum, int _damage, bool _isdie);
 	// 유저 피격결과 정보패킹(성공실패,데미지,죽으면 false)
 	void User_Pack_Under_Attack_Result(User* _user, bool _result, int _damage, bool _state);
 	// 몬스터 타겟 정보패킹(몬스터코드,몬스터번호,케릭터코드)
-	void User_Pack_Nearset_Character(User* _user, int _monstercode, int _monsternum, Character* _character);
+	void User_Pack_Nearset_Character(User* _user, int _monstercode, int _monsternum, Character* _character, char*& _data, int& _datasize, UINT64& _sendprotocol);
 
 	// **UnPack 함수**
 	// 채널 이동 요청 언팩 (채널번호)
@@ -107,7 +107,7 @@ private:
 	// 공격정보 패킹(유저코드,공격정보)
 	void User_Pack_AttackNum_Info(User* _user, char* _data, int& _datasize, int _attacknum);
 	// 공격정보 패킹(몬스터코드,몬스터번호,공격번호)
-	void User_Pack_Monster_AttackNum_Info(User* _user, char* _data, int& _datasize,int _code, int _num, int _attacknum);
+	void User_Pack_Monster_Attack_Info(User* _user, char* _data, int& _datasize,int _code, int _num, int _attackcode);
 	// 몬스터 피격결과. 다른유저한테 정보패킹(데미지,죽었다는의미)
 	void User_Pack_MonsterAttackToOher_Result(User* _user, char* _data, int& _datasize, int _monstercode, int _monsternum, int _damage, bool _isdie);
 	// 유저 피격결과. 다른유저한테 정보패킹(캐릭터코드,데미지,죽었다는의미)
@@ -135,6 +135,9 @@ private:
 	void User_Send_Party_InviteToOther(User* _user, UINT64 _p, char* _data, int& _datasize, char* _code);
 	// 파티원에게 전송
 	void User_Send_Party_ToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
+	// 파티원에게 전송(해당 유저 포함)
+	void User_Send_Party(User* _user, UINT64 _p, char* _data, int& _datasize);
+
 
 	// 다른 유저 인게임에서 떠난 정보 전송
 	void User_Send_LeaveInfoToOther(User* _user, UINT64 _p, char* _data, int& _datasize);
@@ -145,7 +148,6 @@ private:
 
 
 	//  **몬스터 관련** //
-
 	// 몬스터 공격시 피격 판정
 	bool User_Under_Attack(User* _user, char* _buf);
 	// 스테이지 상승 및 몬스터정보 셋팅
@@ -160,6 +162,8 @@ private:
 	bool GetMonsterInfo(User* _user, int _code, int _num, MonsterInfo*& _info);
 	// 가장 가까운 유저는 누구인가
 	bool GetNearestChracter(User* _user, int _monstercode, int _monsternum, float& _length, Character*& _character);
+	// 몬스터 이동 정보 및 공격 판단
+	bool Monster_Req_Move(User* _user, char* _buf);
 	// 보스 몬스터 이동 정보 및 공격 판단
 	bool BossMonster_Req_Move(User* _user, char* _buf);
 

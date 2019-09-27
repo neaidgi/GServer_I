@@ -345,11 +345,11 @@ void MonsterControl::SetBossMonsterAttackInfo(int _attacknum, int _attacktime)
 }
 
 // 보스 몬스터는 무슨 공격을 할것인가(몬스터코드,길이,[아웃풋]공격번호)
-bool MonsterControl::Is_BossMonster_What_Attack(MonsterInfo* _monster, float _length, int & _attacknum)
+bool MonsterControl::Is_BossMonster_What_Attack(MonsterInfo* _monster, float _length, int & _attackcode)
 {
 	int count = 0;
 	int attacknum = 0;
-
+	int weight = 0;
 	// 
 	MonsterAttackInfo attackinfo;
 	MonsterNowAttackInfo temp;
@@ -364,20 +364,43 @@ bool MonsterControl::Is_BossMonster_What_Attack(MonsterInfo* _monster, float _le
 		// 공격 가능한 거리라면
 		if (_length >= attackinfo.attack_range)
 		{
+			switch (attackinfo.attack_type)
+			{
+			case ATTACK_TYPE_MELEE: // 근접공격
+				weight = 70;
+				break;
+			case ATTACK_TYPE_LONG_RANGE: // 원거리 공격
+				weight = 10;
+				break;
+			case ATTACK_TYPE_EXPLOSION: // 광역 공격(범위있음)
+				weight = 30;
+				break;
+			case ATTACK_TYPE_FIELD: // 광역 공격(필드전체)
+				weight = 10;
+				break;
+			default: // 공격정보가 없으면
+				return false;
+			}
 			// 공격 코드
 			temp.attack_code = attackinfo.attack_code;
 			// 랜덤 가중치(공격 타입에 따른 확률)
-			switch (attackinfo.attack_type)
-			{
-			default:
-				break;
-			}
+			temp.weight = weight;
+			// 공격 시간
+			temp.attack_time = attackinfo.attack_time;
+
 			// 자료를 어디에 넣어두고 이중에서 랜덤을 돌릴까
 			random_attackinfo.push_back(temp);
 		}
 	}
 
-	return true;
+	if (random_attackinfo.size() > 0)
+	{
+		temp = RandomNumberManager::GetInstance()->GetRandom_MonsterAttackInfo(random_attackinfo);
+		SetBossMonsterAttackInfo(temp.attack_code, temp.attack_time);
+		_attackcode = temp.attack_code;
+		return true;
+	}
+	return false;
 }
 
 // 몬스터 체력 감소

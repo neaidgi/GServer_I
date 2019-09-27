@@ -365,6 +365,11 @@ void PartyRoom::SetBossMonsterAttackInfo(int _attacknum, int _attacktime)
 	m_monster_control->SetBossMonsterAttackInfo(_attacknum, _attacktime);
 }
 
+bool PartyRoom::Is_BossMonster_What_Attack(MonsterInfo * _monster, float _length, int & _attackcode)
+{
+	return m_monster_control->Is_BossMonster_What_Attack(_monster, _length, _attackcode);
+}
+
 // 몬스터 정보 요청
 bool PartyRoom::GetMonsterinfo(int _monster_code, int _monster_num, MonsterInfo *& _monsterinfo)
 {

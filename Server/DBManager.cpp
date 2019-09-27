@@ -756,6 +756,7 @@ bool DBManager::Monster_Req_AttackInfo(Monster * _monster_out[])
 			attackinfo.attack_range = atoi(sql_row[3]);
 			attackinfo.attack_ratio = atoi(sql_row[4]);
 			attackinfo.attack_type = atoi(sql_row[5]);
+			attackinfo.attack_time = atof(sql_row[6]);
 
 			switch (code)
 			{

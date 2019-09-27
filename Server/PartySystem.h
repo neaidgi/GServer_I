@@ -118,6 +118,8 @@ public:
 	int GetBossMonsterAttackNum() { return m_monster_control->GetBossMonsterAttackNum(); }
 	// 보스 몬스터가 공격 가능한가
 	bool Is_BossMonster_Attackable() { return m_monster_control->Is_BossMonster_Attackable(); }
+	// 보스 몬스터는 무슨 공격을 할것인가(몬스터코드,길이,[아웃풋]공격번호)
+	bool Is_BossMonster_What_Attack(MonsterInfo* _monster, float _length, int& _attackcode);
 };
 
 // 파티시스템

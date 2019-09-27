@@ -137,7 +137,7 @@ public:
 	// 보스 몬스터가 공격 가능한가
 	bool Is_BossMonster_Attackable() { return Is_End_BossMonsterTimer(); }
 	// 보스 몬스터는 무슨 공격을 할것인가(몬스터코드,길이,[아웃풋]공격번호)
-	bool Is_BossMonster_What_Attack(MonsterInfo* _monster, float _length, int& _attacknum);
+	bool Is_BossMonster_What_Attack(MonsterInfo* _monster, float _length, int& _attackcode);
 
 
 	// 보스몬스터 변수 초기화, 공격코드 getset,공격중인지, 공격 시간 getset

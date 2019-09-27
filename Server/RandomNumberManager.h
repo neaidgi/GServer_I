@@ -2,6 +2,7 @@
 #define _RANDOMNUMBER_MANAGER_H_
 
 #include "Global.h"
+#include "GameDataManager.h"
 
 class RandomNumberManager
 {
@@ -28,6 +29,30 @@ public:
 	}
 
 	// °¡ÁßÄ¡ ·£´ý
+	MonsterNowAttackInfo GetRandom_MonsterAttackInfo(std::vector<MonsterNowAttackInfo> attackinfo)
+	{
+		int num = 0;
+		int maxnum = 0;
+		int weight = 0;
+		int index = 0;
+
+		for (int i = 0; i < attackinfo.size(); i++)
+		{
+			maxnum += attackinfo.at(i).weight;
+		}
+		num = GetRandomNumber(maxnum);
+
+		for (int i = 0; i < attackinfo.size(); i++)
+		{
+			weight += attackinfo.at(i).weight;
+			if (num < weight)
+			{
+				index = i;
+				break;
+			}
+		}
+		return attackinfo.at(index);
+	}
 };
 
 #endif

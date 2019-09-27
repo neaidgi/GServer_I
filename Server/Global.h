@@ -63,7 +63,8 @@
 #define PROTOCOL_INGAME_CHARACER 0x100							// [중간틀 - 인게임] 캐릭터관련
 
 // 인게임 세부틀(PROTOCOL_INGAME_CHARACER) - [서버] 캐릭터 관련
-#define PROTOCOL_SERVER_INGAME_CHARACTER_COMPART 0x7FF0000000	// [세부틀 - 캐릭터관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_CHARACTER_COMPARE_END 0x4000000000	// [세부틀 - 캐릭터관련] [프로토콜 연산용] - 끝
+#define PROTOCOL_SERVER_INGAME_CHARACTER_COMPARE_START 0x10000000	// [세부틀 - 캐릭터관련] [프로토콜 연산용] - 시작
 
 #define PROTOCOL_INGAME_OTHERPLAYER_ATTACK_SUCCESS 0x4000000000	// [세부틀 - 캐릭터관련] [서버->클라] 다른 유저 공격성공했다
 #define PROTOCOL_INGAME_ATTACK_RESULT 0x2000000000				// [세부틀 - 캐릭터관련] [서버->클라] 유저 공격 결과
@@ -80,12 +81,13 @@
 #define PROTOCOL_INGAME_OTHERPLAYERLIST_INFO 0x10000000			// [세부틀 - 캐릭터관련] [서버->클라] 유저들 정보
 
 // 인게임 세부틀(PROTOCOL_INGMAE_MONSTER) - [서버] 몬스터 관련
-#define PROTOCOL_SERVER_INGAME_MONSTER_COMPART 0xFF0000000		// [세부틀 - 몬스터관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_MONSTER_COMPARE_END 0x800000000		// [세부틀 - 몬스터관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_MONSTER_COMPARE_START 0x10000000		// [세부틀 - 몬스터관련] [프로토콜 연산용]
 
-#define PROTOCOL_INGAME_MONSTER_SET_TARGET	0x800000000			// [세부틀 - 몬스터관련] [서버->클라] 몬스터 대상지정
-#define PROTOCOL_INGAME_BOSS_MONSTER_ATTACK_RESULT 0x400000000	// [세부틀 - 몬스터관련] [서버->클라] 보스몬스터 공격 결과
-#define PROTOCOL_INGAME_BOSS_MONSTER_ATTACK_INFO 0x200000000	// [세부틀 - 몬스터관련] [서버->클라] 보스몬스터 공격 정보
-#define PROTOCOL_INGAME_BOSS_MONSTER_MOVE 0x100000000			// [세부틀 - 몬스터관련] [서버->클라] 보스몬스터 이동정보
+#define PROTOCOL_INGAME_BOSS_MONSTER_ATTACK_RESULT 0x800000000	// [세부틀 - 몬스터관련] [서버->클라] 보스몬스터 공격 결과
+#define PROTOCOL_INGAME_BOSS_MONSTER_ATTACK_INFO 0x400000000	// [세부틀 - 몬스터관련] [서버->클라] 보스몬스터 공격 정보
+#define PROTOCOL_INGAME_BOSS_MONSTER_MOVE 0x200000000			// [세부틀 - 몬스터관련] [서버->클라] 보스몬스터 이동정보
+#define PROTOCOL_INGAME_MONSTER_SET_TARGET	0x100000000			// [세부틀 - 몬스터관련] [서버->클라] 몬스터 대상지정
 
 #define PROTOCOL_INGAME_MONSTER_OTHER_ATTACK_RESULT 0x80000000	// [세부틀 - 몬스터관련] [서버->클라] 몬스터 다른유저 공격결과
 #define PROTOCOL_INGAME_MONSTER_ATTACK_RESULT 0x40000000		// [세부틀 - 몬스터관련] [서버->클라] 몬스터 유저 공격결과
@@ -93,14 +95,16 @@
 #define PROTOCOL_MONSTER_MOVE_RESULT 0x10000000					// [세부틀 - 몬스터관련] [서버->클라] 몬스터 이동정보
 
 // 인게임 세부틀(PROTOCOL_INGAME_CHANNEL) - [서버] 채널 관련
-#define PROTOCOL_SERVER_INGAME_CHANNEL_COMPART 0x7000000		// [세부틀 - 채널관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_CHANNEL_COMPARE_END 0x4000000		// [세부틀 - 채널관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_CHANNEL_COMPARE_START 0x1000000		// [세부틀 - 채널관련] [프로토콜 연산용]
 
 #define PROTOCOL_CHANNLE_USER_CHANGE 0x4000000					// [세부틀 - 채널관련] [서버->클라] 채널 이동한 유저 정보
 #define PROTOCOL_CHANNLE_CHANGE_RESULT 0x2000000				// [세부틀 - 채널관련] [서버->클라] 채널 변경 결과
 #define PROTOCOL_CHANNLE_INFO 0x1000000							// [세부틀 - 채널관련] [서버->클라] 채널 정보
 
 // 인게임 세부틀(PROTOCOL_INGAME_PARTY) - [서버] 파티 관련
-#define PROTOCOL_SERVER_INGAME_PARTY_COMPART 0x1FFF0000000		// [세부틀 - 파티관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_PARTY_COMPARE_END 0x10000000000		// [세부틀 - 파티관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_PARTY_COMPARE_START 0x10000000		// [세부틀 - 파티관련] [프로토콜 연산용]
 
 #define PROTOCOL_PARTY_USER_INFO 0x10000000000					// [세부틀 - 파티관련] [서버->클라] 파티원정보
 
@@ -120,21 +124,24 @@
 #define PROTOCOL_PARTY_ROOM_INVITE 0x10000000					// [세부틀 - 파티관련] [서버->클라] 파티 초대(특정유저에게)
 
 // 인게임 세부틀(PROTOCOL_INGAME_DUNGEON) - [서버] 던전 관련
-#define PROTOCOL_SERVER_INGAME_DUNGEON_COMPART 0x70000000		// [세부틀 - 던전관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_DUNGEON_COMPARE_END 0x40000000		// [세부틀 - 던전관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_DUNGEON_COMPARE_START 0x10000000		// [세부틀 - 던전관련] [프로토콜 연산용]
 
 #define PROTOCOL_DUNGEON_STAGE_IN_RESULT 0x40000000				// [세부틀 - 던전관련] [서버->클라] 스테이지에 입장결과
 #define PROTOCOL_DUNGEON_LEAVE_RESULT 0x20000000				// [세부틀 - 던전관련] [서버->클라] 던전 퇴장 결과
 #define PROTOCOL_DUNGEON_ENTER_RESULT 0x10000000				// [세부틀 - 던전관련] [서버->클라] 던전 입장 결과
 
 // 인게임 세부틀(PROTOCOL_INGAME_ANIMATION) - [서버] 애니메이션 관련
-#define PROTOCOL_SERVER_INGAME_ANIMATION_COMPART 0x7000000		// [세부틀 - 애니메이션관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_ANIMATION_COMPARE_END 0x4000000		// [세부틀 - 애니메이션관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_ANIMATION_COMPARE_START 0x1000000		// [세부틀 - 애니메이션관련] [프로토콜 연산용]
 
 #define PROTOCOL_MONSTER_ANIMATION_ATTACK 0x4000000				// [세부틀 - 애니메이션관련] [서버->클라] 몬스터 애니메이션(공격)
 #define PROTOCOL_MONSTER_ANIMATION 0x2000000					// [세부틀 - 애니메이션관련] [서버->클라] 몬스터 애니메이션
 #define PROTOCOL_CHARACER_ANIMATION 0x1000000					// [세부틀 - 애니메이션관련] [서버->클라] 캐릭터 애니메이션
 
 // 인게임 세부틀(PROTOCOL_INGMAE_MENU) - [서버] 매뉴 관련
-#define PROTOCOL_SERVER_INGAME_MENU_COMPART 0x7000000				// [세부틀 - 몬스터관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_MENU_COMPARE_END 0x4000000				// [세부틀 - 몬스터관련] [프로토콜 연산용]
+#define PROTOCOL_SERVER_INGAME_MENU_COMPARE_START 0x1000000				// [세부틀 - 몬스터관련] [프로토콜 연산용]
 
 #define PROTOCOL_OTHERPLAYER_LEAVE 0x4000000					// [세부틀 - 몬스터관련] [서버->클라] 다른 유저가 채널에서 나갔을때
 #define PROTOCOL_MENU_RESULT_LOGOUT 0x2000000					// [세부틀 - 몬스터관련] [서버->클라] 로그아웃 결과
@@ -391,7 +398,8 @@ enum SEND_TYPE
 {
 	DEFAULT = 0,
 	CHANNEL,				// 채널유저
-	PARTY,					// 파티원
+	PARTY,					// 파티원(해당 포함)
+	PARTY_TO_OTHER,			// 파티원(해당유저 빼고)
 	SPECIFIC_CHANNEL,		// 특정채널
 	SPECIFIC_USER,			// 특정 유저
 	CHANNEL_EXCLUDE_PARTY,	// 채널유저(파티원제외)
@@ -449,17 +457,11 @@ enum SEND_TYPE
 // -- 공격 타입 -- //
 // 근접 공격
 #define ATTACK_TYPE_MELEE 1
-// 근접 공격(넉백)
-#define ATTACK_TYPE_KNOCK_BACK_MELLE 2
-// 근접 공격(뒤로공격)
-#define ATTACK_TYPE_BACK_MELEE 3
 // 원거리 공격
-#define ATTACK_TYPE_LONG_RANGE 4
+#define ATTACK_TYPE_LONG_RANGE 2
 // 광역 공격(범위있음)
-#define ATTACK_TYPE_EXPLOSION 5
+#define ATTACK_TYPE_EXPLOSION 3
 // 광역 공격(필드전체)
-#define ATTACK_TYPE_FIELD 6
-// 소환 공격
-#define ATTACK_TYPE_SUMMON_UP 7
+#define ATTACK_TYPE_FIELD 4
 
 #endif
