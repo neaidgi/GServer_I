@@ -7,7 +7,7 @@
 #include "Character.h"
 #include "Monster.h"
 #include "StageData.h"
-#include "CriticalSectionManager.h"
+#include "CriticalSection.h"
 #include <mysql.h>
 
 class DBManager : public CMultiThreadSync<DBManager>

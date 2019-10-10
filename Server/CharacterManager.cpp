@@ -403,6 +403,7 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 	UINT64 protocol = 0;
 	UINT64 sendprotocol = 0;
 	UINT64 compartrprotocol = 0;
+	UINT64 detailprotocol = 0;
 	UINT64 tempprotocol = 0;
 	char buf[BUFSIZE];
 	memset(buf, 0, sizeof(buf));
@@ -420,7 +421,7 @@ RESULT CharacterManager::Character_Management_Process(User * _user)
 
 	RESULT result = RT_DEFAULT;
 
-	compartrprotocol = PROTOCOL_CLIENT_CHARACTER_MENU_COMPART;
+	compartrprotocol = PROTOCOL_CLIENT_CHARACTER_MENU_COMPARE;
 
 	tempprotocol = 0;
 

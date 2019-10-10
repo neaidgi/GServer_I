@@ -1,5 +1,5 @@
-#ifndef _CRITICALSECTION_MANAGER_H_
-#define _CRITICALSECTION_MANAGER_H_
+#ifndef _CRITICALSECTION_H_
+#define _CRITICALSECTION_H_
 
 #include "Global.h"
 #include "MsgManager.h"

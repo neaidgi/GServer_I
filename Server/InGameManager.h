@@ -8,7 +8,7 @@
 #include "UserManager.h"
 #include "DBManager.h"
 #include "CharacterVerification.h"
-#include "CriticalSectionManager.h"
+#include "CriticalSection.h"
 #include "ChannelSystem.h"
 #include "GameDataManager.h"
 #include "ThreadManager.h"

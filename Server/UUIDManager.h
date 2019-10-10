@@ -2,7 +2,7 @@
 #define UUID_MANAGER_H
 
 #include "User.h"
-#include "CriticalSectionManager.h"
+#include "CriticalSection.h"
 #include <list>
 
 class UUIDManager : public CMultiThreadSync<UUIDManager>

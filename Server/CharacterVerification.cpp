@@ -5,7 +5,7 @@ void CharacterVerification::Initialize(float _CommuTime, float _Move_MarginofErr
 {
 	CommuTime = _CommuTime;
 	Move_MarginofError = _Move_MarginofError;
-	m_collision = new Collision();
+	m_collision = new CollisionSystem();
 }
 
 // 이동 검증 함수

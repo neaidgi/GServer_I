@@ -3,7 +3,7 @@
 
 #include "Global.h"
 
-class Collision
+class CollisionSystem
 {
 public:
 

@@ -12,7 +12,7 @@ class CharacterVerification
 private:
 	float Move_MarginofError;		// 이동 오차 범위
 	float CommuTime;				// 통신 시간
-	Collision* m_collision;			// 충돌 처리담당
+	CollisionSystem* m_collision;			// 충돌 처리담당
 public:
 	CharacterVerification(){}
 	~CharacterVerification(){}

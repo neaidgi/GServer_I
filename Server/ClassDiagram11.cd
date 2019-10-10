@@ -192,7 +192,7 @@
   <Class Name="RandomNumberManager" Collapsed="true">
     <Position X="26.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAABABAAAAAQACAACAAAAgABAAAAAAAQAAAAACAAAA=</HashCode>
+      <HashCode>AQAABABAAAAAQACAACAAAAgABAAAAAAAQAAAAACAAAA=</HashCode>
       <FileName>RandomNumberManager.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -262,14 +262,14 @@
   <Class Name="Monster" Collapsed="true">
     <Position X="23.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAIARIAADjCAChACCGGCC4AwIBAghgIIlB1AgMEAAA=</HashCode>
+      <HashCode>AAAIARAAADDCAChACCGGCC4AwIBAghgIIlA1AgMAAAA=</HashCode>
       <FileName>Monster.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MonsterControl" Collapsed="true">
     <Position X="19" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEAAAxCQUACwgBBOACgHgCAAgCCCEAIAAQIAkAAAAAA=</HashCode>
+      <HashCode>AEAAAxCQUACwgBBOACgHgCAAgCCCEAoAAQIAkAAAAAA=</HashCode>
       <FileName>MonsterControl.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -304,14 +304,14 @@
   <Class Name="InGameManager" Collapsed="true">
     <Position X="14.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>oJAShLgCjAB6xGSAACBQqEBgBj4MVO4VaACIRFAAUKI=</HashCode>
+      <HashCode>opAShLgCjAB6xGaAICBQqEJgBj4MVO4XaACIRFAAWKI=</HashCode>
       <FileName>InGameManager.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PartyRoom" Collapsed="true">
     <Position X="23.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAEiUAAiW8AASAWAngAAAgCAUEQEMAgIAgAMAIAA=</HashCode>
+      <HashCode>AAAAAEiUAAiW8AASAWAngAAAgCAUEQkMAgIAgAMAIAA=</HashCode>
       <FileName>PartySystem.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -340,21 +340,21 @@
     <Position X="21.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAEEgAAAAQAAAAAAAAA=</HashCode>
-      <FileName>CriticalSectionManager.h</FileName>
+      <FileName>CriticalSection.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CMultiThreadSync&lt;T&gt;" Collapsed="true">
+  <Class Name="CMultiThreadSync&lt;T&gt;">
     <Position X="10" Y="0.5" Width="1.5" />
     <NestedTypes>
       <Class Name="CMultiThreadSync&lt;T&gt;::CThreadSync" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>CriticalSectionManager.h</NewMemberFileName>
+          <NewMemberFileName>CriticalSection.h</NewMemberFileName>
         </TypeIdentifier>
       </Class>
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
-      <FileName>CriticalSectionManager.h</FileName>
+      <FileName>CriticalSection.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="UUIDManager" Collapsed="true">
@@ -416,7 +416,7 @@
   <Struct Name="MonsterAttackInfo" Collapsed="true">
     <Position X="23.25" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAAAAAABgEAAAAAAAAAAAQAAAAAAAAAAAAAgAgAAAAA=</HashCode>
+      <HashCode>IAAAAAABgEAAAAAAAAAAAQAAAAAAAAAAAAAgAkAAAAA=</HashCode>
       <FileName>Monster.h</FileName>
     </TypeIdentifier>
   </Struct>
@@ -458,7 +458,7 @@
   <Enum Name="MONSTER_ATTACK_CODE" Collapsed="true">
     <Position X="26.75" Y="9" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAAAAAMAAAAAAAEAAAEAAEAAAAAAAAAAAQAAAAA=</HashCode>
+      <HashCode>AABCAAAAAAMAAAAAAAEAAAEAAEAAAAABAAAAAUAQAAA=</HashCode>
       <FileName>Global.h</FileName>
     </TypeIdentifier>
   </Enum>

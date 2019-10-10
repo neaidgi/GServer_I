@@ -2,7 +2,7 @@
 #define SOCKET_H
 
 #include "Global.h"
-#include "CriticalSectionManager.h"
+#include "CriticalSection.h"
 
 class Socket : public CMultiThreadSync<Socket>
 {

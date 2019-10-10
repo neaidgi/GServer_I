@@ -1,6 +1,6 @@
 #include "Packet.h"
 #include "MsgManager.h"
-#include "CriticalSectionManager.h"
+#include "CriticalSection.h"
 
 // »ý¼ºÀÚ
 Packet::Packet()

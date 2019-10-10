@@ -3,7 +3,7 @@
 
 #include "GameDataManager.h"
 #include "User.h"
-#include "CriticalSectionManager.h"
+#include "CriticalSection.h"
 #include "RandomNumberManager.h"
 #include "MonsterTime.h"
 

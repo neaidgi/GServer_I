@@ -2,7 +2,7 @@
 #define USER_MANAGER_H
 
 #include "User.h"
-#include "CriticalSectionManager.h"
+#include "CriticalSection.h"
 
 class UserManager : public CMultiThreadSync<UserManager>
 {
