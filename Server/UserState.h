@@ -4,7 +4,10 @@
 #include "Global.h"
 
 class User;
-
+/*
+	UserState
+	- 유저의 상태에 맞는 작업을 하는 상태패턴의 가장 부모단계의 클래스
+*/
 class UserState
 {
 private:

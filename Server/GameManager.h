@@ -4,6 +4,17 @@
 #include "Global.h"
 #include "IocpModel.h"
 
+/*
+	[GameManager]
+	
+	CreateInstance() - 매니저 생성
+	GetInstance() - 매니저 접근지정자
+	DestroyInstance() - 매니저 삭제
+	
+	InitializeManager() - 초기화
+	EndManager() - 마무리
+*/
+
 class GameManager : public IocpModel 
 {
 private:
