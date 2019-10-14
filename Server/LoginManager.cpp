@@ -229,7 +229,10 @@ RESULT LoginManager::TitleProcess(User * _user)
 			{
 				result = RT_LOGINFAIL;
 			}
-			result = RT_LOGIN;
+			else
+			{
+				result = RT_LOGIN;
+			}
 			break;
 		case PROTOCOL_REQ_JOIN: // 가입 요청
 			sprintf(msg, "%s : 가입 요청", _user->getID());
