@@ -4,7 +4,18 @@
 #include "User.h"
 #include "CriticalSection.h"
 #include <list>
+/*
+	[UUIDManager]
+	
+	CreateInstance() - 매니저 생성
+	GetInstance() - 매니저 접근지정자
+	DestroyInstance() - 매니저 삭제
+	
+	InitializeManager() - 초기화
+	EndManager() - 마무리
+*/
 
+// 동기화를 사용하기 위해 CMultiThreadSync 상속받음
 class UUIDManager : public CMultiThreadSync<UUIDManager>
 {
 private:

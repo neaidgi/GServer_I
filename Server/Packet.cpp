@@ -219,31 +219,34 @@ bool Packet::TakeOutSendPacket()
 	}
 }
 
-// Data 패킹 Send 큐사용. BitProtocol 추가
+// Data 패킹 Send 큐사용.
 void Packet::Quepack(UINT64 p, void * data, int size)
 {
+	// 동기화
 	CThreadSync cs;
 
 	SendPacket* temp = new SendPacket();
 
 	char* ptr = temp->sendBuf;
 
+	// 전체 길이 = 프로토콜 + 데이터 길이
 	temp->sendSize = sizeof(UINT64) + size;
 
+	// 전체 길이
 	memcpy(ptr, &temp->sendSize, sizeof(int));
 	ptr += sizeof(int);
-
+	// 프로토콜 
 	memcpy(ptr, &p, sizeof(UINT64));
 	ptr += sizeof(UINT64);
-
+	// 데이터
 	memcpy(ptr, data, size);
 
-	temp->sendSize += sizeof(size);		// 보낼 사이즈
+	// 보낼 사이즈 = 패킷 크기 + 전체 길이
+	temp->sendSize += sizeof(size);		
 
 	// 암호화
 	EncryptManager::GetInstance()->encoding(temp->sendBuf + sizeof(int), temp->sendSize);
 	// 큐에 넣기
-
 	sendQueue.push(temp);
 }
 

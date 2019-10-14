@@ -34,6 +34,7 @@ void DBManager::DestroyInstance()
 	}
 }
 
+// DB에 접속
 bool DBManager::InitializeDB()
 {
 	mysql = mysql_init(NULL);
@@ -58,7 +59,7 @@ void DBManager::EndManager()
 	mysql_close(mysql);
 }
 
-//DB 선택
+// DB 선택
 bool DBManager::SelectDB(char * _dbname)
 {
 	if (mysql_select_db(mysql, _dbname)) // 데이터베이스 선택
@@ -215,6 +216,7 @@ bool DBManager::Login_Req_Login(char * _id, char * _pw)
 		return false;
 	}
 }
+
 // 회원탈퇴
 bool DBManager::Login_Req_Leave(char * _id)
 {
