@@ -3386,7 +3386,6 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				switch (tempprotocol)
 				{
 				case PROTOCOL_REQ_DUNGEON_ENTER:// 던전 입장 요청
-				{
 					User_EnterInDun_Channel(_user);
 					// 각 파티원들이 채널에 속해있는 유저들한테 send한다
 					User_Send_ToOther(_user, 0, ENTER_DUNGEON, nullptr, 0, 0, nullptr);
@@ -3399,16 +3398,17 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 
 					result = RT_INGAME_DUNGEON_ENTER_RESULT;
 					break;
-				}
 				case PROTOCOL_REQ_DUNGEON_LEAVE: // 던전 나가기 요청
-				{
 					User_LeaveInDun_Channel(_user);
 
 					result = RT_INGAME_DUNGEON_LEAVE_RESULT;
 					break;
-				}
-				case PROTOCOL_DUNGEON_STAGE_IN: // 스테이지 입장 요청
-				{
+				case PROTOCOL_DUNGEON_STAGE_READY_INFO: // 스테이지 입장 준비(파티원)
+
+					break;
+				case PROTOCOL_DUNGEON_STAGE_IN: // 스테이지 입장 요청(방장)
+					// 파티원들이 준비되어있는지 확인
+
 					// 스테이지 입장시 캐릭터 좌표 전송
 					User_Pack_Party_Dungeon_Stage_SpawnData(_user, buf, datasize);
 					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_IN_RESULT);
@@ -3423,16 +3423,10 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					HANDLE hThread = ThreadManager::GetInstance()->addThread(MonsterSpawnTimerProcess, 0, _user);
 					CloseHandle(hThread);
 
-					/*
-					sendprotocol = 0;
-					User_Pack_Dungeon_Monster_SpawnInfo(_user, buf, datasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGMAE_MONSTER, PROTOCOL_MONSTER_INFO);
-					User_Send_Party_ToOther(_user, sendprotocol, buf, datasize);
-					_user->Quepack(sendprotocol, buf, datasize);*/
-
 					result = RT_INGAME_DUNGEON_STAGE_IN_RESULT;
 					break;
-				}
+				case PROTOCOL_DUNGEON_CLEAR_CHOICE: // 스테이지 클리어 후 메뉴 선택(다음스테이지 준비, 파티탈퇴(마을로가기))
+					break;
 				default:
 					break;
 				}
@@ -3441,7 +3435,6 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 				{
 					break;
 				}
-
 				// protocol이랑 비교할 대상 쉬프트 연산
 				detailprotocol = detailprotocol << 1;
 			}

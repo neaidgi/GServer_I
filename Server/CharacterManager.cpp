@@ -99,17 +99,10 @@ bool CharacterManager::NickOverlapCheck(User * _user, char * _buf)
 	_buf += sizeof(int);
 
 	memcpy(nick, _buf, len);
-
+	CThreadSync cs;
 	check = DBManager::GetInstance()->Character_Req_CharacterCheckName(nick);
 
-	if (check)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return check;
 }
 
 // 캐릭터 생성

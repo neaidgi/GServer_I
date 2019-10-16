@@ -19,7 +19,6 @@ UserManager::~UserManager()
 
 void UserManager::CreateInstance()
 {
-	CThreadSync cs;
 	if (Instance != nullptr)
 	{
 		delete Instance;
@@ -77,6 +76,7 @@ void UserManager::removeUser(User* _user)
 
 User* UserManager::getUser(SOCKET _sock)
 {
+	CThreadSync cs;
 	User* target = nullptr;
 
 	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
@@ -95,6 +95,7 @@ User* UserManager::getUser(SOCKET _sock)
 
 User* UserManager::getUser(char* _id)
 {
+	CThreadSync cs;
 	User* target = nullptr;
 
 	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
@@ -113,6 +114,7 @@ User* UserManager::getUser(char* _id)
 
 User * UserManager::getUserCode(char * _code)
 {
+	CThreadSync cs;
 	User* target = nullptr;
 
 	char msg[BUFSIZE];
@@ -140,6 +142,7 @@ User * UserManager::getUserCode(char * _code)
 
 User * UserManager::getUserCode(const char * _code)
 {
+	CThreadSync cs;
 	User* target = nullptr;
 
 	char msg[BUFSIZE];
@@ -166,6 +169,7 @@ User * UserManager::getUserCode(const char * _code)
 
 bool UserManager::isUser(User * _user)
 {
+	CThreadSync cs;
 	User* target = nullptr;
 
 	for (std::list<User*>::iterator i = ConnectUserlist.begin(); i != ConnectUserlist.end(); ++i)
@@ -176,7 +180,6 @@ bool UserManager::isUser(User * _user)
 		{
 			return true;
 		}
-
 	}
 	return false;
 }
@@ -189,6 +192,7 @@ void UserManager::startSearch()
 
 bool UserManager::searchData(User *& _user)
 {
+	CThreadSync cs;
 	// 유저 하나씩 꺼내서 save에 넣음
 	if (save != ConnectUserlist.end())
 	{

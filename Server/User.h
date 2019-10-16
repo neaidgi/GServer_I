@@ -58,11 +58,16 @@ private:
 	SlotData* characterslot[SLOTMAXCOUNT];
 	Character* current_character;
 	int slotcount;
+	// 파티리더인가
 	bool is_partyleader;
 	bool is_slotload;
 	bool is_callback;
+	// 던전안에 있나
 	bool is_dungeon;
+	// 캐릭터가 살아있나
 	bool is_Characterlive;
+	// 레디되어있나
+	bool is_gamereday;
 public:
 	User(SOCKET _sock, SOCKADDR_IN _addr);
 	~User();
