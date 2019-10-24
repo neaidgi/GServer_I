@@ -67,7 +67,7 @@ private:
 	// 캐릭터가 살아있나
 	bool is_Characterlive;
 	// 레디되어있나
-	bool is_stagereday;
+	bool is_gamereday;
 public:
 	User(SOCKET _sock, SOCKADDR_IN _addr);
 	~User();
@@ -125,9 +125,6 @@ public:
 	void SetLeaveDungeon() { is_dungeon = false; }
 	bool isDungeon() { return is_dungeon; }
 	// void ResetDungeonInfo() { is_dungeon = false; }
-	bool GetiStageReady() { return is_stagereday; }
-	void SetStageReady() { is_stagereday = true; }
-	void SetNotStageReady() { is_stagereday = false; }
 
 	// -- 채널 관련 -- //
 	const int GetChannelNum() { return channelnum; }
