@@ -20,6 +20,7 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr) : Packet(_sock, _addr)
 	is_callback = true;
 	is_dungeon = false;
 	is_Characterlive = true;
+	is_stagereday = false;
 }
 
 User::~User()
@@ -90,6 +91,7 @@ void User::ResetUserInfo()
 	SetLeaveDungeon();
 	ResetCurCharacter();
 	ResetPartyInfo();
+	SetNotStageReady();
 }
 
 // 슬롯 캐릭터 1개 삭제 // 몇 번째인지 _index 받아서 삭제 후 땡기기
