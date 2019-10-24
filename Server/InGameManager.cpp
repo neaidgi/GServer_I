@@ -137,7 +137,7 @@ bool InGameManager::MangerInitialize()
 	// 인증, 채널시스템,파티시스템 초기화
 	m_verification = new CharacterVerification();
 	channelsystem = new ChannelSystem();
-	m_partysystem = new PartySystem();
+	m_partysystem = new PartyManager();
 
 	m_verification->Initialize(0, 0);
 	channelsystem->InitializeChannel();
@@ -1958,12 +1958,14 @@ bool InGameManager::User_Remove_PartyRoom(char * _code)
 // 파티에 유저 추가(참여하는유저코드,파티방번호)
 bool InGameManager::User_Party_AddUser(User* _user, int _partyroomnum)
 {
+	CThreadSync cs;
 	return m_partysystem->Partyroom_add_User(_user, _partyroomnum);
 }
 
 // 해당 유저 파티방 인원수
 int InGameManager::User_PartyRoom_UserNum(User * _user)
 {
+	CThreadSync cs;
 	return m_partysystem->GetPartyRoomUserNum(_user->GetPartyNum());
 }
 
@@ -1998,6 +2000,7 @@ bool InGameManager::User_PartRoom_User_Leave(User * _user)
 // 파티장 위임
 bool InGameManager::User_PartyRoom_Leader_Delegate(User* _user, char* _code)
 {
+	CThreadSync cs;
 	return m_partysystem->Party_Leader_Delegate(_user, _code);
 }
 
@@ -2081,11 +2084,41 @@ void InGameManager::User_LeaveInDun_Channel(User * _user)
 	}
 }
 
+// 스테이지 입장 준비 (파티원)
+void InGameManager::User_Stage_Ready(User * _user)
+{
+	char buf[BUFSIZE];
+	memset(buf, 0, sizeof(buf));
+	char* ptr = buf;
+	int datasize = 0;
+	UINT64 othersendprotocol = 0;
+	bool ready;
+
+	if (_user->GetiStageReady())
+	{
+		ready = false;
+	}
+	else
+	{
+		ready = true;
+	}
+
+	// 스테이지 준비상태 패킹
+	User_Pack_Party_InviteResultToOther(_user, buf, datasize, ready);
+
+	// 파티원들에게 send(해당유저 포함)
+	othersendprotocol = _user->BitPackProtocol(othersendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_READY_RESULT);
+
+	if (_user->isParty())
+	{
+		User_Send_ToOther(_user, othersendprotocol, PARTY, buf, datasize, 0, nullptr);
+	}
+}
+
 PartyRoom * InGameManager::GetPartyRoomSearch(User * _user)
 {
 	return m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
 }
-
 
 // 스테이지 상승 및 몬스터정보 셋팅
 void InGameManager::User_Dungeon_Stage_Rise(User * _user)
@@ -3407,6 +3440,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 
 					break;
 				case PROTOCOL_DUNGEON_STAGE_IN: // 스테이지 입장 요청(방장)
+				{
 					// 파티원들이 준비되어있는지 확인
 
 					// 스테이지 입장시 캐릭터 좌표 전송
@@ -3425,8 +3459,12 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 
 					result = RT_INGAME_DUNGEON_STAGE_IN_RESULT;
 					break;
+				}
+					
 				case PROTOCOL_DUNGEON_CLEAR_CHOICE: // 스테이지 클리어 후 메뉴 선택(다음스테이지 준비, 파티탈퇴(마을로가기))
+				{
 					break;
+				}
 				default:
 					break;
 				}

@@ -36,7 +36,7 @@ private:
 
 	CharacterVerification* m_verification;
 	ChannelSystem*	channelsystem;
-	PartySystem* m_partysystem;
+	PartyManager* m_partysystem;
 
 	// **Pack 함수** //
 	// 다른 유저 위치정보 요청. (유저숫자,코드,직업코드,닉네임,위치,회전)
@@ -88,7 +88,7 @@ private:
 	void User_Unpack_Attack_Info(User* _user, char* _buf, int& _attacknum);
 	// 몬스터가 무슨공격했는지 언팩(공격정보)
 	void User_Unpack_Monster_Successfully_Attack_The_User(User* _user, char* _buf, int& _monstercode, int& _monsternum, int& _attacknum, Vector3& _dir);
-
+	
 
 	// ** 다른유저에게 줄 정보 Pack ** //
 	// 이동이나 회전 정보 패킹 (코드,백터3)
@@ -223,7 +223,8 @@ public:
 	void User_EnterInDun_Channel(User* _user);
 	// 던전 채널 나가기
 	void User_LeaveInDun_Channel(User* _user);
-
+	// 스테이지 입장 준비 (파티원)
+	void User_Stage_Ready(User* _user);
 	// 파티방 전달
 	PartyRoom* GetPartyRoomSearch(User* _user);
 	

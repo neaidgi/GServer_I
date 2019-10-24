@@ -123,14 +123,23 @@ public:
 };
 
 // 파티시스템
-class PartySystem
+class PartyManager
 {
 private:
+	static PartyManager* Instance;
+
 	std::list<PartyRoom*> m_partyroom_list;
 	std::list<PartyRoom*>::iterator save;
 public:
-	PartySystem();
-	~PartySystem();
+	PartyManager();
+	~PartyManager();
+
+	static void CreateInstance();
+	static PartyManager* GetInstance();
+	static void DestroyInstance();
+
+	bool InitializeManager();
+	void EndManager();
 
 	void InitializePartySystem();
 	// 검색 초기화
@@ -154,6 +163,9 @@ public:
 
 	// 파티장 위임
 	bool Party_Leader_Delegate(User* _user, char* _code);
+	
+	// 파티원들이 스테이지에 입장할 준비가 되었는가
+	bool Party_Is_Members_Ready(User* _user);
 
 	// 해당 유저 파티 인원수
 	int GetPartyRoomUserNum(int _partyroomnum);

@@ -184,7 +184,7 @@ bool ChannelList::DungeonEnter(PartyRoom* _partyroom)
 			return false;
 		}
 	}
-
+	// 던전입장 설정
 	_partyroom->DungeonEnter_PartyRoom();
 
 	InDunChannel.push_back(_partyroom);
