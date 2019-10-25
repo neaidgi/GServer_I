@@ -653,3 +653,46 @@ PartyRoom * PartyManager::GetPartyRoomSearch(int _partyroomnum)
 		}
 	}
 }
+
+/* send 담당 */
+// 파티원들에게 send
+void PartyManager::Party_Send_ToMembers(User * _user, UINT64 _p, char * _data, int & _datasize)
+{
+	User* user = nullptr;
+	PartyRoom* partyroom = nullptr;
+
+	if (_user->isParty())
+	{
+		// 파티방 객체 가져오기
+		partyroom = GetPartyRoomSearch(_user->GetPartyNum());
+
+		// 검색 초기화
+		partyroom->StartSearchPartyRoom();
+		// 검색 시작
+		while (partyroom->SearchPartyRoom(user))
+		{
+			if (user->isIngame() && user->getSocket() != _user->getSocket())
+			{
+				user->Quepack(_p, _data, _datasize);
+				if (user->isSending() == false)
+				{
+					if (user->TakeOutSendPacket())
+					{
+						user->IOCP_SendMsg();
+					}
+				}
+				// 메세지
+				//char msg[BUFSIZE];
+				//memset(msg, 0, sizeof(msg));
+				//sprintf(msg, "Party_Send_ToMembers :: 보내는 소켓: [%d] 받는 소켓: [%d] 아이디: [%s] 프로토콜: [%d]\n 데이터사이즈: [%d] SendQueue Size: [%d]", _user->getSocket(), user->getSocket(), user->getID(),
+				//	_p, _datasize, user->GetSendQueueSize());
+				//MsgManager::GetInstance()->DisplayMsg("INFO", msg);
+			}
+		}
+	}
+}
+
+// 특정 파티원에게 send
+void PartyManager::Party_Send_ToOther(User * _user, UINT64 _p, char * _data, int & _datasize)
+{
+}

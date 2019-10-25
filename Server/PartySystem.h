@@ -171,6 +171,12 @@ public:
 	int GetPartyRoomUserNum(int _partyroomnum);
 	// 파티방 검색(파티번호)
 	PartyRoom* GetPartyRoomSearch(int _partyroomnum);
+	
+	/* send 담당 */
+	// 파티원들에게 send
+	void Party_Send_ToMembers(User* _user, UINT64 _p, char * _data, int & _datasize);
+	// 특정 파티원에게 send
+	void Party_Send_ToOther(User * _user, UINT64 _p, char * _data, int & _datasize);
 };
 
 

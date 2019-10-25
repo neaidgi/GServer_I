@@ -110,7 +110,7 @@ private:
 	// 던전 입장시 스폰위치. (파티원수,유저코드,좌표)
 	void User_Pack_Party_Dungeon_SpawnData(User* _user,char* _data,int& _datasize);
 	// 던전 스테이지 입장시 스폰위치. (파티원수,유저코드,좌표)
-	void User_Pack_Party_Dungeon_Stage_SpawnData(User* _user, char* _data, int& _datasize);
+	void User_Pack_Party_Dungeon_Stage_SpawnData(User* _user, UINT64 _p, char* _data, int& _datasize);
 	// 던전 스테이지 입장시 몬스터 정보.
 	void User_Pack_Dungeon_Monster_SpawnInfo(User* _user, char* _data, int& _datasize);
 	// 던전 스테이지 입장시 몬스터 정보.(몬스터코드,몬스터숫자,스폰될좌표)
@@ -225,6 +225,7 @@ public:
 	void User_LeaveInDun_Channel(User* _user);
 	// 스테이지 입장 준비 (파티원)
 	void User_Stage_Ready(User* _user);
+
 	// 파티방 전달
 	PartyRoom* GetPartyRoomSearch(User* _user);
 	

@@ -323,7 +323,8 @@ enum RESULT {
 	RT_INGAME_DUNGEON_MONSTER_INFO_RESULT,	// 던전 몬스터 정보 결과
 	RT_INGAME_DUNGEON_STAGE_IN_RESULT,		// 던전 스테이지 입장 결과
 	RT_INGMAE_MONSTER_MOVE_RESULT,			// 몬스터 이동 결과
-	RT_INGAME_MONSTER_ATTACK				// 몬스터 공격
+	RT_INGAME_MONSTER_ATTACK,				// 몬스터 공격
+	RT_INGMAE_DUNGEON_STAGE_READY			// 던전 스테이지 준비
 };
 
 // 직업코드

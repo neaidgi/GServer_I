@@ -79,6 +79,10 @@ bool InGameState::Read(User * _user)
 		{
 			state = INGAME_INIT_RECV;
 		}
+		else if (result == RT_INGMAE_DUNGEON_STAGE_READY)
+		{
+			state = INGAME_INIT_RECV;
+		}
 		break;
 	default:
 		break;

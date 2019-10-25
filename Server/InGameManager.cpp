@@ -883,11 +883,13 @@ void InGameManager::User_Pack_Party_Dungeon_SpawnData(User * _user, char * _data
 }
 
 // 던전 스테이지 입장시 스폰위치. (파티원수,유저코드,좌표)
-void InGameManager::User_Pack_Party_Dungeon_Stage_SpawnData(User * _user, char * _data, int & _datasize)
+void InGameManager::User_Pack_Party_Dungeon_Stage_SpawnData(User * _user, UINT64 _p, char * _data, int & _datasize)
 {
-	char* ptr = _data;
-	int size = 0;
+	char* rptr = _data;
+	char* ptr = rptr + sizeof(int);
+	int size = _datasize;
 
+	UINT64 protocol = _p;
 	int usercount = 0;
 	int codesize = 0;
 
@@ -938,6 +940,8 @@ void InGameManager::User_Pack_Party_Dungeon_Stage_SpawnData(User * _user, char *
 
 		count++;
 	}
+
+	_p = _user->BitPackProtocol(protocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_IN_RESULT);
 
 	_datasize = size;
 }
@@ -2115,6 +2119,7 @@ void InGameManager::User_Stage_Ready(User * _user)
 	}
 }
 
+// 파티방 전달
 PartyRoom * InGameManager::GetPartyRoomSearch(User * _user)
 {
 	return m_partysystem->GetPartyRoomSearch(_user->GetPartyNum());
@@ -3433,30 +3438,40 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					break;
 				case PROTOCOL_REQ_DUNGEON_LEAVE: // 던전 나가기 요청
 					User_LeaveInDun_Channel(_user);
-
 					result = RT_INGAME_DUNGEON_LEAVE_RESULT;
 					break;
 				case PROTOCOL_DUNGEON_STAGE_READY_INFO: // 스테이지 입장 준비(파티원)
-
+					User_Stage_Ready(_user);
+					result = RT_INGMAE_DUNGEON_STAGE_READY;
 					break;
 				case PROTOCOL_DUNGEON_STAGE_IN: // 스테이지 입장 요청(방장)
 				{
 					// 파티원들이 준비되어있는지 확인
+					if (m_partysystem->Party_Is_Members_Ready(_user))
+					{
+						// 스테이지 입장시 캐릭터 좌표 전송
+						User_Pack_Party_Dungeon_Stage_SpawnData(_user, buf, datasize);
+						sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_IN_RESULT);
 
-					// 스테이지 입장시 캐릭터 좌표 전송
-					User_Pack_Party_Dungeon_Stage_SpawnData(_user, buf, datasize);
-					sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_IN_RESULT);
+						User_Send_ToOther(_user, sendprotocol, PARTY_TO_OTHER, buf, datasize, 0, nullptr);
+						_user->Quepack(sendprotocol, buf, datasize);
 
-					User_Send_ToOther(_user, sendprotocol, PARTY_TO_OTHER, buf, datasize, 0, nullptr);
-					_user->Quepack(sendprotocol, buf, datasize);
+						// 스테이지 입장시 몬스터 정보 셋팅
+						User_Dungeon_Stage_Rise(_user);
 
-					// 스테이지 입장시 몬스터 정보 셋팅
-					User_Dungeon_Stage_Rise(_user);
+						// 몬스터 스폰 정보를 보내주는 스레드 추가
+						HANDLE hThread = ThreadManager::GetInstance()->addThread(MonsterSpawnTimerProcess, 0, _user);
+						CloseHandle(hThread);
+					}
+					else
+					{
+						// 실패시 결과
+						// 유저 추가 실패(초대 받는사람한테 실패라고 보낸다)
+						User_Pack_Party_InviteResultToOther(_user, buf, datasize, false);
 
-					// 몬스터 스폰 정보를 보내주는 스레드 추가
-					HANDLE hThread = ThreadManager::GetInstance()->addThread(MonsterSpawnTimerProcess, 0, _user);
-					CloseHandle(hThread);
-
+						sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_IN_RESULT);
+						_user->Quepack(sendprotocol, buf, datasize);
+					}
 					result = RT_INGAME_DUNGEON_STAGE_IN_RESULT;
 					break;
 				}
