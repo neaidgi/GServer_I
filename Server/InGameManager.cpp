@@ -3450,7 +3450,7 @@ RESULT InGameManager::InGame_Init_Packet(User * _user)
 					if (m_partysystem->Party_Is_Members_Ready(_user))
 					{
 						// 스테이지 입장시 캐릭터 좌표 전송
-						User_Pack_Party_Dungeon_Stage_SpawnData(_user, buf, datasize);
+						//User_Pack_Party_Dungeon_Stage_SpawnData(_user, buf, datasize);
 						sendprotocol = _user->BitPackProtocol(sendprotocol, PROTOCOL_INGAME, PROTOCOL_INGAME_DUNGEON, PROTOCOL_DUNGEON_STAGE_IN_RESULT);
 
 						User_Send_ToOther(_user, sendprotocol, PARTY_TO_OTHER, buf, datasize, 0, nullptr);

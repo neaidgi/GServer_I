@@ -165,6 +165,7 @@
     <ClCompile Include="MsgManager.cpp" />
     <ClCompile Include="NetworkDataManager.cpp" />
     <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="PartyRoom.cpp" />
     <ClCompile Include="PartySystem.cpp" />
     <ClCompile Include="RandomNumberManager.cpp" />
     <ClCompile Include="Socket.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="MsgManager.h" />
     <ClInclude Include="NetworkDataManager.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="PartyRoom.h" />
     <ClInclude Include="PartySystem.h" />
     <ClInclude Include="RandomNumberManager.h" />
     <ClInclude Include="Socket.h" />
