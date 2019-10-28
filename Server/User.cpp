@@ -20,7 +20,7 @@ User::User(SOCKET _sock, SOCKADDR_IN _addr) : Packet(_sock, _addr)
 	is_callback = true;
 	is_dungeon = false;
 	is_Characterlive = true;
-	is_stagereday = false;
+	is_gamereday = false;
 }
 
 User::~User()

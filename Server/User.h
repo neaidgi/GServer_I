@@ -125,9 +125,9 @@ public:
 	void SetLeaveDungeon() { is_dungeon = false; }
 	bool isDungeon() { return is_dungeon; }
 	// void ResetDungeonInfo() { is_dungeon = false; }
-	bool GetiStageReady() { return is_stagereday; }
-	void SetStageReady() { is_stagereday = true; }
-	void SetNotStageReady() { is_stagereday = false; }
+	bool GetiStageReady() { return is_gamereday; }
+	void SetStageReady() { is_gamereday = true; }
+	void SetNotStageReady() { is_gamereday = false; }
 
 	// -- 채널 관련 -- //
 	const int GetChannelNum() { return channelnum; }
